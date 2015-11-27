@@ -1,0 +1,38 @@
+<resources>
+    <string name="app_name">Vertretungsplan</string>
+
+    <string name="hello_world">Hello world!</string>
+    <string name="action_settings">Settings</string>
+
+    <string name="drawer_open">Open</string>
+    <string name="drawer_closed">Close</string>
+
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="fixedHour">Stunde:</string>
+    <string name="notLoadedText">---</string>
+    <string name="fixedSubject">Fach:</string>
+    <string name="fixedRoom">Raum:</string>
+    <string name="fixedInfo">Info:</string>
+    <string name="fixedDate">Datum:</string>
+
+    <!--Wochentage-->
+    <string name="dayMonday">Montag</string>
+    <string name="dayTuesday">Dienstag</string>
+    <string name="dayWednesday">Mittwoch</string>
+    <string name="dayThursday">Donnerstag</string>
+    <string name="dayFriday">Freitag</string>
+    <string name="daySaturday">Samstag</string>
+    <string name="daySunday">Sonntag</string>
+    <string name="dayInvalid">Die Woche hat zuviele Tage!</string>
+    <string name="long_loading">Laden dauert ungewönlich lang!\nInternet Verbindung überprüfen!</string>
+    <string name="close">Beenden</string>
+    <string name="noVP">Kein VP.</string>
+
+
+    <!--Preference Names-->
+    <string name="PREF_FILE_NAME">HWVPData</string>
+
+    <string name="SELECTED_GRADE">selectedGrade</string>
+    <string name="REPEAT_TIME">repeatTime</string>
+    <string name="TOAST_ENABLED">toastEnabled</string>
+</resources>

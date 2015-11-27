@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ripple xmlns:androdi="http://schemas.android.com/apk/res/android" androdi:color="?android:attr/colorControlHighlight">
+    <item androdi:id="@android:id/mask" androdi:drawable="@android:color/white"></item>
+</ripple>
