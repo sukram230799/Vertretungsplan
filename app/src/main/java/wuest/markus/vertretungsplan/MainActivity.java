@@ -145,7 +145,7 @@ public class MainActivity extends AppCompatActivity implements NavigationDrawerF
     private SwipeRefreshLayout refreshLayout = null;
 
     public static final String TAG = "MainActivity";
-    /* Not used because defined in preferencenames.xml
+    /* Not used because defined in strings.xml
     public static final String PREF_FILE_NAME = "HWVPData";
     public static final String SELECTED_GRADE = "selectedGrade";
     public static final String REPEAT_TIME = "repeatTime";*/
@@ -162,7 +162,11 @@ public class MainActivity extends AppCompatActivity implements NavigationDrawerF
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        getSupportActionBar().setDisplayHomeAsUpEnabled(false);
+        try {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(false);
+        } catch (java.lang.NullPointerException e){
+
+        }
         //getSupportActionBar().setHomeButtonEnabled(true);
 
         try {
@@ -185,13 +189,12 @@ public class MainActivity extends AppCompatActivity implements NavigationDrawerF
                 getSupportFragmentManager().findFragmentById(R.id.fragment_navigation_drawer);
         drawerFragment.setUp(R.id.fragment_navigation_drawer, (DrawerLayout) findViewById(R.id.drawer_layout), toolbar);
         drawerFragment.setItemSelectedListener(this);
-        Preferences preferences = new Preferences(this);
-        position = dbHandler.getGradePosition(new HWGrade(preferences.readStringFromPreferences(getString(R.string.SELECTED_GRADE), "NULL")));
+        position = dbHandler.getGradePosition(new HWGrade(Preferences.readStringFromPreferences(this, getString(R.string.SELECTED_GRADE), "NULL")));
         if (position < 0) {
             position = 0;
         }
         loadVPFragment(getSupportFragmentManager(), position);
-        Log.v(TAG, preferences.readStringFromPreferences(getString(R.string.SELECTED_GRADE), "NULL"));
+        Log.v(TAG, Preferences.readStringFromPreferences(this, getString(R.string.SELECTED_GRADE), "NULL"));
     }
 
     @Override
@@ -272,8 +275,7 @@ public class MainActivity extends AppCompatActivity implements NavigationDrawerF
             hwGrade = dbHandler.getGrade(position);
         } catch (DBError dbError) {
             dbError.printStackTrace();
-            Preferences preferences = new Preferences(this);
-            hwGrade = new HWGrade(preferences.readStringFromPreferences(getString(R.string.SELECTED_GRADE), "NULL"));
+            hwGrade = new HWGrade(Preferences.readStringFromPreferences(this, getString(R.string.SELECTED_GRADE), "NULL"));
         }
         Log.v(GetVP.TAG, "From 2");
         new Thread(new GetVP(this, hwGrade, vpHandler)).start();

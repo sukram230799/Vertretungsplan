@@ -16,6 +16,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 
@@ -40,7 +41,6 @@ public class NavigationDrawerFragment extends Fragment implements GradeAdapter.C
     private ItemSelectedListener itemSelectedListener;
     public int selectedItem;
 
-    private Preferences preferences;
 
     private Handler handler = new Handler() {
         @Override
@@ -52,7 +52,7 @@ public class NavigationDrawerFragment extends Fragment implements GradeAdapter.C
     };
 
     public NavigationDrawerFragment() {
-        preferences = new Preferences(getActivity());
+        //preferences = new Preferences(getActivity());
         // Required empty public constructor
     }
 
@@ -63,7 +63,7 @@ public class NavigationDrawerFragment extends Fragment implements GradeAdapter.C
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mUserLearnedDrawer = Boolean.valueOf(preferences.readStringFromPreferences(KEY_USER_LEARNED_DRAWER, "false"));
+        mUserLearnedDrawer = Boolean.valueOf(Preferences.readStringFromPreferences(getActivity(), KEY_USER_LEARNED_DRAWER, "false"));
         if (savedInstanceState == null) {
             mFromSavedInstanceState = true;
         }
@@ -86,19 +86,24 @@ public class NavigationDrawerFragment extends Fragment implements GradeAdapter.C
 
     public static List<HWGrade> getData(Context context) {
         DBHandler dbHandler = new DBHandler(context, null, null, 1);
-        List<HWGrade> data = new ArrayList<HWGrade>();
+        List<HWGrade> data = null;
         try {
+            data = new ArrayList<>(Arrays.asList(dbHandler.getGrades()));
+        } catch (DBError dbError) {
+            dbError.printStackTrace();
+            data = new ArrayList<>();
+        }
+        /*try {
             for (HWGrade grade : dbHandler.getGrades()) {
                 data.add(grade);
             }
         } catch (DBError dbError) {
             dbError.printStackTrace();
-        }
+        }*/
         return data;
     }
 
     public void setUp(int fragmentId, DrawerLayout drawerLayout, Toolbar toolbar) {
-        preferences = new Preferences(getActivity());
         selectedItem = -1;
         containerView = getActivity().findViewById(fragmentId);
         mDrawerLayout = drawerLayout;
@@ -113,7 +118,7 @@ public class NavigationDrawerFragment extends Fragment implements GradeAdapter.C
                 super.onDrawerOpened(drawerView);
                 if (!mUserLearnedDrawer) {
                     mUserLearnedDrawer = true;
-                    preferences.saveStringToPreferences(KEY_USER_LEARNED_DRAWER, mUserLearnedDrawer + "");
+                    Preferences.saveStringToPreferences(getActivity(), KEY_USER_LEARNED_DRAWER, mUserLearnedDrawer + "");
                 }
                 getActivity().supportInvalidateOptionsMenu();
                 //super.onDrawerOpened(drawerView);
@@ -125,7 +130,7 @@ public class NavigationDrawerFragment extends Fragment implements GradeAdapter.C
                 getActivity().supportInvalidateOptionsMenu();
             }
         };
-        if (mUserLearnedDrawer = false && !mFromSavedInstanceState) {
+        if (mUserLearnedDrawer == false && !mFromSavedInstanceState) {
             mDrawerLayout.openDrawer(containerView);
         }
         mDrawerLayout.setDrawerListener(mDrawerToggle);
@@ -149,6 +154,6 @@ public class NavigationDrawerFragment extends Fragment implements GradeAdapter.C
     }
 
     public interface ItemSelectedListener {
-        public void gradeItemSelected(View view, int position, boolean longclick);
+        void gradeItemSelected(View view, int position, boolean longclick);
     }
 }

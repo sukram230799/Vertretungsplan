@@ -17,8 +17,7 @@ public class Alarm extends BroadcastReceiver
         wl.acquire();
         // Put here YOUR code.
         context.startService(new Intent(context, UpdateDataSet.class));
-        Preferences preferences = new Preferences(context);
-        if (preferences.readBooleanFromPreferences(context.getString(R.string.TOAST_ENABLED), false)) {
+        if (Preferences.readBooleanFromPreferences(context, context.getString(R.string.TOAST_ENABLED), false)) {
             Toast.makeText(context, "Alarm !!!!!!!!!!", Toast.LENGTH_SHORT).show(); // For example
         }
         wl.release();
@@ -31,8 +30,7 @@ public class Alarm extends BroadcastReceiver
         PendingIntent pi = PendingIntent.getBroadcast(context, 0, i, 0);
         int repeatTime;
         try {
-            Preferences preferences = new Preferences(context);
-            repeatTime = Integer.parseInt(preferences.readStringFromPreferences(context.getString(R.string.REPEAT_TIME), "10"));
+            repeatTime = Integer.parseInt(Preferences.readStringFromPreferences(context, context.getString(R.string.REPEAT_TIME), "10"));
             if (repeatTime < 1) {
                 repeatTime = 15;
             }

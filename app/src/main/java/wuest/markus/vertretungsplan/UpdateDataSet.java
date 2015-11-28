@@ -42,12 +42,11 @@ public class UpdateDataSet extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        Preferences preferences = new Preferences(this);
-        if (preferences.readBooleanFromPreferences(context.getString(R.string.TOAST_ENABLED), false)) {
+        if (Preferences.readBooleanFromPreferences(this, getString(R.string.TOAST_ENABLED), false)) {
             Toast.makeText(this, "UpdateDataSet", Toast.LENGTH_SHORT).show();
         }
-        grade = new HWGrade(preferences.readStringFromPreferences(getString(R.string.SELECTED_GRADE), "NULL"));
-        if (!grade.equals("NULL")) {
+        grade = new HWGrade(Preferences.readStringFromPreferences(this, getString(R.string.SELECTED_GRADE), "NULL"));
+        if (!grade.get_GradeName().equals("NULL")) {
             dbHandler = new DBHandler(this, null, null, 1);
             try {
                 oldData = dbHandler.getVP(grade);

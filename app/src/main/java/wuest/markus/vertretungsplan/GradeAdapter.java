@@ -22,14 +22,13 @@ public class GradeAdapter extends RecyclerView.Adapter<GradeAdapter.GradeViewHol
     private int chosenGradePosition = -1;
     private ClickListener clickListener;
     int selected = -1;
-    private Preferences preferences;
+    //private Preferences preferences;
 
     public GradeAdapter(Context context, List<HWGrade> data) {
         Log.v("DEBUG.GA", data.size() + "");
         this.context = context;
         inflater = LayoutInflater.from(context);
         this.data = data;
-        this.preferences = new Preferences(context);
     }
 
     public void deleteItem(int position) {
@@ -59,8 +58,8 @@ public class GradeAdapter extends RecyclerView.Adapter<GradeAdapter.GradeViewHol
     @Override
     public void onBindViewHolder(GradeViewHolder holder, int i) {
         holder.position = i;
-        if (chosenGrade == "NULL") {
-            chosenGrade = preferences.readStringFromPreferences(context.getString(R.string.SELECTED_GRADE), "NULL");
+        if (chosenGrade.equals("NULL")) {
+            chosenGrade = Preferences.readStringFromPreferences(context, context.getString(R.string.SELECTED_GRADE), "NULL");
             Log.v("DEBUG", chosenGrade);
         }
         Log.v("DEBUG.onBVH", data.get(i).get_GradeName());
@@ -119,7 +118,7 @@ public class GradeAdapter extends RecyclerView.Adapter<GradeAdapter.GradeViewHol
             Log.v(TAG, v.toString());
             Vibrator vibrator = (Vibrator) context.getSystemService(Context.VIBRATOR_SERVICE);
             vibrator.vibrate(500);
-            preferences.saveStringToPreferences(context.getString(R.string.SELECTED_GRADE), data.get(getAdapterPosition()).get_GradeName());
+            Preferences.saveStringToPreferences(context, context.getString(R.string.SELECTED_GRADE), data.get(getAdapterPosition()).get_GradeName());
             notifyItemChanged(chosenGradePosition);
             notifyItemChanged(position);
             chosenGrade = data.get(getAdapterPosition()).get_GradeName();
@@ -131,7 +130,7 @@ public class GradeAdapter extends RecyclerView.Adapter<GradeAdapter.GradeViewHol
     }
 
     public interface ClickListener {
-        public void gradeItemClicked(View view, int position, boolean longpress);
+        void gradeItemClicked(View view, int position, boolean longpress);
 
         //public void gradeItemLongClicked(View view, int position);
     }

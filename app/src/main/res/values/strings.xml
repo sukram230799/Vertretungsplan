@@ -32,7 +32,7 @@
     <!--Preference Names-->
     <string name="PREF_FILE_NAME">HWVPData</string>
 
-    <string name="SELECTED_GRADE">selectedGrade</string>
-    <string name="REPEAT_TIME">repeatTime</string>
-    <string name="TOAST_ENABLED">toastEnabled</string>
+    <string name="SELECTED_GRADE">wuest.markus.vertretungsplan.selectedGrade</string>
+    <string name="REPEAT_TIME">wuest.markus.vertretungsplan.repeatTime</string>
+    <string name="TOAST_ENABLED">wuest.markus.vertretungsplan.toastEnabled</string>
 </resources>
