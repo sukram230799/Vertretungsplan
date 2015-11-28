@@ -26,15 +26,18 @@ public class About extends AppCompatActivity {
                 Snackbar.make(view, "E-Mail", Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();
                 Intent emailIntent = new Intent(Intent.ACTION_SENDTO, Uri.fromParts(
-                        "mailto", "sukram230799@outlook.com", null));
-                emailIntent.putExtra(Intent.EXTRA_EMAIL, "sukram230799@outlook.com");
-                emailIntent.putExtra(Intent.EXTRA_SUBJECT, "Subject");
-                emailIntent.putExtra(Intent.EXTRA_TEXT, "Body");
+                        "mailto", "vp.school@outlook.com", null));
+                emailIntent.putExtra(Intent.EXTRA_EMAIL, "vp.school@outlook.com");
+                emailIntent.putExtra(Intent.EXTRA_SUBJECT, "VP Support");
+                emailIntent.putExtra(Intent.EXTRA_TEXT, "");
                 startActivity(Intent.createChooser(emailIntent, "Dem Entwickler eine E-Mail schreiben."));
             }
         });
 
-        WebView webView = (WebView) findViewById(R.id.about_webview);
-        webView.loadUrl("file:///android_asset/MITLicense.html");
+        WebView aboutWebView = (WebView) findViewById(R.id.about_webview);
+        aboutWebView.loadUrl("file:///android_asset/MITLicense.html");
+
+        WebView josupLicense = (WebView) findViewById(R.id.jsoup_license);
+        josupLicense.loadUrl("http://jsoup.org/license");
     }
 }
