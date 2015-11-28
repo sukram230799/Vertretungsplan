@@ -25,7 +25,7 @@ public class PlanAdapter extends RecyclerView.Adapter<PlanAdapter.PlanViewHolder
 
     public PlanAdapter(Context context, List<VPData> data) {
         Log.v(TAG, "@PlanAdapter");
-        Log.v(TAG, ""+data.size());
+        Log.v(TAG, "" + data.size());
         Log.v(TAG, String.valueOf(context));
         this.context = context;
         this.data = data;
@@ -57,16 +57,32 @@ public class PlanAdapter extends RecyclerView.Adapter<PlanAdapter.PlanViewHolder
         Calendar c = new GregorianCalendar();
         c.setTime(data.get(position).get_date());
         switch (c.get(Calendar.DAY_OF_WEEK)) {
-            case Calendar.MONDAY: Wochentag = context.getString(R.string.dayMonday); break;
-            case Calendar.TUESDAY: Wochentag = context.getString(R.string.dayTuesday); break;
-            case Calendar.WEDNESDAY: Wochentag = context.getString(R.string.dayWednesday); break;
-            case Calendar.THURSDAY: Wochentag = context.getString(R.string.dayThursday); break;
-            case Calendar.FRIDAY: Wochentag = context.getString(R.string.dayFriday); break;
-            case Calendar.SATURDAY: Wochentag = context.getString(R.string.daySaturday); break;
-            case Calendar.SUNDAY: Wochentag = context.getString(R.string.daySunday); break;
-            default: Wochentag = context.getString(R.string.dayInvalid); break;
+            case Calendar.MONDAY:
+                Wochentag = context.getString(R.string.dayMonday);
+                break;
+            case Calendar.TUESDAY:
+                Wochentag = context.getString(R.string.dayTuesday);
+                break;
+            case Calendar.WEDNESDAY:
+                Wochentag = context.getString(R.string.dayWednesday);
+                break;
+            case Calendar.THURSDAY:
+                Wochentag = context.getString(R.string.dayThursday);
+                break;
+            case Calendar.FRIDAY:
+                Wochentag = context.getString(R.string.dayFriday);
+                break;
+            case Calendar.SATURDAY:
+                Wochentag = context.getString(R.string.daySaturday);
+                break;
+            case Calendar.SUNDAY:
+                Wochentag = context.getString(R.string.daySunday);
+                break;
+            default:
+                Wochentag = context.getString(R.string.dayInvalid);
+                break;
         }
-        holder.textDate.setText(Wochentag + ", den " + dateFormat.format(data.get(position).get_date()));
+        holder.textDate.setText(context.getString(R.string.datebuilder, Wochentag, dateFormat.format(data.get(position).get_date())));
         holder.textHour.setText(CombineData.combineHours(data.get(position).get_hours()));
         holder.textSubject.setText(data.get(position).get_subject());
         holder.textRoom.setText(data.get(position).get_room());
@@ -109,7 +125,7 @@ public class PlanAdapter extends RecyclerView.Adapter<PlanAdapter.PlanViewHolder
         @Override
         public void onClick(View v) {
             clickListener.planItemClicked(v, getAdapterPosition(), longpress);
-            longpress= false;
+            longpress = false;
         }
 
         @Override

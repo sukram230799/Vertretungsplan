@@ -93,7 +93,7 @@ public class GetVP implements Runnable {
                     //In this section the rows with their hours are seperated!
                     //v This step is made because Jsoup expects a whole table
                     Document rowDoc = Jsoup.parseBodyFragment("<table><tr>" + row.html() + "</tr></table>");
-                    int hour = 0;
+                    int hour;
                     for (Element hourEl : rowDoc.select("td.spalte1")) {
                         //Every hour object is seperated in the following step! This is needed because sometime the website combines the hours
                         try {

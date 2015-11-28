@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
-    <PreferenceCategory android:title="Generelles">
+    <PreferenceCategory android:title="@string/general">
         <wuest.markus.vertretungsplan.GradeListPreference
             android:key="@string/SELECTED_GRADE"
-            android:title="Meine Klasse" />
+            android:title="@string/mygrade" />
     </PreferenceCategory>
     <PreferenceCategory android:title="Automatisch Laden">
         <CheckBoxPreference
             android:defaultValue="true"
             android:key="@string/UPDATE"
-            android:title="Aktualisieren" />
+            android:title="@string/refresh" />
         <EditTextPreference
             android:dependency="@string/UPDATE"
             android:inputType="number"
@@ -23,10 +23,12 @@
             android:defaultValue="true"
             android:dependency="@string/UPDATE"
             android:key="@string/NOTIFICATION"
-            android:title="Benachrichtigung" />
+            android:title="@string/notification" />
     </PreferenceCategory>
-    <CheckBoxPreference
-        android:defaultValue="false"
-        android:key="@string/DEVELOPER_MODE"
-        android:title="Entwickler Modus" />
+    <PreferenceCategory android:title="Erweitertes">
+        <CheckBoxPreference
+            android:defaultValue="false"
+            android:key="@string/DEVELOPER_MODE"
+            android:title="@string/developermode" />
+    </PreferenceCategory>
 </PreferenceScreen>

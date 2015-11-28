@@ -9,7 +9,7 @@
         android:id="@+id/textNotificationTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Vertretungsplanänderung"
+        android:text="@string/timetablechange"
         android:textAppearance="?android:attr/textAppearanceLarge"
         android:textStyle="bold" />
 
@@ -20,11 +20,11 @@
         <TableRow android:id="@+id/rowNotification">
 
             <TextView android:id="@+id/textNotificationOld"
-                android:text="Alte Daten"
+                android:text="@string/olddata"
                 android:layout_marginRight="5dp" />
 
             <TextView android:id="@+id/textNotificationNew"
-                android:text="Neue Daten" />
+                android:text="@string/newdata" />
         </TableRow>
     </TableLayout>
 

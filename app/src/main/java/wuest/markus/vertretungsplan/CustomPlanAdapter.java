@@ -10,7 +10,7 @@ import android.widget.TextView;
 class CustomPlanAdapter extends ArrayAdapter<VPData>{
 
     public CustomPlanAdapter(Context context, VPData[] resource) {
-        super(context, R.layout.custom_plan_row, (VPData[]) resource);
+        super(context, R.layout.custom_plan_row, resource);
     }
 
     @Override
@@ -18,7 +18,7 @@ class CustomPlanAdapter extends ArrayAdapter<VPData>{
         LayoutInflater inflater = LayoutInflater.from(getContext());
         View view = inflater.inflate(R.layout.custom_plan_row, parent, false);
         VPData vpData = getItem(position);
-        TextView textHour = (TextView) view.findViewById(R.id.textHour);
+        //TextView textHour = (TextView) view.findViewById(R.id.textHour);
         TextView textSubject = (TextView) view.findViewById(R.id.textSubject);
         TextView textRoom = (TextView) view.findViewById(R.id.textRoom);
         TextView textInfo1 = (TextView) view.findViewById(R.id.textInfo1);

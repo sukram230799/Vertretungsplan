@@ -105,6 +105,7 @@ public class DBHandler extends SQLiteOpenHelper {
         } else {
             throw new DBError(DBError.NOTFOUND);
         }
+        c.close();
         return hwGrade;
     }
 
@@ -130,6 +131,7 @@ public class DBHandler extends SQLiteOpenHelper {
         Grades = (HWGrade[]) GradeList.toArray(new HWGrade[GradeList.size()]);
         db.close();
         Log.v(TAG, "-getGrades():db.close();");
+        c.close();
         return Grades;
     }
 
@@ -141,6 +143,7 @@ public class DBHandler extends SQLiteOpenHelper {
         if(!c.isAfterLast()){
             return c.getInt(c.getColumnIndex(COLUMN_ID)) - 1;
         }
+        c.close();
         return -1;
     }
 
@@ -183,6 +186,7 @@ public class DBHandler extends SQLiteOpenHelper {
             }
             c.moveToNext();
         }
+        c.close();
         if (vpDatas.isEmpty()) {
             throw new DBError(DBError.TABLEEMPTY);
         } else {
@@ -222,10 +226,12 @@ public class DBHandler extends SQLiteOpenHelper {
         Cursor cursor = getWritableDatabase().rawQuery(query, null);
         cursor.moveToFirst();
         if(cursor.isAfterLast()){
+            cursor.close();
             Log.v(TAG, "false");
             return false;
         }
         Log.v(TAG, "true");
+        cursor.close();
         return true;
     }
 

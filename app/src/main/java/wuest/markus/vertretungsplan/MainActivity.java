@@ -240,8 +240,8 @@ public class MainActivity extends AppCompatActivity implements NavigationDrawerF
 
     private void loadVPFragment(FragmentManager fragmentManager, int position) {
         this.position = position;
-        HWGrade grade = null;
-        boolean isVP;
+        //HWGrade grade = null;
+        //boolean isVP;
         /*try {
             grade = dbHandler.getGrade(position);
             isVP = dbHandler.isVP(grade);

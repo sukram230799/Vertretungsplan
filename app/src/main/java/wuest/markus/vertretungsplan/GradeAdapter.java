@@ -1,6 +1,6 @@
 package wuest.markus.vertretungsplan;
 
-import android.annotation.TargetApi;
+//import android.annotation.TargetApi;
 import android.content.Context;
 import android.graphics.Color;
 import android.os.Build;

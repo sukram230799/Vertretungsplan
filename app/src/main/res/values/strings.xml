@@ -25,10 +25,13 @@
     <string name="daySaturday">Samstag</string>
     <string name="daySunday">Sonntag</string>
     <string name="dayInvalid">Die Woche hat zuviele Tage!</string>
+    <string name="datebuilder">%1$s, den %2$s</string>
+
+
     <string name="long_loading">Laden dauert ungewönlich lang!\nInternet Verbindung überprüfen!</string>
     <string name="close">Beenden</string>
     <string name="noVP">Kein VP.</string>
-
+    <string name="emailToDev">E-Mail an den Entwickler.</string>
 
     <!--Preference Names-->
     <string name="PREF_FILE_NAME">HWVPData</string>
@@ -38,4 +41,13 @@
     <string name="UPDATE_TIME">wuest.markus.vertretungsplan.updateTime</string>
     <string name="DEVELOPER_MODE">wuest.markus.vertretungsplan.toastEnabled</string>
     <string name="NOTIFICATION">wuest.markus.vertretungsplan.notification</string>
+    <string name="notification">Benachrichtigung</string>
+    <string name="developermode">Entwickler Modus</string>
+    <string name="refresh">Aktualisieren</string>
+    <string name="mygrade">Meine Klasse</string>
+    <string name="general">Generelles</string>
+    <string name="timetablechange">Vertretungsplanänderung</string>
+    <string name="olddata">Alte Daten</string>
+    <string name="newdata">Neue Daten</string>
+    <string name="about">About</string>
 </resources>

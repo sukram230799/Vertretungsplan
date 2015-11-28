@@ -27,7 +27,7 @@ public class GetGradesFromVPGrades implements Runnable {
     public void run() {
         Message message = new Message();
         ArrayList<HWGrade> grades = new ArrayList<HWGrade>();
-        String grade_number = "";
+        String grade_number;
         for (int times = 7/*1*/; times <= 7; times++) {
             try {
                 grade_number = String.valueOf(times);
@@ -36,7 +36,7 @@ public class GetGradesFromVPGrades implements Runnable {
                         .data("id", grade_number)
                         .post();
                 //Log.v("GRADES.TEXT", doc.text());
-                if (doc.text() == "") break;
+                if (doc.text().equals("")) break;
                 Log.v("GRADES", doc.text());
                 for (Element grade : doc.select("a")) {
                     Log.v("GRADES.GRADE", grade.html());

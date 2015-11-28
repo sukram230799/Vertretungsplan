@@ -104,7 +104,7 @@ public class CombineData {
         Integer lastNumber = hours.get(0);
         Integer combineTimes = 0;
         for (Integer hour : hours) {
-            if (lastNumber != hour) {
+            if (!lastNumber.equals(hour)) {
                 if (lastNumber == hour - 1) {
                     lastNumber = hour;
                     combineTimes++;
@@ -207,7 +207,7 @@ public class CombineData {
 
     public static String getChanges(ChangedHour[] changedHours) {
         ArrayList<Integer> hours = new ArrayList<>();
-        Date date = new Date();
+        Date date;
         String changesString = null;
         if (changedHours != null && changedHours.length > 0) {
             date = changedHours[0].getDate();

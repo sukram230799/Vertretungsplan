@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="wuest.markus.vertretungsplan">
+    package="wuest.markus.vertretungsplan"
+    android:versionName="1.0.1">
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
@@ -30,7 +31,7 @@
             android:parentActivityName=".MainActivity"
             android:theme="@style/AppTheme.NoActionBar" />
 
-        <!---->
+        <!--  -->
         <receiver
             android:name=".Alarm"
             android:process=":remote" />
@@ -43,7 +44,8 @@
         <service
             android:name=".UpdateDataSet"
             android:label="UpdateDataSet" />
-        <!---->
+        <!--  -->
+        <activity android:name=".License"></activity>
     </application>
 
 </manifest>

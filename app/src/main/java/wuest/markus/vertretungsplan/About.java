@@ -23,6 +23,7 @@ public class About extends AppCompatActivity {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+
                 Snackbar.make(view, "E-Mail", Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();
                 Intent emailIntent = new Intent(Intent.ACTION_SENDTO, Uri.fromParts(
@@ -30,14 +31,15 @@ public class About extends AppCompatActivity {
                 emailIntent.putExtra(Intent.EXTRA_EMAIL, "vp.school@outlook.com");
                 emailIntent.putExtra(Intent.EXTRA_SUBJECT, "VP Support");
                 emailIntent.putExtra(Intent.EXTRA_TEXT, "");
-                startActivity(Intent.createChooser(emailIntent, "Dem Entwickler eine E-Mail schreiben."));
+                startActivity(Intent.createChooser(emailIntent, getString(R.string.emailToDev)));
+
             }
         });
-
-        WebView aboutWebView = (WebView) findViewById(R.id.about_webview);
-        aboutWebView.loadUrl("file:///android_asset/MITLicense.html");
-
+        /*
+        Intent i = new Intent(this, License.class);
+        startActivity(i.putExtra("URL", "http://jsoup.org/license"));
+*/
         WebView josupLicense = (WebView) findViewById(R.id.jsoup_license);
-        josupLicense.loadUrl("http://jsoup.org/license");
+        josupLicense.loadUrl("file:///android_asset/licenses.html");
     }
 }
