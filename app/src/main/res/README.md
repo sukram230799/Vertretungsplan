@@ -1,0 +1,1 @@
+![Logo](https://github.com/sukram230799/Vertretungsplan/blob/master/app/src/main/res/mipmap-xxxhdpi/ic_launcher.png "Logo") https://www.iconfinder.com/icons/463008/calendar_event_month_plan_planning_schedule_timetable_icon#size=128
