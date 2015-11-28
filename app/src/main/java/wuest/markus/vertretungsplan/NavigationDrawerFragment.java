@@ -11,6 +11,7 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -84,22 +85,25 @@ public class NavigationDrawerFragment extends Fragment implements GradeAdapter.C
         return layout;
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        gradeAdapter = new GradeAdapter(getActivity(), getData(getActivity()));
+        gradeAdapter.setClickListener(this);
+        recyclerView.setAdapter(gradeAdapter);
+        recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+        Log.v("NavDrawFrag", "onResume");
+    }
+
     public static List<HWGrade> getData(Context context) {
         DBHandler dbHandler = new DBHandler(context, null, null, 1);
-        List<HWGrade> data = null;
+        List<HWGrade> data;
         try {
             data = new ArrayList<>(Arrays.asList(dbHandler.getGrades()));
         } catch (DBError dbError) {
             dbError.printStackTrace();
             data = new ArrayList<>();
         }
-        /*try {
-            for (HWGrade grade : dbHandler.getGrades()) {
-                data.add(grade);
-            }
-        } catch (DBError dbError) {
-            dbError.printStackTrace();
-        }*/
         return data;
     }
 
@@ -130,7 +134,7 @@ public class NavigationDrawerFragment extends Fragment implements GradeAdapter.C
                 getActivity().supportInvalidateOptionsMenu();
             }
         };
-        if (mUserLearnedDrawer == false && !mFromSavedInstanceState) {
+        if (!mUserLearnedDrawer && !mFromSavedInstanceState) {
             mDrawerLayout.openDrawer(containerView);
         }
         mDrawerLayout.setDrawerListener(mDrawerToggle);
@@ -146,6 +150,7 @@ public class NavigationDrawerFragment extends Fragment implements GradeAdapter.C
     @Override
     public void gradeItemClicked(View view, int position, boolean longclick) {
         if (selectedItem != position) {
+            //Not used yet
         }
         if (!longclick) {
             mDrawerLayout.closeDrawers();

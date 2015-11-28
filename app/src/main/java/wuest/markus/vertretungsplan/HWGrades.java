@@ -1,5 +1,5 @@
 package wuest.markus.vertretungsplan;
-
+/*
 public class HWGrades {
 
     private int _id;
@@ -26,4 +26,4 @@ public class HWGrades {
     public HWGrade[] get_GradeName() {
         return _hwGrades;
     }
-}
+}*/

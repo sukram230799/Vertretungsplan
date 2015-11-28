@@ -42,7 +42,7 @@ public class UpdateDataSet extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        if (Preferences.readBooleanFromPreferences(this, getString(R.string.TOAST_ENABLED), false)) {
+        if (Preferences.readBooleanFromPreferences(this, getString(R.string.DEVELOPER_MODE), false)) {
             Toast.makeText(this, "UpdateDataSet", Toast.LENGTH_SHORT).show();
         }
         grade = new HWGrade(Preferences.readStringFromPreferences(this, getString(R.string.SELECTED_GRADE), "NULL"));

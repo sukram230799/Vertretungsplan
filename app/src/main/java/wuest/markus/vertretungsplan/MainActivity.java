@@ -8,6 +8,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
+import android.os.Build;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v4.app.FragmentManager;
@@ -164,8 +165,8 @@ public class MainActivity extends AppCompatActivity implements NavigationDrawerF
 
         try {
             getSupportActionBar().setDisplayHomeAsUpEnabled(false);
-        } catch (java.lang.NullPointerException e){
-
+        } catch (java.lang.NullPointerException e) {
+            e.printStackTrace();
         }
         //getSupportActionBar().setHomeButtonEnabled(true);
 
@@ -213,9 +214,14 @@ public class MainActivity extends AppCompatActivity implements NavigationDrawerF
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
-            Log.v(TAG, "Settings selected!");
-            Toast.makeText(this, "Not Implemented yet", Toast.LENGTH_LONG);
+            if (Build.VERSION.SDK_INT > Build.VERSION_CODES.HONEYCOMB) {
+                startActivity(new Intent(this, Settings.class));
+            } else {
+                startActivity(new Intent(this, SettingsActivity.class));
+            }
             return true;
+        } else if (id == R.id.about) {
+            startActivity(new Intent(this, About.class));
         }
 
         return super.onOptionsItemSelected(item);

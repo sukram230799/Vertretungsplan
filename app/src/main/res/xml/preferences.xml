@@ -1,17 +1,32 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
-    <PreferenceCategory android:title="Einstellungen">
-        <ListPreference
-            android:defaultValue="-1"
-            android:key="selectedGrade"
-            android:summary="Bitt Klasse wählen"
-            android:title="Klasse auswählen" />
+    <PreferenceCategory android:title="Generelles">
+        <wuest.markus.vertretungsplan.GradeListPreference
+            android:key="@string/SELECTED_GRADE"
+            android:title="Meine Klasse" />
+    </PreferenceCategory>
+    <PreferenceCategory android:title="Automatisch Laden">
+        <CheckBoxPreference
+            android:defaultValue="true"
+            android:key="@string/UPDATE"
+            android:title="Aktualisieren" />
         <EditTextPreference
-            android:defaultValue="15"
+            android:dependency="@string/UPDATE"
             android:inputType="number"
-            android:summary="Wert in Minuten"
-            android:title="Aktualierungshäufigkeit" />
+            android:key="@string/UPDATE_TIME"
+            android:numeric="integer"
+            android:summary="In Minuten"
+            android:title="Häufigkeit"
+
+            />
+        <CheckBoxPreference
+            android:defaultValue="true"
+            android:dependency="@string/UPDATE"
+            android:key="@string/NOTIFICATION"
+            android:title="Benachrichtigung" />
     </PreferenceCategory>
-    <PreferenceCategory android:title="Über">
-    </PreferenceCategory>
+    <CheckBoxPreference
+        android:defaultValue="false"
+        android:key="@string/DEVELOPER_MODE"
+        android:title="Entwickler Modus" />
 </PreferenceScreen>

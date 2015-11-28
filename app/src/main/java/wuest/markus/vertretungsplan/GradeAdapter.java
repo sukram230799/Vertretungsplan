@@ -1,7 +1,9 @@
 package wuest.markus.vertretungsplan;
 
+import android.annotation.TargetApi;
 import android.content.Context;
 import android.graphics.Color;
+import android.os.Build;
 import android.os.Vibrator;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -9,6 +11,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.support.design.widget.Snackbar;
 
 import java.util.Collections;
 import java.util.List;
@@ -51,8 +54,8 @@ public class GradeAdapter extends RecyclerView.Adapter<GradeAdapter.GradeViewHol
     @Override
     public GradeViewHolder onCreateViewHolder(ViewGroup parent, int i) {
         View view = inflater.inflate(R.layout.custom_grade_row, parent, false);
-        GradeViewHolder holder = new GradeViewHolder(view);
-        return holder;
+        //GradeViewHolder holder = new GradeViewHolder(view);
+        return new GradeViewHolder(view);
     }
 
     @Override
@@ -68,7 +71,12 @@ public class GradeAdapter extends RecyclerView.Adapter<GradeAdapter.GradeViewHol
             Log.v("DEBUG.found", chosenGrade);
             chosenGradePosition = i;
             //holder.title.setBackgroundColor(Color.parseColor("#888888"));
-            holder.title.setBackgroundColor(context.getResources().getColor(R.color.colorPrimary));
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                holder.title.setBackgroundColor(context.getResources().getColor(R.color.colorPrimary, context.getTheme()));//getColor(R.color.colorPrimary));
+            } else {
+                holder.title.setBackgroundColor(context.getResources().getColor(R.color.colorPrimary));
+            }
+            //holder.title.setBackgroundColor(Color.parseColor());
         } else {
             if (i == selected) {
                 holder.title.setBackgroundColor(Color.parseColor("#cccccc"));
@@ -118,6 +126,8 @@ public class GradeAdapter extends RecyclerView.Adapter<GradeAdapter.GradeViewHol
             Log.v(TAG, v.toString());
             Vibrator vibrator = (Vibrator) context.getSystemService(Context.VIBRATOR_SERVICE);
             vibrator.vibrate(500);
+            Snackbar.make(v, "Klasse " + data.get(getAdapterPosition()).get_GradeName() + " wurde als Standard festgelegt.", Snackbar.LENGTH_LONG)
+                    .setAction("Action", null).show();
             Preferences.saveStringToPreferences(context, context.getString(R.string.SELECTED_GRADE), data.get(getAdapterPosition()).get_GradeName());
             notifyItemChanged(chosenGradePosition);
             notifyItemChanged(position);

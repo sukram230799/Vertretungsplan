@@ -13,7 +13,7 @@ public class AutoStart extends BroadcastReceiver {
         if (intent.getAction().equals(Intent.ACTION_BOOT_COMPLETED)) {
             DBHandler handler = new DBHandler(context, null, null, 1);
             handler.removeVP(new HWGrade(Preferences.readStringFromPreferences(context, context.getString(R.string.PREF_FILE_NAME), "NULL")));
-            if (Preferences.readBooleanFromPreferences(context, context.getString(R.string.TOAST_ENABLED), false)) {
+            if (Preferences.readBooleanFromPreferences(context, context.getString(R.string.DEVELOPER_MODE), false)) {
                 Toast.makeText(context, "Autostart", Toast.LENGTH_SHORT).show();
             }
             alarm.SetAlarm(context);
