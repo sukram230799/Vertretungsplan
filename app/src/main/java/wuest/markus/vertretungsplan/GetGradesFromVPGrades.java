@@ -28,7 +28,7 @@ public class GetGradesFromVPGrades implements Runnable {
         Message message = new Message();
         ArrayList<HWGrade> grades = new ArrayList<HWGrade>();
         String grade_number;
-        for (int times = 7/*1*/; times <= 7; times++) {
+        for (int times = 1; times <= 7; times++) {
             try {
                 grade_number = String.valueOf(times);
                 Document doc = Jsoup.connect("http://vp.hw-schule.de/request.php")
@@ -36,11 +36,12 @@ public class GetGradesFromVPGrades implements Runnable {
                         .data("id", grade_number)
                         .post();
                 //Log.v("GRADES.TEXT", doc.text());
-                if (doc.text().equals("")) break;
-                Log.v("GRADES", doc.text());
-                for (Element grade : doc.select("a")) {
-                    Log.v("GRADES.GRADE", grade.html());
-                    grades.add(new HWGrade(grade.html()));
+                if (!doc.text().equals("")) {
+                    Log.v("GRADES", doc.text());
+                    for (Element grade : doc.select("a")) {
+                        Log.v("GRADES.GRADE", grade.html());
+                        grades.add(new HWGrade(grade.html()));
+                    }
                 }
             } catch (IOException e) {
                 //e.printStackTrace();
@@ -50,9 +51,10 @@ public class GetGradesFromVPGrades implements Runnable {
             }
         }
         DBHandler dbHandler = new DBHandler(context, null, null, 1);
-        for (HWGrade grade : grades) {
+        /*for (HWGrade grade : grades) {
             dbHandler.addGrade(grade);
-        }
+        }*/
+        dbHandler.saveAddGrades(grades.toArray(new HWGrade[grades.size()]));
         dbHandler.close();
         try {
             Thread.sleep(1000);

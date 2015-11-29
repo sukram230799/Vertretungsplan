@@ -10,6 +10,7 @@ import android.util.Log;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 
 public class DBHandler extends SQLiteOpenHelper {
@@ -84,6 +85,35 @@ public class DBHandler extends SQLiteOpenHelper {
         Log.v(TAG, "-addGrade()");
     }
 
+    public void saveAddGrades(HWGrade[] newGrades){
+        ArrayList<HWGrade> hwGradeArrayList = new ArrayList<>(Arrays.asList(newGrades));
+        HWGrade[] oldGrades = {};
+        try {
+            oldGrades = getGrades();
+            int outer = 0;
+            int inner = 0;
+            int innerif = 0;
+            for (HWGrade oldGrade : oldGrades){
+                Log.d("saveAddGrade", "outer: " + outer++);
+                for (HWGrade newGrade : newGrades){
+                    Log.d("saveAddGrade", "inner: " + inner++);
+                    if(oldGrade.get_GradeName().equals(newGrade.get_GradeName())){
+                        hwGradeArrayList.remove(newGrade);
+                        Log.d("saveAddGrade", "if: " + innerif++);
+                    }
+                }
+            }
+            for(HWGrade grade: hwGradeArrayList){
+                addGrade(grade);
+            }
+        } catch (DBError dbError) {
+            dbError.printStackTrace();
+            for (HWGrade hwGrade : newGrades){
+                addGrade(hwGrade);
+            }
+        }
+    }
+
     public void delGrade(String Grade) {
         Log.v(TAG, "@delGrade()");
         SQLiteDatabase db = getWritableDatabase();
@@ -114,7 +144,7 @@ public class DBHandler extends SQLiteOpenHelper {
         ArrayList<HWGrade> GradeList = new ArrayList<HWGrade>();
         HWGrade[] Grades = {new HWGrade("NULL")};
         SQLiteDatabase db = getWritableDatabase();
-        String query = "SELECT * FROM " + TABLE_GRADES + " WHERE 1";
+        String query = "SELECT * FROM " + TABLE_GRADES + " WHERE 1 ORDER BY " + COLUMN_GRADE;
         Cursor c = db.rawQuery(query, null);
         c.moveToFirst();
         Log.v(TAG, "$getGrades:Before while");

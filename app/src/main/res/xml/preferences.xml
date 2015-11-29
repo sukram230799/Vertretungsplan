@@ -15,7 +15,7 @@
             android:inputType="number"
             android:key="@string/UPDATE_TIME"
             android:numeric="integer"
-            android:summary="In Minuten"
+            android:summary="Standard: 15min."
             android:title="Häufigkeit"
 
             />

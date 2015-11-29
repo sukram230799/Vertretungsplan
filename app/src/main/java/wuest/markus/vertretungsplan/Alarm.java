@@ -1,49 +1,53 @@
 package wuest.markus.vertretungsplan;
+
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.os.PowerManager;
+import android.util.Log;
 import android.widget.Toast;
 
-public class Alarm extends BroadcastReceiver
-{
+public class Alarm extends BroadcastReceiver {
     @Override
-    public void onReceive(Context context, Intent intent)
-    {
+    public void onReceive(Context context, Intent intent) {
         PowerManager pm = (PowerManager) context.getSystemService(Context.POWER_SERVICE);
         PowerManager.WakeLock wl = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "");
         wl.acquire();
         // Put here YOUR code.
-        context.startService(new Intent(context, UpdateDataSet.class));
-        if (Preferences.readBooleanFromPreferences(context, context.getString(R.string.DEVELOPER_MODE), false)) {
-            Toast.makeText(context, "Alarm !!!!!!!!!!", Toast.LENGTH_SHORT).show(); // For example
+        if (Preferences.readBooleanFromPreferences(context, context.getString(R.string.UPDATE), true)) {
+            Log.d("Alarm", "Setting Alarm");
+            context.startService(new Intent(context, UpdateDataSet.class));
+            if (Preferences.readBooleanFromPreferences(context, context.getString(R.string.DEVELOPER_MODE), false)) {
+                Toast.makeText(context, "Alarm !!!!!!!!!!", Toast.LENGTH_SHORT).show(); // For example
+            }
         }
         wl.release();
     }
 
-    public void SetAlarm(Context context)
-    {
-        AlarmManager am =( AlarmManager)context.getSystemService(Context.ALARM_SERVICE);
+    public void SetAlarm(Context context) {
+        AlarmManager am = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
         Intent i = new Intent(context, Alarm.class);
         PendingIntent pi = PendingIntent.getBroadcast(context, 0, i, 0);
         int repeatTime;
-        try {
-            repeatTime = Integer.parseInt(Preferences.readStringFromPreferences(context, context.getString(R.string.UPDATE_TIME), "10"));
-            if (repeatTime < 1) {
+        if (Preferences.readBooleanFromPreferences(context, context.getString(R.string.DEVELOPER_MODE), false)) {
+            repeatTime = 1;
+        } else {
+            try {
+                repeatTime = Integer.parseInt(Preferences.readStringFromPreferences(context, context.getString(R.string.UPDATE_TIME), "15"));
+                if (repeatTime < 1) {
+                    repeatTime = 15;
+                }
+            } catch (NumberFormatException e) {
+                e.printStackTrace();
                 repeatTime = 15;
             }
-        }
-        catch (NumberFormatException e) {
-            e.printStackTrace();
-            repeatTime = 15;
         }
         am.setInexactRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), 1000 * 60 * repeatTime, pi); // Millisec * Second * Minute
     }
 
-    public void CancelAlarm(Context context)
-    {
+    public void CancelAlarm(Context context) {
         Intent intent = new Intent(context, Alarm.class);
         PendingIntent sender = PendingIntent.getBroadcast(context, 0, intent, 0);
         AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);

@@ -11,6 +11,7 @@ import android.os.IBinder;
 import android.os.Message;
 import android.support.v4.app.TaskStackBuilder;
 import android.support.v7.app.NotificationCompat;
+import android.util.Log;
 import android.widget.Toast;
 
 public class UpdateDataSet extends Service {
@@ -21,9 +22,10 @@ public class UpdateDataSet extends Service {
         super.onCreate();
     }
 
-    Handler handler = new Handler() {
+    Handler vpHandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
+            Log.d("vpHandler", "RUN");
             try {
                 String message = CombineData.getChanges(CombineData.findChanges(oldData, dbHandler.getVP(grade)));
                 if (message != null) {
@@ -36,26 +38,39 @@ public class UpdateDataSet extends Service {
         }
     };
 
+    Handler gradesHandler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            Log.d("gradesHandler", "RUN");
+            if (Preferences.readBooleanFromPreferences(context, getString(R.string.DEVELOPER_MODE), false)) {
+                Toast.makeText(context, "UpdateDataSet", Toast.LENGTH_SHORT).show();
+            }
+            grade = new HWGrade(Preferences.readStringFromPreferences(context, getString(R.string.SELECTED_GRADE), "NULL"));
+            if (!grade.get_GradeName().equals("NULL")) {
+                dbHandler = new DBHandler(context, null, null, 1);
+                try {
+                    oldData = dbHandler.getVP(grade);
+                } catch (DBError dbError) {
+                    oldData = null;
+                }
+                Thread thread = new Thread(new GetVP(context, grade, vpHandler));
+                thread.start();
+                //alarm.SetAlarm(this);
+            } else {
+                stopSelf();
+            }
+        }
+    };
+
     Context context = this;
     DBHandler dbHandler;
     HWGrade grade;
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        if (Preferences.readBooleanFromPreferences(this, getString(R.string.DEVELOPER_MODE), false)) {
-            Toast.makeText(this, "UpdateDataSet", Toast.LENGTH_SHORT).show();
-        }
-        grade = new HWGrade(Preferences.readStringFromPreferences(this, getString(R.string.SELECTED_GRADE), "NULL"));
-        if (!grade.get_GradeName().equals("NULL")) {
-            dbHandler = new DBHandler(this, null, null, 1);
-            try {
-                oldData = dbHandler.getVP(grade);
-            } catch (DBError dbError) {
-                oldData = null;
-            }
-            Thread thread = new Thread(new GetVP(this, grade, handler));
-            thread.start();
-            //alarm.SetAlarm(this);
+        Log.d("UpdateDataSet", "In there");
+        if (Preferences.readBooleanFromPreferences(context, context.getString(R.string.UPDATE), true)) {
+            new Thread(new GetGradesFromVPGrades(this, gradesHandler)).start();
         } else {
             stopSelf();
         }
@@ -91,7 +106,7 @@ public class UpdateDataSet extends Service {
 */
         android.app.Notification notification = new NotificationCompat.Builder(context)
                 .setSmallIcon(R.drawable.ic_stat_calendar)
-                //.setLargeIcon(BitmapFactory.decodeResource(context.getResources(), R.drawable.ic_stat_calendar))
+                        //.setLargeIcon(BitmapFactory.decodeResource(context.getResources(), R.drawable.ic_stat_calendar))
                 .setAutoCancel(true)
                 .setContentIntent(resultPendingIntent)
                 .setContentTitle("VP-Änderung")
