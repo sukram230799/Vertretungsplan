@@ -87,7 +87,7 @@ public class DBHandler extends SQLiteOpenHelper {
 
     public void saveAddGrades(HWGrade[] newGrades){
         ArrayList<HWGrade> hwGradeArrayList = new ArrayList<>(Arrays.asList(newGrades));
-        HWGrade[] oldGrades = {};
+        HWGrade[] oldGrades;
         try {
             oldGrades = getGrades();
             int outer = 0;
@@ -124,7 +124,7 @@ public class DBHandler extends SQLiteOpenHelper {
 
     public HWGrade getGrade(int position) throws DBError {
         Log.v(TAG, "@getGrade:" + position);
-        HWGrade hwGrade = new HWGrade("NULL");
+        HWGrade hwGrade;
         SQLiteDatabase db = getWritableDatabase();
         String query = "SELECT * FROM " + TABLE_GRADES + " WHERE " + COLUMN_ID + "=\"" + (position+1) + "\";";
         Log.v(TAGQUERY, query);
@@ -141,10 +141,10 @@ public class DBHandler extends SQLiteOpenHelper {
 
     public HWGrade[] getGrades() throws DBError {
         Log.v(TAG, "@getGrades()");
-        ArrayList<HWGrade> GradeList = new ArrayList<HWGrade>();
-        HWGrade[] Grades = {new HWGrade("NULL")};
+        ArrayList<HWGrade> GradeList = new ArrayList<>();
+        HWGrade[] Grades;
         SQLiteDatabase db = getWritableDatabase();
-        String query = "SELECT * FROM " + TABLE_GRADES + " WHERE 1 ORDER BY " + COLUMN_GRADE;
+        String query = "SELECT * FROM " + TABLE_GRADES + " WHERE 1"/* ORDER BY " + COLUMN_GRADE*/;
         Cursor c = db.rawQuery(query, null);
         c.moveToFirst();
         Log.v(TAG, "$getGrades:Before while");
@@ -158,7 +158,7 @@ public class DBHandler extends SQLiteOpenHelper {
         if (GradeList.isEmpty()) {
             throw new DBError(DBError.TABLEEMPTY);
         }
-        Grades = (HWGrade[]) GradeList.toArray(new HWGrade[GradeList.size()]);
+        Grades = GradeList.toArray(new HWGrade[GradeList.size()]);
         db.close();
         Log.v(TAG, "-getGrades():db.close();");
         c.close();
@@ -180,7 +180,7 @@ public class DBHandler extends SQLiteOpenHelper {
     public VPData[] getVP(HWGrade grade) throws DBError {
         trimPlans();
         Log.v(TAG, "@getVP");
-        ArrayList<VPData> vpDatas = new ArrayList<VPData>();
+        ArrayList<VPData> vpDatas = new ArrayList<>();
         SQLiteDatabase db = getWritableDatabase();
         String query;
         //String query = "SELECT * FROM " + TABLE_VP + " WHERE " + COLUMN_DATE + ">= date(" + sdf.format(new Date()) + ");"; //Not used because of sorting with deleting of old entrys!
@@ -220,7 +220,7 @@ public class DBHandler extends SQLiteOpenHelper {
         if (vpDatas.isEmpty()) {
             throw new DBError(DBError.TABLEEMPTY);
         } else {
-            return (VPData[]) vpDatas.toArray(new VPData[vpDatas.size()]);
+            return vpDatas.toArray(new VPData[vpDatas.size()]);
         }
     }
 

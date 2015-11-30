@@ -31,19 +31,19 @@ public class Alarm extends BroadcastReceiver {
         Intent i = new Intent(context, Alarm.class);
         PendingIntent pi = PendingIntent.getBroadcast(context, 0, i, 0);
         int repeatTime;
-        if (Preferences.readBooleanFromPreferences(context, context.getString(R.string.DEVELOPER_MODE), false)) {
+        /*if (Preferences.readBooleanFromPreferences(context, context.getString(R.string.DEVELOPER_MODE), false)) {
             repeatTime = 1;
-        } else {
-            try {
-                repeatTime = Integer.parseInt(Preferences.readStringFromPreferences(context, context.getString(R.string.UPDATE_TIME), "15"));
-                if (repeatTime < 1) {
-                    repeatTime = 15;
-                }
-            } catch (NumberFormatException e) {
-                e.printStackTrace();
+        } else {*/
+        try {
+            repeatTime = Integer.parseInt(Preferences.readStringFromPreferences(context, context.getString(R.string.UPDATE_TIME), "15"));
+            if (repeatTime < 1) {
                 repeatTime = 15;
             }
+        } catch (NumberFormatException e) {
+            e.printStackTrace();
+            repeatTime = 15;
         }
+        //}
         am.setInexactRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), 1000 * 60 * repeatTime, pi); // Millisec * Second * Minute
     }
 
