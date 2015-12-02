@@ -35,7 +35,7 @@ public class Alarm extends BroadcastReceiver {
             repeatTime = 1;
         } else {*/
         try {
-            repeatTime = Integer.parseInt(Preferences.readStringFromPreferences(context, context.getString(R.string.UPDATE_TIME), "15"));
+            repeatTime = Integer.parseInt(Preferences.readStringFromPreferences(context, context.getString(R.string.UPDATE_TIME), context.getString(R.string.UPDATE_TIME_STANDARD)));
             if (repeatTime < 1) {
                 repeatTime = 15;
             }

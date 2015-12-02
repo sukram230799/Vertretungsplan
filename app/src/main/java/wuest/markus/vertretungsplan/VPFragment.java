@@ -10,9 +10,13 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AbsListView;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -45,14 +49,15 @@ public class VPFragment extends Fragment implements PlanAdapter.ClickListener, S
         position = getArguments().getInt("section_number");
         Log.v(TAG, "section_number: " + position);
         //if (position < 0) position = 0;
-        this.data = new ArrayList<VPData>();
+        this.data = new ArrayList<>();
         DBHandler dbHandler = new DBHandler(getContext(), null, null, 1);
         try {
             VPData[] vpData = dbHandler.getVP(dbHandler.getGrade(position));
             vpData = CombineData.combine(vpData);
-            for (VPData data : vpData) {
+            this.data = Arrays.asList(vpData);
+            /*for (VPData data : vpData) {
                 this.data.add(data);
-            }
+            }*/
         } catch (DBError dbError) {
             dbError.printStackTrace();
             if (dbError.getMessage().equals(DBError.TABLEEMPTY)) {
@@ -90,14 +95,38 @@ public class VPFragment extends Fragment implements PlanAdapter.ClickListener, S
             mSwipeRefreshLayout.setRefreshing(true);
             refreshListener.refreshedContent(mSwipeRefreshLayout);
         }*/
-        TextView noVPText = (TextView) layout.findViewById(R.id.noVPText);
-        if(data.isEmpty()){
-            noVPText.setVisibility(View.VISIBLE);
+//        TextView noVPText = (TextView) layout.findViewById(R.id.noVPText);
+        final ListView noVP = (ListView) layout.findViewById(R.id.noVP);
+        String[] i = {"Kein VP."};
+        ArrayAdapter adapter = new ArrayAdapter<>(getContext(), R.layout.no_vp, i);
+        noVP.setAdapter(adapter);
+        if (data.isEmpty()) {
+//            noVPText.setVisibility(View.VISIBLE);
+            noVP.setVisibility(View.VISIBLE);
             recyclerView.setVisibility(View.GONE);
         } else {
-            noVPText.setVisibility(View.GONE);
+//            noVPText.setVisibility(View.GONE);
+            noVP.setVisibility(View.GONE);
             recyclerView.setVisibility(View.VISIBLE);
         }
+        noVP.setOnScrollListener(new AbsListView.OnScrollListener() {
+            @Override
+            public void onScrollStateChanged(AbsListView view, int scrollState) {
+
+            }
+
+            @Override
+            public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+                if (data.isEmpty()) {
+                    int topRowVerticalPosition = (noVP == null || noVP.getChildCount() == 0) ? 0 : noVP.getChildAt(0).getTop();
+                    mSwipeRefreshLayout.setEnabled(firstVisibleItem == 0 && topRowVerticalPosition >= 0);
+                }
+                else {
+                    int topRowVerticalPosition = (recyclerView == null || recyclerView.getChildCount() == 0) ? 0 : recyclerView.getChildAt(0).getTop();
+                    mSwipeRefreshLayout.setEnabled(firstVisibleItem == 0 && topRowVerticalPosition >= 0);
+                }
+            }
+        });
         //mSwipeRefreshLayout.setOnRefreshListener();
         return layout;
         //return inflater.inflate(R.layout.fragment_vp, container, false);

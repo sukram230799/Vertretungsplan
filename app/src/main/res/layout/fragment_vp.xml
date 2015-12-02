@@ -15,14 +15,23 @@
             android:layout_height="match_parent"
             android:orientation="vertical">
 
-            <TextView
+            <!--<TextView
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:text="@string/noVP"
                 android:visibility="visible"
                 android:id="@+id/noVPText"
                 android:gravity="center"
-                android:textSize="30sp" />
+                android:textSize="30sp" />-->
+
+            <ListView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:id="@+id/noVP"
+                android:layout_gravity="center"
+                android:visibility="visible"
+                android:textAlignment="center"
+                android:divider="#cccccc" />
 
             <android.support.v7.widget.RecyclerView
                 android:id="@+id/plan_recycler_view"

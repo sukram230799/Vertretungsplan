@@ -17,13 +17,13 @@
             android:numeric="integer"
             android:summary="Standard: 15min."
             android:title="Häufigkeit"
-
             />
         <CheckBoxPreference
             android:defaultValue="true"
             android:dependency="@string/UPDATE"
             android:key="@string/NOTIFICATION"
-            android:title="@string/notification" />
+            android:title="@string/notification"
+            android:summary="@string/notification_inform"/>
     </PreferenceCategory>
     <PreferenceCategory android:title="Erweitertes">
         <CheckBoxPreference

@@ -36,12 +36,12 @@ public class DBHandler extends SQLiteOpenHelper {
 
     public DBHandler(Context context, String name, SQLiteDatabase.CursorFactory factory, int version) {
         super(context, DATABASE_NAME, factory, DATABASE_VERSION);
-        Log.v(TAG, "@DBHandler()");
+        Log.d(TAG, "@DBHandler()");
     }
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        Log.v(TAG, "@onCreate()");
+        Log.d(TAG, "@onCreate()");
         //Grade Table
         String query = "CREATE TABLE " + TABLE_GRADES + "(" +
                 COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
@@ -61,31 +61,31 @@ public class DBHandler extends SQLiteOpenHelper {
                 ");";
         db.execSQL(query);
 
-        Log.v(TAG, "-onCreate");
+        Log.d(TAG, "-onCreate");
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        Log.v(TAG, "@onUpgrade()");
+        Log.d(TAG, "@onUpgrade()");
         //No Migration!
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_GRADES);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_VP);
         onCreate(db);
-        Log.v(TAG, "-onUpgrade()");
+        Log.d(TAG, "-onUpgrade()");
     }
 
     //Add ROW
     public void addGrade(HWGrade hwGrade) {
-        Log.v(TAG, "@addGrade()");
+        Log.d(TAG, "@addGrade()");
         ContentValues values = new ContentValues();
         values.put(COLUMN_GRADE, hwGrade.get_GradeName());
         SQLiteDatabase db = getWritableDatabase();
         db.insert(TABLE_GRADES, null, values);
         //db.close(); //Never CLOSE DB!
-        Log.v(TAG, "-addGrade()");
+        Log.d(TAG, "-addGrade()");
     }
 
-    public void saveAddGrades(HWGrade[] newGrades){
+    public void saveAddGrades(HWGrade[] newGrades) {
         ArrayList<HWGrade> hwGradeArrayList = new ArrayList<>(Arrays.asList(newGrades));
         HWGrade[] oldGrades;
         try {
@@ -93,41 +93,41 @@ public class DBHandler extends SQLiteOpenHelper {
             int outer = 0;
             int inner = 0;
             int innerif = 0;
-            for (HWGrade oldGrade : oldGrades){
+            for (HWGrade oldGrade : oldGrades) {
                 Log.d("saveAddGrade", "outer: " + outer++);
-                for (HWGrade newGrade : newGrades){
+                for (HWGrade newGrade : newGrades) {
                     Log.d("saveAddGrade", "inner: " + inner++);
-                    if(oldGrade.get_GradeName().equals(newGrade.get_GradeName())){
+                    if (oldGrade.get_GradeName().equals(newGrade.get_GradeName())) {
                         hwGradeArrayList.remove(newGrade);
                         Log.d("saveAddGrade", "if: " + innerif++);
                     }
                 }
             }
-            for(HWGrade grade: hwGradeArrayList){
+            for (HWGrade grade : hwGradeArrayList) {
                 addGrade(grade);
             }
         } catch (DBError dbError) {
             dbError.printStackTrace();
-            for (HWGrade hwGrade : newGrades){
+            for (HWGrade hwGrade : newGrades) {
                 addGrade(hwGrade);
             }
         }
     }
 
     public void delGrade(String Grade) {
-        Log.v(TAG, "@delGrade()");
+        Log.d(TAG, "@delGrade()");
         SQLiteDatabase db = getWritableDatabase();
         db.execSQL("DELETE FROM " + TABLE_GRADES + " WHERE " + COLUMN_GRADE + "=\"" + Grade + "\";");
         //db.close(); //Never CLOSE DB!
-        Log.v(TAG, "-delGrade()");
+        Log.d(TAG, "-delGrade()");
     }
 
     public HWGrade getGrade(int position) throws DBError {
-        Log.v(TAG, "@getGrade:" + position);
+        Log.d(TAG, "@getGrade:" + position);
         HWGrade hwGrade;
         SQLiteDatabase db = getWritableDatabase();
-        String query = "SELECT * FROM " + TABLE_GRADES + " WHERE " + COLUMN_ID + "=\"" + (position+1) + "\";";
-        Log.v(TAGQUERY, query);
+        String query = "SELECT * FROM " + TABLE_GRADES + " WHERE " + COLUMN_ID + "=\"" + (position + 1) + "\";";
+        Log.d(TAGQUERY, query);
         Cursor c = db.rawQuery(query, null);
         c.moveToFirst();
         if (!c.isAfterLast()) {
@@ -140,17 +140,16 @@ public class DBHandler extends SQLiteOpenHelper {
     }
 
     public HWGrade[] getGrades() throws DBError {
-        Log.v(TAG, "@getGrades()");
+        Log.d(TAG, "@getGrades()");
         ArrayList<HWGrade> GradeList = new ArrayList<>();
-        HWGrade[] Grades;
         SQLiteDatabase db = getWritableDatabase();
         String query = "SELECT * FROM " + TABLE_GRADES + " WHERE 1"/* ORDER BY " + COLUMN_GRADE*/;
         Cursor c = db.rawQuery(query, null);
         c.moveToFirst();
-        Log.v(TAG, "$getGrades:Before while");
+        Log.d(TAG, "$getGrades:Before while");
         while (!c.isAfterLast()) {
             if (c.getString(c.getColumnIndex(COLUMN_GRADE)) != null) {
-                Log.v(TAG, "$getGrades:WHILE");
+                Log.d(TAG, "$getGrades:WHILE");
                 GradeList.add(new HWGrade(c.getString(c.getColumnIndex(COLUMN_GRADE))));
             }
             c.moveToNext();
@@ -158,11 +157,10 @@ public class DBHandler extends SQLiteOpenHelper {
         if (GradeList.isEmpty()) {
             throw new DBError(DBError.TABLEEMPTY);
         }
-        Grades = GradeList.toArray(new HWGrade[GradeList.size()]);
         db.close();
-        Log.v(TAG, "-getGrades():db.close();");
+        Log.d(TAG, "-getGrades():db.close();");
         c.close();
-        return Grades;
+        return GradeList.toArray(new HWGrade[GradeList.size()]);
     }
 
     public int getGradePosition(HWGrade grade) {
@@ -170,16 +168,45 @@ public class DBHandler extends SQLiteOpenHelper {
         String query = "SELECT * FROM " + TABLE_GRADES + " WHERE " + COLUMN_GRADE + "=\"" + grade.get_GradeName() + "\";";
         Cursor c = db.rawQuery(query, null);
         c.moveToFirst();
-        if(!c.isAfterLast()){
+        if (!c.isAfterLast()) {
             return c.getInt(c.getColumnIndex(COLUMN_ID)) - 1;
         }
         c.close();
         return -1;
     }
 
+    public void sortGrades() {
+        ArrayList<HWGrade> gradeList = new ArrayList<>();
+        SQLiteDatabase db = getWritableDatabase();
+        String query = "SELECT * FROM " + TABLE_GRADES + " WHERE 1 ORDER BY " + COLUMN_GRADE;
+        Cursor c = db.rawQuery(query, null);
+        c.moveToFirst();
+        Log.d(TAG, "$getGrades:Before while");
+        while (!c.isAfterLast()) {
+            if (c.getString(c.getColumnIndex(COLUMN_GRADE)) != null) {
+                Log.d(TAG, "$getGrades:WHILE");
+                gradeList.add(new HWGrade(c.getString(c.getColumnIndex(COLUMN_GRADE))));
+            }
+            c.moveToNext();
+        }
+        if (gradeList.isEmpty()) {
+            return;
+        }
+        c.close();
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_GRADES);
+        query = "CREATE TABLE " + TABLE_GRADES + "(" +
+                COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                COLUMN_GRADE + " TEXT " +
+                ");";
+        db.execSQL(query);
+        for (HWGrade hwGrade: gradeList){
+            addGrade(hwGrade);
+        }
+    }
+
     public VPData[] getVP(HWGrade grade) throws DBError {
         trimPlans();
-        Log.v(TAG, "@getVP");
+        Log.d(TAG, "@getVP");
         ArrayList<VPData> vpDatas = new ArrayList<>();
         SQLiteDatabase db = getWritableDatabase();
         String query;
@@ -187,7 +214,7 @@ public class DBHandler extends SQLiteOpenHelper {
         query = "SELECT * FROM " + TABLE_VP + " WHERE " + COLUMN_GRADE + "=\"" + grade.get_GradeName() + "\" ORDER BY " + COLUMN_DATE + ", " + COLUMN_HOUR + " ASC";
         Cursor c = db.rawQuery(query, null);
         c.moveToFirst();
-        Log.v(TAG, "$getVP@while");
+        Log.d(TAG, "$getVP@while");
         while (!c.isAfterLast()) {
             if (c.getString(c.getColumnIndex(COLUMN_GRADE)) != null &&
                     c.getString(c.getColumnIndex(COLUMN_SUBJECT)) != null &&
@@ -196,9 +223,9 @@ public class DBHandler extends SQLiteOpenHelper {
                     c.getString(c.getColumnIndex(COLUMN_INFO2)) != null &&
                     c.getString(c.getColumnIndex(COLUMN_DATE)) != null
                     ) {
-                Log.v(TAG, "2");
+                Log.d(TAG, "2");
                 try {
-                    Log.v(TAG, "3");
+                    Log.d(TAG, "3");
                     vpDatas.add(new VPData(grade,
                             new Integer[]{c.getInt(c.getColumnIndex(COLUMN_HOUR))},
                             c.getString(c.getColumnIndex(COLUMN_SUBJECT)),
@@ -212,7 +239,7 @@ public class DBHandler extends SQLiteOpenHelper {
                     onUpgrade(db, 0, DATABASE_VERSION);
                     throw new DBError(DBError.INVALIDDATEFORMAT);
                 }
-                Log.v(TAG, "4");
+                Log.d(TAG, "4");
             }
             c.moveToNext();
         }
@@ -225,13 +252,13 @@ public class DBHandler extends SQLiteOpenHelper {
     }
 
     public void addPlan(VPData[] vpDatas) {
-        Log.v(TAG, "@addDayPlan");
+        Log.d(TAG, "@addDayPlan");
         SQLiteDatabase db = getWritableDatabase();
         ContentValues values = new ContentValues();
-        Log.v(TAG, "$addDayPlan:before for");
+        Log.d(TAG, "$addDayPlan:before for");
         for (VPData data : vpDatas) {
-            for(Integer hour: data.get_hours()) {
-                Log.v(TAG, "$addDayPlan:for");
+            for (Integer hour : data.get_hours()) {
+                Log.d(TAG, "$addDayPlan:for");
                 values.put(COLUMN_DATE, dbDateFormat.format(data.get_date()));
                 values.put(COLUMN_GRADE, data.get_grade().get_GradeName());
                 values.put(COLUMN_HOUR, hour);
@@ -243,24 +270,24 @@ public class DBHandler extends SQLiteOpenHelper {
                 values = new ContentValues();
             }
         }
-        Log.v(TAG, "-addDayPlan");
+        Log.d(TAG, "-addDayPlan");
     }
 
-    void removeVP(HWGrade grade){
-        String query = "DELETE FROM " + TABLE_VP + " WHERE " + COLUMN_GRADE +"=\"" + grade.get_GradeName() +"\";";
+    void removeVP(HWGrade grade) {
+        String query = "DELETE FROM " + TABLE_VP + " WHERE " + COLUMN_GRADE + "=\"" + grade.get_GradeName() + "\";";
         getWritableDatabase().execSQL(query);
     }
 
-    public boolean isVP(HWGrade grade){
+    public boolean isVP(HWGrade grade) {
         String query = "SELECT 1 FROM " + TABLE_VP + " WHERE " + COLUMN_GRADE + "=\"" + grade.get_GradeName() + "\";";
         Cursor cursor = getWritableDatabase().rawQuery(query, null);
         cursor.moveToFirst();
-        if(cursor.isAfterLast()){
+        if (cursor.isAfterLast()) {
             cursor.close();
-            Log.v(TAG, "false");
+            Log.d(TAG, "false");
             return false;
         }
-        Log.v(TAG, "true");
+        Log.d(TAG, "true");
         cursor.close();
         return true;
     }
@@ -269,7 +296,7 @@ public class DBHandler extends SQLiteOpenHelper {
         SQLiteDatabase db = getWritableDatabase();
         String query;
         query = "DELETE FROM " + TABLE_VP + " WHERE " + COLUMN_DATE + " < '"/*date("*/ + dbDateFormat.format(new Date()) + /*")*/"';";
-        Log.v(TAG, query);
+        Log.d(TAG, query);
         db.execSQL(query); //Delete old VP
         /*
         SQLiteDatabase db = getWritableDatabase();

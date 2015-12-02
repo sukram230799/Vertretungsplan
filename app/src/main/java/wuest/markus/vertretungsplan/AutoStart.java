@@ -21,7 +21,7 @@ public class AutoStart extends BroadcastReceiver {
                 Toast.makeText(context, "Autostart", Toast.LENGTH_SHORT).show();
             }
             alarm.SetAlarm(context);
-            //context.startService(new Intent(context, UpdateDataSet.class));
+            context.startService(new Intent(context, UpdateDataSet.class));
         }
     }
 }

@@ -68,11 +68,19 @@ public class UpdateDataSet extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        Log.d("UpdateDataSet", "In there");
-        if (Preferences.readBooleanFromPreferences(context, context.getString(R.string.UPDATE), true)) {
-            new Thread(new GetGradesFromVPGrades(this, gradesHandler)).start();
+        if (!MainActivity.foreground || MainActivity.manualupdate) {
+            MainActivity.manualupdate = false;
+            Log.d("UpdateDataSet", "In there");
+            if (Preferences.readBooleanFromPreferences(context, context.getString(R.string.UPDATE), true)) {
+                new Thread(new GetGradesFromVPGrades(this, gradesHandler)).start();
+            } else {
+                stopSelf();
+                return START_NOT_STICKY;
+            }
         } else {
+            Log.d("UpdateDataSet", "MainActivity Active");
             stopSelf();
+            return START_NOT_STICKY;
         }
         return START_STICKY;
     }

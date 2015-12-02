@@ -1,8 +1,6 @@
 package wuest.markus.vertretungsplan;
 
-import android.app.AlarmManager;
 import android.app.AlertDialog;
-import android.app.PendingIntent;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -21,7 +19,8 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Toast;
+
+import java.util.Date;
 
 public class MainActivity extends AppCompatActivity implements NavigationDrawerFragment.ItemSelectedListener, VPFragment.RefreshContentListener {
 
@@ -34,7 +33,7 @@ public class MainActivity extends AppCompatActivity implements NavigationDrawerF
             if (bundle.getString("Error") == null) {
                 loadVPFragment(getSupportFragmentManager(), position);
                 if (refreshLayout != null) {
-                    Log.v(TAG, "setRefreshing(false)");
+                    Log.d(TAG, "setRefreshing(false)");
                     refreshLayout.setRefreshing(false);
                     /*refreshLayout.destroyDrawingCache();
                     refreshLayout.clearAnimation();*/
@@ -46,6 +45,7 @@ public class MainActivity extends AppCompatActivity implements NavigationDrawerF
                 AlertDialog.Builder builder = new AlertDialog.Builder(context);
                 builder.setTitle("Keine Verbindung");
                 builder.setMessage("Die App konnte aufgrund eines Netzwerkfehlers die Daten nicht laden.");
+                builder.setCancelable(false);
                 builder.setPositiveButton("Erneut versuchen", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
@@ -53,7 +53,7 @@ public class MainActivity extends AppCompatActivity implements NavigationDrawerF
                             if (refreshLayout != null) {
                                 refreshLayout.setColorSchemeColors(Color.BLACK);
                             }
-                            Log.v(GetVP.TAG, "From 1");
+                            Log.d(GetVP.TAG, "From 1");
                             new Thread(new GetVP(context, new HWGrade(bundle.getString("HWGrade")), vpHandler)).start();
                         }
                     }
@@ -70,7 +70,7 @@ public class MainActivity extends AppCompatActivity implements NavigationDrawerF
                                 .replace(R.id.container, vpFragment)
                                 .commit();
                         if (refreshLayout != null) {
-                            Log.v(TAG, "setRefreshing(false)");
+                            Log.d(TAG, "setRefreshing(false)");
                             refreshLayout.setRefreshing(false);
                             /*refreshLayout.destroyDrawingCache();
                             refreshLayout.clearAnimation();*/
@@ -83,7 +83,7 @@ public class MainActivity extends AppCompatActivity implements NavigationDrawerF
                 }
             }
 
-            Log.v(TAG, "reloaded");
+            Log.d(TAG, "reloaded");
         }
     };
 
@@ -95,6 +95,8 @@ public class MainActivity extends AppCompatActivity implements NavigationDrawerF
             final Bundle bundle = msg.getData();
             progressDialog.dismiss();
             if (bundle.get("Error") == null) {
+                drawerFragment.onResume();
+                /*
                 AlertDialog.Builder builder = new AlertDialog.Builder(context);
                 builder.setTitle("Neustarten");
                 builder.setMessage("Die App muss nun neugestartet werden.");
@@ -113,10 +115,11 @@ public class MainActivity extends AppCompatActivity implements NavigationDrawerF
                 AlertDialog alertDialog = builder.create();
                 if (!isFinishing()) {
                     alertDialog.show();
-                }
+                }*/
             } else {
                 AlertDialog.Builder builder = new AlertDialog.Builder(context);
                 builder.setTitle("Keine Verbindung");
+                builder.setCancelable(false);
                 builder.setMessage("Die App konnte aufgrund eines Netzwerkfehlers die Daten nicht laden.");
                 builder.setPositiveButton("Erneut versuchen", new DialogInterface.OnClickListener() {
                     @Override
@@ -152,7 +155,11 @@ public class MainActivity extends AppCompatActivity implements NavigationDrawerF
     public static final String REPEAT_TIME = "repeatTime";*/
     DBHandler dbHandler;
 
+    static boolean foreground = false;
+    static boolean manualupdate = false;
+
     private Toolbar toolbar;
+    private NavigationDrawerFragment drawerFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -177,6 +184,7 @@ public class MainActivity extends AppCompatActivity implements NavigationDrawerF
             progressDialog = new ProgressDialog(this, ProgressDialog.STYLE_SPINNER);
             progressDialog.setMessage("Initializing");
             progressDialog.setIndeterminate(true);
+            progressDialog.setCancelable(false);
             if (!isFinishing()) {
                 progressDialog.show();
             }
@@ -186,7 +194,7 @@ public class MainActivity extends AppCompatActivity implements NavigationDrawerF
     }
 
     public void SetUp() {
-        NavigationDrawerFragment drawerFragment = (NavigationDrawerFragment)
+        drawerFragment = (NavigationDrawerFragment)
                 getSupportFragmentManager().findFragmentById(R.id.fragment_navigation_drawer);
         drawerFragment.setUp(R.id.fragment_navigation_drawer, (DrawerLayout) findViewById(R.id.drawer_layout), toolbar);
         drawerFragment.setItemSelectedListener(this);
@@ -195,14 +203,30 @@ public class MainActivity extends AppCompatActivity implements NavigationDrawerF
             position = 0;
         }
         loadVPFragment(getSupportFragmentManager(), position);
-        Log.v(TAG, Preferences.readStringFromPreferences(this, getString(R.string.SELECTED_GRADE), "NULL"));
+        Log.d(TAG, Preferences.readStringFromPreferences(this, getString(R.string.SELECTED_GRADE), "NULL"));
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_main, menu);
+        if (!Preferences.readBooleanFromPreferences(this, getString(R.string.DEVELOPER_MODE), false)) {
+            getMenuInflater().inflate(R.menu.menu_main, menu);
+        } else {
+            getMenuInflater().inflate(R.menu.menu_dev, menu);
+        }
         return true;
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        foreground = false;
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        foreground = true;
     }
 
     @Override
@@ -222,6 +246,32 @@ public class MainActivity extends AppCompatActivity implements NavigationDrawerF
             return true;
         } else if (id == R.id.about) {
             startActivity(new Intent(this, About.class));
+        } else if (id == R.id.sort) {
+            dbHandler.sortGrades();
+            drawerFragment.onResume();
+        } else if (id == R.id.updatedataset){
+            manualupdate = true;
+            startService(new Intent(this, UpdateDataSet.class));
+        } else if (id == R.id.fakedata){
+            HWGrade hwGrade;
+            try {
+                hwGrade = dbHandler.getGrade(position);
+            } catch (DBError dbError) {
+                dbError.printStackTrace();
+                hwGrade = new HWGrade("TG11-2");
+            }
+            Integer[] hour0 = {0,1};
+            Integer[] hour1 = {2,3};
+            Integer[] hour2 = {4,5};
+            Integer[] hour3 = {6,7};
+            Integer[] hour4 = {8,9};
+            VPData[] vpData = {new VPData(hwGrade, hour0, "S", "A1337", "Freisetzung", "", new Date()),
+                    new VPData(hwGrade, hour1, "C", "A1337", "Freisetzung", "", new Date()),
+                    new VPData(hwGrade, hour2, "H", "A1337", "Freisetzung", "", new Date()),
+                    new VPData(hwGrade, hour3, "U", "A1337", "Freisetzung", "", new Date()),
+                    new VPData(hwGrade, hour4, "L", "A1337", "Freisetzung", "", new Date())};
+            dbHandler.addPlan(vpData);
+            loadVPFragment(getSupportFragmentManager(), position);
         }
 
         return super.onOptionsItemSelected(item);
@@ -233,7 +283,7 @@ public class MainActivity extends AppCompatActivity implements NavigationDrawerF
     @Override
     public void gradeItemSelected(View view, int position, boolean longclick) {
         this.position = position;
-        Log.v("DEBUG.Item", String.valueOf(position));
+        Log.d("DEBUG.Item", String.valueOf(position));
         FragmentManager fragmentManager = getSupportFragmentManager();
         loadVPFragment(fragmentManager, position);
     }
@@ -283,9 +333,9 @@ public class MainActivity extends AppCompatActivity implements NavigationDrawerF
             dbError.printStackTrace();
             hwGrade = new HWGrade(Preferences.readStringFromPreferences(this, getString(R.string.SELECTED_GRADE), "NULL"));
         }
-        Log.v(GetVP.TAG, "From 2");
+        Log.d(GetVP.TAG, "From 2");
         new Thread(new GetVP(this, hwGrade, vpHandler)).start();
 
-        Log.v(TAG, "reload");
+        Log.d(TAG, "reload");
     }
 }

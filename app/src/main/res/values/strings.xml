@@ -41,6 +41,11 @@
     <string name="UPDATE_TIME">wuest.markus.vertretungsplan.updateTime</string>
     <string name="DEVELOPER_MODE">wuest.markus.vertretungsplan.toastEnabled</string>
     <string name="NOTIFICATION">wuest.markus.vertretungsplan.notification</string>
+    <string name="UPDATE_TIME_STANDARD">15</string>
+    <string name="UPDATE_TIME_TEXT">%1$s min.</string>
+    <string name="UPDATE_TIME_STANDARD_TEXT">%1$s min. (Standard)</string>
+    <string name="NEW_GRADES">wuest.markus.vertretungsplan.newgrade</string>
+
     <string name="notification">Benachrichtigung</string>
     <string name="developermode">Entwickler Modus</string>
     <string name="refresh">Aktualisieren</string>
@@ -50,4 +55,5 @@
     <string name="olddata">Alte Daten</string>
     <string name="newdata">Neue Daten</string>
     <string name="about">About</string>
+    <string name="notification_inform">Über Änderungen informieren.</string>
 </resources>

@@ -26,7 +26,7 @@ public class GetGradesFromVPGrades implements Runnable {
     @Override
     public void run() {
         Message message = new Message();
-        ArrayList<HWGrade> grades = new ArrayList<HWGrade>();
+        ArrayList<HWGrade> grades = new ArrayList<>();
         String grade_number;
         for (int times = 1; times <= 7; times++) {
             try {
@@ -35,11 +35,11 @@ public class GetGradesFromVPGrades implements Runnable {
                         .data("type", "getKlassen")
                         .data("id", grade_number)
                         .post();
-                //Log.v("GRADES.TEXT", doc.text());
+                //Log.d("GRADES.TEXT", doc.text());
                 if (!doc.text().equals("")) {
-                    Log.v("GRADES", doc.text());
+                    Log.d("GRADES", doc.text());
                     for (Element grade : doc.select("a")) {
-                        Log.v("GRADES.GRADE", grade.html());
+                        Log.d("GRADES.GRADE", grade.html());
                         grades.add(new HWGrade(grade.html()));
                     }
                 }
@@ -55,6 +55,7 @@ public class GetGradesFromVPGrades implements Runnable {
             dbHandler.addGrade(grade);
         }*/
         dbHandler.saveAddGrades(grades.toArray(new HWGrade[grades.size()]));
+        dbHandler.sortGrades();
         dbHandler.close();
         try {
             Thread.sleep(1000);
