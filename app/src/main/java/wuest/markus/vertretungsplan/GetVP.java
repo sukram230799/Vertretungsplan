@@ -20,9 +20,9 @@ public class GetVP implements Runnable {
 
     public static final String TAG = "GetVP";
 
-    private static Context context;
-    private static HWGrade grade;
-    private static Handler handler;
+    private Context context;
+    private HWGrade grade;
+    private Handler handler;
 
     public GetVP(Context context, HWGrade grade, Handler handler) {
         this.context = context;
@@ -41,6 +41,7 @@ public class GetVP implements Runnable {
             try {
                 DBHandler dbHandler = new DBHandler(context, null, null, 1);
                 Document document = Jsoup.connect("http://vp.hw-schule.de/request.php")
+                        .userAgent("wuest.markus.vertretungsplan")
                         .data("type", "getVertretungsplan")
                         .data("id", grade.get_GradeName())
                         .post();
@@ -112,11 +113,11 @@ public class GetVP implements Runnable {
                 }
             }
         }
-        return (VPData[]) vpDataArrayList.toArray(new VPData[vpDataArrayList.size()]);
+        return vpDataArrayList.toArray(new VPData[vpDataArrayList.size()]);
     }
 
     private VPData parseRow(int hour, Element element, HWGrade grade, Date date) {
-        ArrayList<String> stringArrayList = new ArrayList<String>(2);
+        ArrayList<String> stringArrayList = new ArrayList<>(2);
         for (Element row : element.select("td.spalte4")) {
             if (row.html().contains("[")) {
                 stringArrayList.add("");

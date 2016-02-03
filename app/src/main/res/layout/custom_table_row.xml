@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="85dp"
+    android:background="@color/planBackground"
+    android:orientation="horizontal"
+    android:paddingLeft="5dp"
+    android:paddingTop="5dp"
+    android:paddingRight="5dp"
+    android:paddingBottom="0dp">
+
+    <android.support.v7.widget.CardView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:translationZ="10dp">
+
+        <TableLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/planForeground"
+            android:stretchColumns="3">
+
+            <TableRow android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:minHeight="100dp">
+
+                <TextView
+                    android:id="@+id/textHour"
+                    android:layout_width="50dp"
+                    android:layout_height="wrap_content"
+                    android:layout_column="1"
+                    android:text="1"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:gravity="center_vertical"
+                    android:layout_gravity="center_vertical"
+                    android:paddingLeft="15dp" />
+
+
+                <TextView
+                    android:id="@+id/textTeacher"
+                    android:layout_width="75dp"
+                    android:layout_height="wrap_content"
+                    android:layout_column="1"
+                    android:text="BOB"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:gravity="center_vertical"
+                    android:layout_gravity="center_vertical" />
+
+                <TextView
+                    android:id="@+id/textSubject"
+                    android:layout_width="75dp"
+                    android:layout_height="wrap_content"
+                    android:layout_column="1"
+                    android:text="CH"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:gravity="center_vertical"
+                    android:layout_gravity="center_vertical" />
+
+                <TextView
+                    android:id="@+id/textRoom"
+                    android:layout_width="75dp"
+                    android:layout_height="wrap_content"
+                    android:layout_column="1"
+                    android:text="A301"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:gravity="center_vertical|right"
+                    android:layout_gravity="center_vertical" />
+
+                <TextView
+                    android:id="@+id/textRepeatType"
+                    android:layout_width="75dp"
+                    android:layout_height="wrap_content"
+                    android:layout_column="1"
+                    android:text="G151"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:gravity="center_vertical|right"
+                    android:layout_gravity="center_vertical"
+                    android:paddingRight="15dp"
+                    android:password="false" />
+            </TableRow>
+        </TableLayout>
+    </android.support.v7.widget.CardView>
+</LinearLayout>

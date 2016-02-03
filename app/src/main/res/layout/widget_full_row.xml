@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/planBackground"
+    android:orientation="vertical"
+    android:padding="5dp">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/planForeground">
+
+        <TextView
+            android:id="@+id/textDate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="5dp"
+            android:text="@string/notLoadedText"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textColor="#8a000000" />
+
+        <TextView
+            android:id="@+id/fixedHour"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignLeft="@+id/textDate"
+            android:layout_alignStart="@+id/textDate"
+
+            android:layout_below="@+id/textDate"
+            android:layout_marginLeft="10dp"
+            android:layout_marginStart="10dp"
+            android:text="@string/fixedHour"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textColor="#8a000000" />
+
+        <TextView
+            android:id="@+id/textHour"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignTop="@+id/fixedHour"
+            android:layout_marginLeft="30dp"
+            android:layout_marginStart="30dp"
+            android:layout_toEndOf="@+id/fixedHour"
+            android:layout_toRightOf="@+id/fixedHour"
+            android:text="@string/notLoadedText"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textColor="#8a000000" />
+
+        <TextView
+            android:id="@+id/fixedSubject"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignLeft="@+id/textDate"
+            android:layout_alignStart="@+id/textDate"
+
+            android:layout_below="@+id/fixedHour"
+            android:layout_marginLeft="10dp"
+            android:layout_marginStart="10dp"
+            android:text="@string/fixedSubject"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textColor="#8a000000" />
+
+        <TextView
+            android:id="@+id/textSubject"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignLeft="@+id/textHour"
+            android:layout_alignStart="@+id/textHour"
+
+            android:layout_below="@+id/textHour"
+            android:text="@string/notLoadedText"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textColor="#8a000000" />
+
+        <TextView
+            android:id="@+id/fixedRoom"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignLeft="@+id/textDate"
+            android:layout_alignStart="@+id/textDate"
+
+            android:layout_alignTop="@+id/textRoom"
+            android:layout_marginLeft="10dp"
+            android:layout_marginStart="10dp"
+            android:text="@string/fixedRoom"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textColor="#8a000000" />
+
+        <TextView
+            android:id="@+id/textRoom"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignLeft="@+id/textSubject"
+            android:layout_alignStart="@+id/textSubject"
+
+            android:layout_below="@+id/textSubject"
+            android:text="@string/notLoadedText"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textColor="#8a000000" />
+
+        <TextView
+            android:id="@+id/fixedInfo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignLeft="@+id/textDate"
+            android:layout_alignStart="@+id/textDate"
+
+            android:layout_below="@+id/textRoom"
+            android:layout_marginLeft="10dp"
+            android:layout_marginStart="10dp"
+            android:text="@string/fixedInfo"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textColor="#8a000000" />
+
+        <TextView
+            android:id="@+id/textInfo1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignLeft="@+id/textSubject"
+            android:layout_alignStart="@+id/textSubject"
+
+            android:layout_alignTop="@+id/fixedInfo"
+            android:text="@string/notLoadedText"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textColor="#8a000000" />
+
+
+        <TextView
+            android:id="@+id/textInfo2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignLeft="@+id/textInfo1"
+            android:layout_alignStart="@+id/textInfo1"
+
+            android:layout_below="@+id/textInfo1"
+            android:text="@string/notLoadedText"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textColor="#8a000000" />
+    </RelativeLayout>
+</RelativeLayout>

@@ -109,6 +109,7 @@ public class GradeAdapter extends RecyclerView.Adapter<GradeAdapter.GradeViewHol
 
         @Override
         public void onClick(View v) {
+            Log.d(TAG, "CLICK");
             if (clickListener != null) {
                 notifyItemChanged(selected);
                 notifyItemChanged(position);
@@ -124,6 +125,7 @@ public class GradeAdapter extends RecyclerView.Adapter<GradeAdapter.GradeViewHol
         @Override
         public boolean onLongClick(View v) {
             Log.v(TAG, v.toString());
+            Log.d(TAG, "LONGCLICK");
             Vibrator vibrator = (Vibrator) context.getSystemService(Context.VIBRATOR_SERVICE);
             vibrator.vibrate(500);
             Snackbar.make(v, "Klasse " + data.get(getAdapterPosition()).get_GradeName() + " wurde als Standard festgelegt.", Snackbar.LENGTH_LONG)
@@ -134,7 +136,8 @@ public class GradeAdapter extends RecyclerView.Adapter<GradeAdapter.GradeViewHol
             chosenGrade = data.get(getAdapterPosition()).get_GradeName();
             //clickListener.gradeItemLongClicked(v, getAdapterPosition());
             longclick = true;
-            return false;
+            onClick(v);
+            return true;
             //return true;
         }
     }

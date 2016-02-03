@@ -2,159 +2,167 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#cccccc"
-    android:orientation="vertical">
+    android:background="@color/planBackground"
+    android:orientation="vertical"
+    android:paddingBottom="0dp"
+    android:paddingLeft="5dp"
+    android:paddingTop="5dp"
+    android:paddingRight="5dp">
 
-
-    <TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    <android.support.v7.widget.CardView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_margin="5dp"
-        android:layout_marginBottom="0dp"
-        android:layout_marginLeft="5dp"
-        android:layout_marginRight="5dp"
-        android:layout_marginTop="5dp"
-        android:background="#ffffff"
-        android:translationZ="1dp">
-        <!--^ android:background="#ffffff"-->
-        <TextView
-            android:id="@+id/textDate"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_margin="5dp"
-            android:text="@string/notLoadedText"
-            android:textAppearance="?android:attr/textAppearanceMedium" />
+        android:background="@color/planForeground">
 
-        <!--
-    <TableRow
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_marginRight="5dp">
-        <TextView
-            android:id="@+id/fixedDate"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_column="0"
-            android:layout_margin="5dp"
-            android:text="@string/fixedDate"
-            android:textAppearance="?android:attr/textAppearanceMedium" />
-    </TableRow>-->
+        <TableLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            >
+            <!--android:layout_margin="5dp"
+            android:layout_marginBottom="0dp"
+            android:layout_marginLeft="5dp"
+            android:layout_marginRight="5dp"
+            android:layout_marginTop="5dp"-->
+            <!-- android:background="#ffffff"-->
+            <TextView
+                android:id="@+id/textDate"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="5dp"
+                android:text="@string/notLoadedText"
+                android:textAppearance="?android:attr/textAppearanceMedium" />
 
+            <!--
         <TableRow
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_marginLeft="5dp"
             android:layout_marginRight="5dp">
-
             <TextView
-                android:id="@+id/fixedHour"
+                android:id="@+id/fixedDate"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_column="0"
                 android:layout_margin="5dp"
-                android:text="@string/fixedHour"
+                android:text="@string/fixedDate"
                 android:textAppearance="?android:attr/textAppearanceMedium" />
+        </TableRow>-->
 
-            <TextView
-                android:id="@+id/textHour"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_column="1"
-                android:layout_margin="5dp"
-                android:text="@string/notLoadedText"
-                android:textAppearance="?android:attr/textAppearanceMedium" />
-        </TableRow>
+            <TableRow
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginLeft="5dp"
+                android:layout_marginRight="5dp">
 
-        <TableRow
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_marginLeft="5dp"
-            android:layout_marginRight="5dp">
+                <TextView
+                    android:id="@+id/fixedHour"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_column="0"
+                    android:layout_margin="5dp"
+                    android:text="@string/fixedHour"
+                    android:textAppearance="?android:attr/textAppearanceMedium" />
 
-            <TextView
-                android:id="@+id/fixedSubject"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_column="0"
-                android:layout_margin="5dp"
-                android:text="@string/fixedSubject"
-                android:textAppearance="?android:attr/textAppearanceMedium" />
+                <TextView
+                    android:id="@+id/textHour"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_column="1"
+                    android:layout_margin="5dp"
+                    android:text="@string/notLoadedText"
+                    android:textAppearance="?android:attr/textAppearanceMedium" />
+            </TableRow>
 
-            <TextView
-                android:id="@+id/textSubject"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_column="1"
-                android:layout_margin="5dp"
-                android:text="@string/notLoadedText"
-                android:textAppearance="?android:attr/textAppearanceMedium" />
-        </TableRow>
+            <TableRow
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginLeft="5dp"
+                android:layout_marginRight="5dp">
 
-        <TableRow
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_marginLeft="5dp"
-            android:layout_marginRight="5dp">
+                <TextView
+                    android:id="@+id/fixedSubject"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_column="0"
+                    android:layout_margin="5dp"
+                    android:text="@string/fixedSubject"
+                    android:textAppearance="?android:attr/textAppearanceMedium" />
 
-            <TextView
-                android:id="@+id/fixedRoom"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_column="0"
-                android:layout_margin="5dp"
-                android:text="@string/fixedRoom"
-                android:textAppearance="?android:attr/textAppearanceMedium" />
+                <TextView
+                    android:id="@+id/textSubject"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_column="1"
+                    android:layout_margin="5dp"
+                    android:text="@string/notLoadedText"
+                    android:textAppearance="?android:attr/textAppearanceMedium" />
+            </TableRow>
 
-            <TextView
-                android:id="@+id/textRoom"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_column="1"
-                android:layout_margin="5dp"
-                android:text="@string/notLoadedText"
-                android:textAppearance="?android:attr/textAppearanceMedium" />
-        </TableRow>
+            <TableRow
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginLeft="5dp"
+                android:layout_marginRight="5dp">
 
-        <TableRow
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_marginLeft="5dp"
-            android:layout_marginRight="5dp">
+                <TextView
+                    android:id="@+id/fixedRoom"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_column="0"
+                    android:layout_margin="5dp"
+                    android:text="@string/fixedRoom"
+                    android:textAppearance="?android:attr/textAppearanceMedium" />
 
-            <TextView
-                android:id="@+id/fixedInfo"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_column="0"
-                android:layout_margin="5dp"
-                android:text="@string/fixedInfo"
-                android:textAppearance="?android:attr/textAppearanceMedium" />
+                <TextView
+                    android:id="@+id/textRoom"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_column="1"
+                    android:layout_margin="5dp"
+                    android:text="@string/notLoadedText"
+                    android:textAppearance="?android:attr/textAppearanceMedium" />
+            </TableRow>
 
-            <TextView
-                android:id="@+id/textInfo1"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_column="1"
-                android:layout_margin="5dp"
-                android:text="@string/notLoadedText"
-                android:textAppearance="?android:attr/textAppearanceMedium" />
-        </TableRow>
+            <TableRow
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginLeft="5dp"
+                android:layout_marginRight="5dp">
 
-        <TableRow
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_marginBottom="5dp"
-            android:layout_marginLeft="5dp"
-            android:layout_marginRight="5dp">
+                <TextView
+                    android:id="@+id/fixedInfo"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_column="0"
+                    android:layout_margin="5dp"
+                    android:text="@string/fixedInfo"
+                    android:textAppearance="?android:attr/textAppearanceMedium" />
 
-            <TextView
-                android:id="@+id/textInfo2"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_column="1"
-                android:layout_margin="5dp"
-                android:text="@string/notLoadedText"
-                android:textAppearance="?android:attr/textAppearanceMedium" />
-        </TableRow>
-    </TableLayout>
+                <TextView
+                    android:id="@+id/textInfo1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_column="1"
+                    android:layout_margin="5dp"
+                    android:text="@string/notLoadedText"
+                    android:textAppearance="?android:attr/textAppearanceMedium" />
+            </TableRow>
+
+            <TableRow
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginBottom="5dp"
+                android:layout_marginLeft="5dp"
+                android:layout_marginRight="5dp">
+
+                <TextView
+                    android:id="@+id/textInfo2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_column="1"
+                    android:layout_margin="5dp"
+                    android:text="@string/notLoadedText"
+                    android:textAppearance="?android:attr/textAppearanceMedium" />
+            </TableRow>
+        </TableLayout>
+    </android.support.v7.widget.CardView>
 </LinearLayout>

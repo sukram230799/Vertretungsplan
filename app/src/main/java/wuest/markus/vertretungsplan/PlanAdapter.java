@@ -46,8 +46,7 @@ public class PlanAdapter extends RecyclerView.Adapter<PlanAdapter.PlanViewHolder
     public PlanViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         Log.v(TAG, "oCVH");
         View view = inflater.inflate(R.layout.custom_plan_row, parent, false);
-        PlanViewHolder holder = new PlanViewHolder(view);
-        return holder;
+        return new PlanViewHolder(view);
     }
 
     @Override
@@ -83,7 +82,7 @@ public class PlanAdapter extends RecyclerView.Adapter<PlanAdapter.PlanViewHolder
                 break;
         }
         holder.textDate.setText(context.getString(R.string.datebuilder, Wochentag, dateFormat.format(data.get(position).get_date())));
-        holder.textHour.setText(CombineData.combineHours(data.get(position).get_hours()));
+        holder.textHour.setText(CombineData.hoursString(data.get(position).get_hours(), false));
         holder.textSubject.setText(data.get(position).get_subject());
         holder.textRoom.setText(data.get(position).get_room());
         holder.textInfo1.setText(data.get(position).get_info1());
@@ -107,8 +106,8 @@ public class PlanAdapter extends RecyclerView.Adapter<PlanAdapter.PlanViewHolder
         public PlanViewHolder(View itemView) {
             super(itemView);
             Log.v(TAG + ".PVH", "PVH");
-            itemView.setLongClickable(true);
             itemView.setClickable(true);
+            itemView.setLongClickable(true);
             itemView.setOnClickListener(this);
             itemView.setOnLongClickListener(this);
             textDate = (TextView) itemView.findViewById(R.id.textDate);
@@ -137,8 +136,8 @@ public class PlanAdapter extends RecyclerView.Adapter<PlanAdapter.PlanViewHolder
     }
 
     public interface ClickListener {
-        public void planItemClicked(View view, int position, boolean longpress);
+        void planItemClicked(View view, int position, boolean longpress);
 
-        public void planItemLongClicked(View view, int position);
+        void planItemLongClicked(View view, int position);
     }
 }

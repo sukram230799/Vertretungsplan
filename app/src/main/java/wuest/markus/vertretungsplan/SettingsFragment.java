@@ -16,7 +16,11 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         String key = getString(R.string.UPDATE_TIME);
-        addPreferencesFromResource(R.xml.preferences);
+        if (!Preferences.readBooleanFromPreferences(getActivity(), getString(R.string.DEVELOPER_MODE), false)) {
+            addPreferencesFromResource(R.xml.preferences);
+        } else {
+            addPreferencesFromResource(R.xml.preferences_dev);
+        }
         SharedPreferences sp = getPreferenceScreen().getSharedPreferences();
         EditTextPreference editTextPref = (EditTextPreference) findPreference(key);
         editTextPref
@@ -43,7 +47,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         Preference pref = findPreference(key);
         if (pref instanceof EditTextPreference) {
             EditTextPreference etp = (EditTextPreference) pref;
-            if (!(etp.getText() == null) && !etp.getText().equals("")  && !etp.getText().equals("null")) {
+            if (!(etp.getText() == null) && !etp.getText().equals("") && !etp.getText().equals("null")) {
                 pref.setSummary(getString(R.string.UPDATE_TIME_TEXT, etp.getText()));
             } else {
                 pref.setSummary(getString(R.string.UPDATE_TIME_STANDARD_TEXT, getString(R.string.UPDATE_TIME_STANDARD)));

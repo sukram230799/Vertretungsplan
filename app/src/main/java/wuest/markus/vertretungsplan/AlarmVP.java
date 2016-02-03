@@ -9,7 +9,7 @@ import android.os.PowerManager;
 import android.util.Log;
 import android.widget.Toast;
 
-public class Alarm extends BroadcastReceiver {
+public class AlarmVP extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
         PowerManager pm = (PowerManager) context.getSystemService(Context.POWER_SERVICE);
@@ -17,10 +17,10 @@ public class Alarm extends BroadcastReceiver {
         wl.acquire();
         // Put here YOUR code.
         if (Preferences.readBooleanFromPreferences(context, context.getString(R.string.UPDATE), true)) {
-            Log.d("Alarm", "Setting Alarm");
+            Log.d("AlarmVP", "Setting AlarmVP");
             context.startService(new Intent(context, UpdateDataSet.class));
             if (Preferences.readBooleanFromPreferences(context, context.getString(R.string.DEVELOPER_MODE), false)) {
-                Toast.makeText(context, "Alarm !!!!!!!!!!", Toast.LENGTH_SHORT).show(); // For example
+                Toast.makeText(context, "AlarmVP !!!!!!!!!!", Toast.LENGTH_SHORT).show(); // For example
             }
         }
         wl.release();
@@ -28,7 +28,7 @@ public class Alarm extends BroadcastReceiver {
 
     public void SetAlarm(Context context) {
         AlarmManager am = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
-        Intent i = new Intent(context, Alarm.class);
+        Intent i = new Intent(context, AlarmVP.class);
         PendingIntent pi = PendingIntent.getBroadcast(context, 0, i, 0);
         int repeatTime;
         /*if (Preferences.readBooleanFromPreferences(context, context.getString(R.string.DEVELOPER_MODE), false)) {
@@ -48,7 +48,7 @@ public class Alarm extends BroadcastReceiver {
     }
 
     public void CancelAlarm(Context context) {
-        Intent intent = new Intent(context, Alarm.class);
+        Intent intent = new Intent(context, AlarmVP.class);
         PendingIntent sender = PendingIntent.getBroadcast(context, 0, intent, 0);
         AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
         alarmManager.cancel(sender);

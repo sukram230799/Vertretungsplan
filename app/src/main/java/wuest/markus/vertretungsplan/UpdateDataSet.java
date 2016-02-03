@@ -16,7 +16,7 @@ import android.widget.Toast;
 
 public class UpdateDataSet extends Service {
     VPData[] oldData;
-    Alarm alarm = new Alarm();
+    AlarmVP alarmVP = new AlarmVP();
 
     public void onCreate() {
         super.onCreate();
@@ -55,7 +55,7 @@ public class UpdateDataSet extends Service {
                 }
                 Thread thread = new Thread(new GetVP(context, grade, vpHandler));
                 thread.start();
-                //alarm.SetAlarm(this);
+                //alarmVP.SetAlarm(this);
             } else {
                 stopSelf();
             }
@@ -68,6 +68,9 @@ public class UpdateDataSet extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        if(Preferences.readBooleanFromPreferences(context, context.getString(R.string.SEARCH_FOR_UPDATES), true)){
+            new Thread(new CallHome(context, null)).start();
+        }
         if (!MainActivity.foreground || MainActivity.manualupdate) {
             MainActivity.manualupdate = false;
             Log.d("UpdateDataSet", "In there");
@@ -88,7 +91,7 @@ public class UpdateDataSet extends Service {
     @Override
     public void onStart(Intent intent, int startId)
     {
-        alarm.SetAlarm(this);
+        alarmVP.SetAlarm(this);
     }*/
 
     @Override

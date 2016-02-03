@@ -21,6 +21,7 @@
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
+                <category android:name="android.intent.category.MULTIWINDOW_LAUNCHER" />
             </intent-filter>
         </activity>
         <activity android:name=".Settings" />
@@ -33,7 +34,10 @@
 
         <!--  -->
         <receiver
-            android:name=".Alarm"
+            android:name=".AlarmVP"
+            android:process=":remote" />
+        <receiver
+            android:name=".AlarmSP"
             android:process=":remote" />
         <receiver android:name=".AutoStart">
             <intent-filter>
@@ -45,7 +49,79 @@
             android:name=".UpdateDataSet"
             android:label="UpdateDataSet" />
         <!--  -->
-        <activity android:name=".License"></activity>
+        <activity android:name=".License" />
+
+        <receiver android:name=".VPWidget">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/vpwidget_info" />
+        </receiver>
+
+        <activity android:name=".VPWidgetConfigureActivity">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_CONFIGURE" />
+            </intent-filter>
+        </activity>
+
+        <service
+            android:name=".VPWidgetService"
+            android:enabled="true"
+            android:exported="true"
+            android:permission="android.permission.BIND_REMOTEVIEWS" />
+
+        <uses-library
+            android:name="com.sec.android.app.multiwindow"
+            android:required="false" />
+
+        <meta-data
+            android:name="com.sec.android.support.multiwindow"
+            android:value="true" />
+        <meta-data
+            android:name="com.sec.android.multiwindow.DEFAULT_SIZE_W"
+            android:resource="@dimen/app_defaultsize_w" />
+        <meta-data
+            android:name="com.sec.android.multiwindow.DEFAULT_SIZE_H"
+            android:resource="@dimen/app_defaultsize_h" />
+        <meta-data
+            android:name="com.sec.android.multiwindow.MINIMUM_SIZE_W"
+            android:resource="@dimen/app_minimumsize_w" />
+        <meta-data
+            android:name="com.sec.android.multiwindow.MINIMUM_SIZE_H"
+            android:resource="@dimen/app_minimumsize_h" />
+
+        <activity
+            android:name=".TableEditor"
+            android:label="@string/title_activity_table_editor"
+            android:parentActivityName=".MainActivity"
+            android:theme="@style/AppTheme">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="wuest.markus.vertretungsplan.MainActivity" />
+        </activity>
+        <activity android:name=".TimeTableImport">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.BROWSABLE" />
+                <category android:name="android.intent.category.DEFAULT" />
+
+                <data
+                    android:host="vp.hw-schule.de"
+                    android:scheme="http" />
+                <data
+                    android:host="vp.sukram230799.bplaced.net"
+                    android:scheme="http" />
+            </intent-filter>
+        </activity>
+
+        <service
+            android:name=".TimeTableService"
+            android:enabled="true"
+            android:exported="true"/>
     </application>
 
 </manifest>

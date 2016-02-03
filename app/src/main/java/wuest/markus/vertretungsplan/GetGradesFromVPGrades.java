@@ -15,8 +15,8 @@ import java.util.ArrayList;
 
 public class GetGradesFromVPGrades implements Runnable {
 
-    private static Context context;
-    private static Handler handler;
+    private Context context;
+    private Handler handler;
 
     public GetGradesFromVPGrades(Context context, Handler handler) {
         this.context = context;
@@ -32,6 +32,7 @@ public class GetGradesFromVPGrades implements Runnable {
             try {
                 grade_number = String.valueOf(times);
                 Document doc = Jsoup.connect("http://vp.hw-schule.de/request.php")
+                        .userAgent("wuest.markus.vertretungsplan")
                         .data("type", "getKlassen")
                         .data("id", grade_number)
                         .post();

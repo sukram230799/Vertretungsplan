@@ -13,6 +13,11 @@
         android:title="@string/about"
         app:showAsAction="never" />
     <item
+        android:id="@+id/showTableEditor"
+        android:orderInCategory="100"
+        android:title="TableEditor"
+        app:showAsAction="never" />
+    <item
         android:id="@+id/sort"
         android:orderInCategory="100"
         android:title="Liste sortieren"
@@ -27,4 +32,40 @@
         android:orderInCategory="100"
         android:title="Fake Data"
         app:showAsAction="never" />
+    <item
+        android:id="@+id/showid"
+        android:orderInCategory="100"
+        android:title="Show ID"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/deleteTimeTable"
+        android:orderInCategory="100"
+        android:title="SP Löschen"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/getTimeTableCSV"
+        android:orderInCategory="100"
+        android:title="SP als CSV"
+        app:showAsAction="never" />
+    <!--<item
+        android:id="@+id/shareTimeTableCSV"
+        android:orderInCategory="100"
+        android:title="SP als CSV senden"
+        app:showAsAction="never" />-->
+    <item
+        android:id="@+id/getQR"
+        android:orderInCategory="100"
+        android:title="QR"
+        app:showAsAction="always" />
+    <item
+        android:id="@+id/addTimeTableCSV"
+        android:orderInCategory="100"
+        android:title="CSV import"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/AlarmSP"
+        android:orderInCategory="100"
+        android:title="AlarmSP"
+        app:showAsAction="never" />
+
 </menu>

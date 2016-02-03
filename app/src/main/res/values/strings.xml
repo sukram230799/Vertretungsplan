@@ -33,21 +33,51 @@
     <string name="noVP">Kein VP.</string>
     <string name="emailToDev">E-Mail an den Entwickler.</string>
 
+    <string-array name="spinner">
+        <item>Vollständig</item>
+        <item>Kurz</item>
+    </string-array>
+
+
     <!--Preference Names-->
     <string name="PREF_FILE_NAME">HWVPData</string>
 
     <string name="SELECTED_GRADE">wuest.markus.vertretungsplan.selectedGrade</string>
+    <string name="SELECTED_GROUP">wuest.markus.vertretungsplan.selectedGroup</string>
     <string name="UPDATE">wuest.markus.vertretungsplan.update</string>
     <string name="UPDATE_TIME">wuest.markus.vertretungsplan.updateTime</string>
     <string name="DEVELOPER_MODE">wuest.markus.vertretungsplan.toastEnabled</string>
+    <string name="NO_EXPIRE">wuest.markus.vertretungsplan.noExpire</string>
     <string name="NOTIFICATION">wuest.markus.vertretungsplan.notification</string>
     <string name="UPDATE_TIME_STANDARD">15</string>
     <string name="UPDATE_TIME_TEXT">%1$s min.</string>
     <string name="UPDATE_TIME_STANDARD_TEXT">%1$s min. (Standard)</string>
     <string name="NEW_GRADES">wuest.markus.vertretungsplan.newgrade</string>
+    <string name="ID">wuest.markus.vertretungsplan.id</string>
+    <string name="SEARCH_FOR_UPDATES">wuest.markus.vertretungsplan.search_updates_backbround</string>
+    <string name="COLOR_BACKGROUND">wuest.markus.vertretungsplan.planBackground</string>
+    <string name="COLOR_FOREGROUND">wuest.markus.vertretungsplan.planForeground</string>
+    <string name="COLOR_FONT">wuest.markus.vertretungsplan.planFontColor</string>
+    <string name="COLOR_STATUSBAR">wuest.markus.vertretungsplan.colorStatusbar</string>
+    <string name="SHOW_TABBEDTABLE">wuest.markus.vertretungsplan.tabbedTable</string>
+    <string name="SHOW_TABLE">wuest.markus.vertretungsplan.table</string>
+    <string name="SHOW_VP">wuest.markus.vertretungsplan.vp</string>
+
+    <string name="QUARTER_LAST_UPDATE">wuest.markus.vertretungsplan.qDate</string>
+    <string name="Q1_S">wuest.markus.vertretungsplan.q1s</string>
+    <string name="Q1_E">wuest.markus.vertretungsplan.q1e</string>
+    <string name="Q2_S">wuest.markus.vertretungsplan.q2s</string>
+    <string name="Q2_E">wuest.markus.vertretungsplan.q2e</string>
+    <string name="Q3_S">wuest.markus.vertretungsplan.q3s</string>
+    <string name="Q3_E">wuest.markus.vertretungsplan.q3e</string>
+    <string name="Q4_S">wuest.markus.vertretungsplan.q4s</string>
+    <string name="Q4_E">wuest.markus.vertretungsplan.q4e</string>
+
+    <string name="update_avaliable">update_avaliable</string>
 
     <string name="notification">Benachrichtigung</string>
     <string name="developermode">Entwickler Modus</string>
+    <string name="noexpire">Kein Löschen</string>
     <string name="refresh">Aktualisieren</string>
     <string name="mygrade">Meine Klasse</string>
     <string name="general">Generelles</string>
@@ -56,4 +86,9 @@
     <string name="newdata">Neue Daten</string>
     <string name="about">About</string>
     <string name="notification_inform">Über Änderungen informieren.</string>
+    <string name="appwidget_text">EXAMPLE</string>
+    <string name="configure">Einrichten</string>
+    <string name="add_widget">Widget speichern</string>
+    <string name="preview">Vorschau</string>
+    <string name="title_activity_table_editor">TableEditor</string>
 </resources>

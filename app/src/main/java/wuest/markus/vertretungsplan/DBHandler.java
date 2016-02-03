@@ -15,8 +15,9 @@ import java.util.Date;
 
 public class DBHandler extends SQLiteOpenHelper {
 
-    private static final int DATABASE_VERSION = 2;
+    private static final int DATABASE_VERSION = 3;
     private static final String DATABASE_NAME = "Vertretungsplan.db";
+    private static Context context;
 
     public static final String TABLE_GRADES = "grades";
     public static final String COLUMN_ID = "_id";
@@ -28,6 +29,10 @@ public class DBHandler extends SQLiteOpenHelper {
     public static final String COLUMN_INFO1 = "infoone";
     public static final String COLUMN_INFO2 = "infotwo";
     public static final String COLUMN_DATE = "date";
+    public static final String TABLE_TIMETABLE = "timetable";
+    public static final String COLUMN_DAY = "day";
+    public static final String COLUMN_TEACHER = "teacher";
+    public static final String COLUMN_REPEATTYPE = "repeattype";
 
     public static final SimpleDateFormat dbDateFormat = new SimpleDateFormat("yyyy-MM-dd");
 
@@ -36,6 +41,10 @@ public class DBHandler extends SQLiteOpenHelper {
 
     public DBHandler(Context context, String name, SQLiteDatabase.CursorFactory factory, int version) {
         super(context, DATABASE_NAME, factory, DATABASE_VERSION);
+        this.context = context;
+
+        //getWritableDatabase().execSQL("DROP TABLE IF EXISTS " + TABLE_TIMETABLE);
+        onCreate(getWritableDatabase());
         Log.d(TAG, "@DBHandler()");
     }
 
@@ -43,13 +52,14 @@ public class DBHandler extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase db) {
         Log.d(TAG, "@onCreate()");
         //Grade Table
-        String query = "CREATE TABLE " + TABLE_GRADES + "(" +
+        String query = "CREATE TABLE IF NOT EXISTS " + TABLE_GRADES + "(" +
                 COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
                 COLUMN_GRADE + " TEXT " +
                 ");";
+        Log.d(TAG, "@onCreate: " + query);
         db.execSQL(query);
         //Data Table
-        query = "CREATE TABLE " + TABLE_VP + "(" +
+        query = "CREATE TABLE IF NOT EXISTS " + TABLE_VP + "(" +
                 COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
                 COLUMN_GRADE + " TEXT, " +
                 COLUMN_HOUR + " INTEGER, " +
@@ -59,6 +69,20 @@ public class DBHandler extends SQLiteOpenHelper {
                 COLUMN_INFO2 + " TEXT, " +
                 COLUMN_DATE + " DATE " +
                 ");";
+        Log.d(TAG, "@onCreate: " + query);
+        db.execSQL(query);
+        //Timetable Table
+        query = "CREATE TABLE IF NOT EXISTS " + TABLE_TIMETABLE + "(" +
+                COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                COLUMN_GRADE + " TEXT, " +
+                COLUMN_DAY + " INTEGER, " +
+                COLUMN_HOUR + " INTEGER, " +
+                COLUMN_TEACHER + " TEXT, " +
+                COLUMN_SUBJECT + " TEXT, " +
+                COLUMN_ROOM + " TEXT, " +
+                COLUMN_REPEATTYPE + " TEXT " +
+                ");";
+        Log.d(TAG, "@onCreate: " + query);
         db.execSQL(query);
 
         Log.d(TAG, "-onCreate");
@@ -68,8 +92,15 @@ public class DBHandler extends SQLiteOpenHelper {
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         Log.d(TAG, "@onUpgrade()");
         //No Migration!
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_GRADES);
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_VP);
+        if (newVersion == 3) {
+            db.execSQL("DROP TABLE IF EXISTS " + TABLE_TIMETABLE);
+        }
+        if (oldVersion < 2 && oldVersion > 0) {
+            db.execSQL("DROP TABLE IF EXISTS " + TABLE_VP);
+        } else {
+            db.execSQL("DROP TABLE IF EXISTS " + TABLE_GRADES);
+            db.execSQL("DROP TABLE IF EXISTS " + TABLE_VP);
+        }
         onCreate(db);
         Log.d(TAG, "-onUpgrade()");
     }
@@ -90,16 +121,16 @@ public class DBHandler extends SQLiteOpenHelper {
         HWGrade[] oldGrades;
         try {
             oldGrades = getGrades();
-            int outer = 0;
-            int inner = 0;
-            int innerif = 0;
+            //int outer = 0;
+            //int inner = 0;
+            //int innerif = 0;
             for (HWGrade oldGrade : oldGrades) {
-                Log.d("saveAddGrade", "outer: " + outer++);
+                //Log.d("saveAddGrade", "outer: " + outer++);
                 for (HWGrade newGrade : newGrades) {
-                    Log.d("saveAddGrade", "inner: " + inner++);
+                    //Log.d("saveAddGrade", "inner: " + inner++);
                     if (oldGrade.get_GradeName().equals(newGrade.get_GradeName())) {
                         hwGradeArrayList.remove(newGrade);
-                        Log.d("saveAddGrade", "if: " + innerif++);
+                        //Log.d("saveAddGrade", "if: " + innerif++);
                     }
                 }
             }
@@ -199,8 +230,22 @@ public class DBHandler extends SQLiteOpenHelper {
                 COLUMN_GRADE + " TEXT " +
                 ");";
         db.execSQL(query);
-        for (HWGrade hwGrade: gradeList){
-            addGrade(hwGrade);
+        ArrayList<HWGrade> usedGrades = new ArrayList<>(gradeList.size());
+        //Check that a grade isn't add more than one time
+        boolean dontAdd = false;
+        for (HWGrade hwGrade : gradeList) {
+            for (HWGrade usedGrade : usedGrades) {
+                if (usedGrade.get_GradeName().equals(hwGrade.get_GradeName())) {
+                    dontAdd = true;
+                    break;
+                }
+            }
+            if (dontAdd) {
+                dontAdd = false;
+            } else {
+                addGrade(hwGrade);
+                usedGrades.add(hwGrade);
+            }
         }
     }
 
@@ -236,7 +281,9 @@ public class DBHandler extends SQLiteOpenHelper {
                     ));
                 } catch (ParseException e) {
                     e.printStackTrace();
-                    onUpgrade(db, 0, DATABASE_VERSION);
+                    //onUpgrade(db, 0, DATABASE_VERSION);
+                    //DROP VP;
+                    db.execSQL("DROP TABLE IF EXISTS " + TABLE_VP);
                     throw new DBError(DBError.INVALIDDATEFORMAT);
                 }
                 Log.d(TAG, "4");
@@ -293,11 +340,13 @@ public class DBHandler extends SQLiteOpenHelper {
     }
 
     public void trimPlans() {
-        SQLiteDatabase db = getWritableDatabase();
-        String query;
-        query = "DELETE FROM " + TABLE_VP + " WHERE " + COLUMN_DATE + " < '"/*date("*/ + dbDateFormat.format(new Date()) + /*")*/"';";
-        Log.d(TAG, query);
-        db.execSQL(query); //Delete old VP
+        if (!Preferences.readBooleanFromPreferences(context, context.getString(R.string.NO_EXPIRE), false)) {
+            SQLiteDatabase db = getWritableDatabase();
+            String query;
+            query = "DELETE FROM " + TABLE_VP + " WHERE " + COLUMN_DATE + " < '"/*date("*/ + dbDateFormat.format(new Date()) + /*")*/"';";
+            Log.d(TAG, query);
+            db.execSQL(query);
+        } //Delete old VP
         /*
         SQLiteDatabase db = getWritableDatabase();
         String query = "delete from dist where rowid not in (select max(rowid) from dist group by hash);";
@@ -306,5 +355,117 @@ public class DBHandler extends SQLiteOpenHelper {
         query = "DELETE FROM " + TABLE_VP + " WHERE " + COLUMN_ID + " NOT IN (SELECT min(" + COLUMN_ID + " FROM " + TABLE_VP + " GROUP BY " + COLUMN_HOUR + ");";
         db.execSQL(query);
         */
+    }
+
+    public void addLesson(HWLesson hwLesson) {
+        Log.d(TAG, "@addLesson()");
+        for (int hour : hwLesson.getHours()) {
+            ContentValues values = new ContentValues();
+            values.put(COLUMN_GRADE, hwLesson.getGrade().get_GradeName());
+            values.put(COLUMN_HOUR, hour);
+            values.put(COLUMN_DAY, hwLesson.getDay());
+            values.put(COLUMN_TEACHER, hwLesson.getTeacher());
+            values.put(COLUMN_SUBJECT, hwLesson.getSubject());
+            values.put(COLUMN_ROOM, hwLesson.getRoom());
+            values.put(COLUMN_REPEATTYPE, hwLesson.getRepeatType());
+
+            SQLiteDatabase db = getWritableDatabase();
+            db.insert(TABLE_TIMETABLE, null, values);
+        }
+
+        Log.d(TAG, "-addLesson()");
+    }
+
+    public HWLesson[] getTimeTable(HWGrade grade) throws DBError {
+        SQLiteDatabase db = getWritableDatabase();
+        String query = "SELECT * FROM " + TABLE_TIMETABLE + " WHERE " + COLUMN_GRADE + "=\"" + grade.get_GradeName() + "\" ORDER BY " + COLUMN_DAY + ", " + COLUMN_SUBJECT + ", " + COLUMN_HOUR + " ASC";
+        Cursor c = db.rawQuery(query, null);
+        ArrayList<HWLesson> hwLessons = parseHours(c, grade);
+        if (hwLessons.isEmpty()) {
+            throw new DBError(DBError.TABLEEMPTY);
+        } else {
+            return hwLessons.toArray(new HWLesson[hwLessons.size()]);
+        }
+    }
+
+    public HWLesson[] getTimeTable(HWGrade grade, int day) throws DBError {
+        SQLiteDatabase db = getWritableDatabase();
+        String query = "SELECT * FROM " + TABLE_TIMETABLE + " WHERE " + COLUMN_GRADE + "=\"" + grade.get_GradeName() + "\" AND " + COLUMN_DAY + "=\"" + day + "\" " + " ORDER BY " + COLUMN_DAY + ", " + COLUMN_HOUR + " ASC";
+        Cursor c = db.rawQuery(query, null);
+        ArrayList<HWLesson> hwLessons = parseHours(c, grade);
+        if (hwLessons.isEmpty()) {
+            throw new DBError(DBError.TABLEEMPTY);
+        } else {
+            return hwLessons.toArray(new HWLesson[hwLessons.size()]);
+        }
+    }
+
+    public HWLesson[] getTimeTableLesson(HWGrade grade, int day, int hour) throws DBError {
+        SQLiteDatabase db = getWritableDatabase();
+        String query = "SELECT * FROM " + TABLE_TIMETABLE + " WHERE " + COLUMN_GRADE + "=\"" + grade.get_GradeName() + "\" AND " + COLUMN_DAY + "=\"" + day + "\" AND " + COLUMN_HOUR + "=\"" + hour + "\" ORDER BY " + COLUMN_DAY + ", " + COLUMN_HOUR + " ASC";
+        Log.d(TAG, query);
+        Cursor c = db.rawQuery(query, null);
+        ArrayList<HWLesson> hwLessons = parseHours(c, grade);
+        if (hwLessons.isEmpty()) {
+            throw new DBError(DBError.TABLEEMPTY);
+        } else {
+            return hwLessons.toArray(new HWLesson[hwLessons.size()]);
+        }
+    }
+
+    private ArrayList<HWLesson> parseHours(Cursor c, HWGrade grade) {
+        ArrayList<HWLesson> hwLessons = new ArrayList<>(c.getCount());
+        c.moveToFirst();
+        Log.d(TAG, "$getVP@while");
+        while (!c.isAfterLast()) {
+            if (c.getInt(c.getColumnIndex(COLUMN_HOUR)) != 0 &&
+                    c.getString(c.getColumnIndex(COLUMN_DAY)) != null &&
+                    c.getString(c.getColumnIndex(COLUMN_TEACHER)) != null &&
+                    c.getString(c.getColumnIndex(COLUMN_SUBJECT)) != null &&
+                    c.getString(c.getColumnIndex(COLUMN_ROOM)) != null &&
+                    c.getString(c.getColumnIndex(COLUMN_REPEATTYPE)) != null
+                    ) {
+                Log.d(TAG, "2");
+                hwLessons.add(new HWLesson(grade,
+                        new Integer[]{c.getInt(c.getColumnIndex(COLUMN_HOUR))},
+                        c.getInt(c.getColumnIndex(COLUMN_DAY)),
+                        c.getString(c.getColumnIndex(COLUMN_TEACHER)),
+                        c.getString(c.getColumnIndex(COLUMN_SUBJECT)),
+                        c.getString(c.getColumnIndex(COLUMN_ROOM)),
+                        c.getString(c.getColumnIndex(COLUMN_REPEATTYPE))
+
+                ));
+                Log.d(TAG, "4");
+            }
+            c.moveToNext();
+        }
+        c.close();
+        return hwLessons;
+    }
+
+    public void dropTimeTable() {
+        SQLiteDatabase db = getWritableDatabase();
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_TIMETABLE);
+
+        String query = "CREATE TABLE IF NOT EXISTS " + TABLE_TIMETABLE + "(" +
+                COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                COLUMN_GRADE + " TEXT, " +
+                COLUMN_DAY + " INTEGER, " +
+                COLUMN_HOUR + " INTEGER, " +
+                COLUMN_TEACHER + " TEXT, " +
+                COLUMN_SUBJECT + " TEXT, " +
+                COLUMN_ROOM + " TEXT, " +
+                COLUMN_REPEATTYPE + " TEXT " +
+                ");";
+        Log.d(TAG, "@onCreate: " + query);
+        db.execSQL(query);
+    }
+
+    public void addMySubject(String subject){
+
+    }
+
+    public String[] getMySubjects(){
+        return null;
     }
 }

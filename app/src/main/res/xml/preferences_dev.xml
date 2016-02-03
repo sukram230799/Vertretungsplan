@@ -17,13 +17,14 @@
             android:key="@string/UPDATE_TIME"
             android:numeric="integer"
             android:summary="Standard: 15min."
-            android:title="Häufigkeit" />
+            android:title="Häufigkeit"
+            />
         <CheckBoxPreference
             android:defaultValue="true"
             android:dependency="@string/UPDATE"
             android:key="@string/NOTIFICATION"
-            android:summary="@string/notification_inform"
-            android:title="@string/notification" />
+            android:title="@string/notification"
+            android:summary="@string/notification_inform"/>
     </PreferenceCategory>
     <PreferenceScreen android:title="Farben">
         <wuest.markus.colorpicker.ColorPreference
@@ -40,11 +41,27 @@
         <CheckBoxPreference
             android:defaultValue="true"
             android:key="@string/SEARCH_FOR_UPDATES"
-            android:summary="Im Hintergrund nach Updates suchen."
-            android:title="App-Update" />
+            android:title="App-Update"
+            android:summary="Im Hintergrund nach Updates suchen." />
         <CheckBoxPreference
             android:defaultValue="false"
             android:key="@string/DEVELOPER_MODE"
             android:title="@string/developermode" />
+        <CheckBoxPreference
+            android:defaultValue="false"
+            android:key="@string/NO_EXPIRE"
+            android:title="@string/noexpire" />
+        <CheckBoxPreference
+            android:defaultValue="false"
+            android:key="@string/SHOW_TABBEDTABLE"
+            android:title="Tabbed Table" />
+        <CheckBoxPreference
+            android:defaultValue="false"
+            android:key="@string/SHOW_TABLE"
+            android:title="Table" />
+        <CheckBoxPreference
+            android:defaultValue="false"
+            android:key="@string/SHOW_VP"
+            android:title="VP" />
     </PreferenceCategory>
 </PreferenceScreen>

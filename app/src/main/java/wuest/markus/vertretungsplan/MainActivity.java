@@ -2,10 +2,13 @@ package wuest.markus.vertretungsplan;
 
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.ClipData;
+import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Handler;
 import android.os.Message;
@@ -15,75 +18,90 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.text.InputType;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.EditText;
+import android.widget.Toast;
 
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+
+import java.io.IOException;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.Random;
 
-public class MainActivity extends AppCompatActivity implements NavigationDrawerFragment.ItemSelectedListener, VPFragment.RefreshContentListener {
+public class MainActivity extends AppCompatActivity implements NavigationDrawerFragment.ItemSelectedListener, VPFragment.RefreshContentListener, TimeTableFragment.RefreshContentListener {
 
     Handler vpHandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
-            //super.handleMessage(msg);
-            final Context context = (Context) msg.obj;
-            final Bundle bundle = msg.getData();
-            if (bundle.getString("Error") == null) {
-                loadVPFragment(getSupportFragmentManager(), position);
-                if (refreshLayout != null) {
-                    Log.d(TAG, "setRefreshing(false)");
-                    refreshLayout.setRefreshing(false);
+            if (msg != null) {
+                //super.handleMessage(msg);
+                final Context context = (Context) msg.obj;
+                final Bundle bundle = msg.getData();
+                if (bundle.getString("Error") == null) {
+                    loadVPFragment(getSupportFragmentManager(), position);
+                    if (refreshLayout != null) {
+                        Log.d(TAG, "setRefreshing(false)");
+                        refreshLayout.setRefreshing(false);
                     /*refreshLayout.destroyDrawingCache();
                     refreshLayout.clearAnimation();*/
-                }
-            } else {
-                if (refreshLayout != null) {
-                    refreshLayout.setColorSchemeColors(Color.RED);
-                }
-                AlertDialog.Builder builder = new AlertDialog.Builder(context);
-                builder.setTitle("Keine Verbindung");
-                builder.setMessage("Die App konnte aufgrund eines Netzwerkfehlers die Daten nicht laden.");
-                builder.setCancelable(false);
-                builder.setPositiveButton("Erneut versuchen", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        if (bundle.getString("HWGrade") != null) {
-                            if (refreshLayout != null) {
-                                refreshLayout.setColorSchemeColors(Color.BLACK);
-                            }
-                            Log.d(GetVP.TAG, "From 1");
-                            new Thread(new GetVP(context, new HWGrade(bundle.getString("HWGrade")), vpHandler)).start();
-                        }
                     }
-                });
-                builder.setNegativeButton("Abbrechen", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.cancel();
-                        dialog.dismiss();
-                        FragmentManager fragmentManager = getSupportFragmentManager();
-                        VPFragment vpFragment = VPFragment.newInstance(position);
-                        vpFragment.setRefreshListener(mainActivity);
-                        fragmentManager.beginTransaction()
-                                .replace(R.id.container, vpFragment)
-                                .commit();
-                        if (refreshLayout != null) {
-                            Log.d(TAG, "setRefreshing(false)");
-                            refreshLayout.setRefreshing(false);
+                } else {
+                    if (refreshLayout != null) {
+                        refreshLayout.setColorSchemeColors(Color.RED);
+                    }
+                    AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                    builder.setTitle("Keine Verbindung");
+                    builder.setMessage("Die App konnte aufgrund eines Netzwerkfehlers die Daten nicht laden.");
+                    builder.setCancelable(false);
+                    builder.setPositiveButton("Erneut versuchen", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            if (bundle.getString("HWGrade") != null) {
+                                if (refreshLayout != null) {
+                                    refreshLayout.setColorSchemeColors(Color.BLACK);
+                                }
+                                Log.d(GetVP.TAG, "From 1");
+                                new Thread(new GetVP(context, new HWGrade(bundle.getString("HWGrade")), vpHandler)).start();
+                            }
+                        }
+                    });
+                    builder.setNegativeButton("Abbrechen", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.cancel();
+                            dialog.dismiss();
+                            try {
+                                FragmentManager fragmentManager = getSupportFragmentManager();
+                                VPFragment vpFragment = VPFragment.newInstance(dbHandler.getGrade(position));
+                                vpFragment.setRefreshListener(mainActivity);
+                                fragmentManager.beginTransaction()
+                                        .replace(R.id.container, vpFragment)
+                                        .commit();
+                            } catch (DBError e) {
+                                e.printStackTrace();
+                            }
+                            if (refreshLayout != null) {
+                                Log.d(TAG, "setRefreshing(false)");
+                                refreshLayout.setRefreshing(false);
                             /*refreshLayout.destroyDrawingCache();
                             refreshLayout.clearAnimation();*/
+                            }
                         }
+                    });
+                    AlertDialog alertDialog = builder.create();
+                    if (!isFinishing()) {
+                        alertDialog.show();
                     }
-                });
-                AlertDialog alertDialog = builder.create();
-                if (!isFinishing()) {
-                    alertDialog.show();
                 }
-            }
 
-            Log.d(TAG, "reloaded");
+                Log.d(TAG, "reloaded");
+            }
         }
     };
 
@@ -91,11 +109,12 @@ public class MainActivity extends AppCompatActivity implements NavigationDrawerF
     Handler gradesHandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
-            final Context context = (Context) msg.obj;
-            final Bundle bundle = msg.getData();
-            progressDialog.dismiss();
-            if (bundle.get("Error") == null) {
-                drawerFragment.onResume();
+            if (msg != null) {
+                final Context context = (Context) msg.obj;
+                final Bundle bundle = msg.getData();
+                progressDialog.dismiss();
+                if (bundle.get("Error") == null) {
+                    drawerFragment.onResume();
                 /*
                 AlertDialog.Builder builder = new AlertDialog.Builder(context);
                 builder.setTitle("Neustarten");
@@ -116,30 +135,75 @@ public class MainActivity extends AppCompatActivity implements NavigationDrawerF
                 if (!isFinishing()) {
                     alertDialog.show();
                 }*/
-            } else {
-                AlertDialog.Builder builder = new AlertDialog.Builder(context);
-                builder.setTitle("Keine Verbindung");
-                builder.setCancelable(false);
-                builder.setMessage("Die App konnte aufgrund eines Netzwerkfehlers die Daten nicht laden.");
-                builder.setPositiveButton("Erneut versuchen", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        if (bundle.getString("HWGrade") != null) {
-                            new Thread(new GetGradesFromVPGrades(context, gradesHandler)).start();
+                } else {
+                    AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                    builder.setTitle("Keine Verbindung");
+                    builder.setCancelable(false);
+                    builder.setMessage("Die App konnte aufgrund eines Netzwerkfehlers die Daten nicht laden.");
+                    builder.setPositiveButton("Erneut versuchen", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            if (bundle.getString("HWGrade") != null) {
+                                new Thread(new GetGradesFromVPGrades(context, gradesHandler)).start();
+                                progressDialog = new ProgressDialog(context, ProgressDialog.STYLE_SPINNER);
+                                progressDialog.setMessage("Initializing");
+                                progressDialog.setIndeterminate(true);
+                                progressDialog.setCancelable(false);
+                                if (!isFinishing()) {
+                                    progressDialog.show();
+                                }
+                            }
                         }
+                    });
+                    builder.setNegativeButton("Beenden", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            System.exit(0);
+                            dialog.cancel();
+                            dialog.dismiss();
+                        }
+                    });
+                    AlertDialog alertDialog = builder.create();
+                    if (!isFinishing()) {
+                        alertDialog.show();
                     }
-                });
-                builder.setNegativeButton("Beenden", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        System.exit(0);
-                        dialog.cancel();
-                        dialog.dismiss();
+                }
+            }
+        }
+    };
+
+    Handler updateHandler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            super.handleMessage(msg);
+            if (msg != null) {
+                final Context context = (Context) msg.obj;
+                final Bundle bundle = msg.getData();
+                if (bundle.getBoolean(getString(R.string.update_avaliable), false)) {
+                    AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                    builder.setTitle("Update");
+                    builder.setCancelable(false);
+                    builder.setMessage("Es gibt eine neue Version!");
+                    builder.setPositiveButton("Herunterladen", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            String url = "http://1drv.ms/1OiRDtE";
+                            Intent i = new Intent(Intent.ACTION_VIEW);
+                            i.setData(Uri.parse(url));
+                            startActivity(i);
+                        }
+                    });
+                    builder.setNegativeButton("Schließen", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.cancel();
+                            dialog.dismiss();
+                        }
+                    });
+                    AlertDialog alertDialog = builder.create();
+                    if (!isFinishing()) {
+                        alertDialog.show();
                     }
-                });
-                AlertDialog alertDialog = builder.create();
-                if (!isFinishing()) {
-                    alertDialog.show();
                 }
             }
         }
@@ -161,8 +225,10 @@ public class MainActivity extends AppCompatActivity implements NavigationDrawerF
     private Toolbar toolbar;
     private NavigationDrawerFragment drawerFragment;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        Log.d(TAG, "onCreate");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
@@ -176,11 +242,11 @@ public class MainActivity extends AppCompatActivity implements NavigationDrawerF
             e.printStackTrace();
         }
         //getSupportActionBar().setHomeButtonEnabled(true);
-
         try {
             dbHandler.getGrades();
         } catch (DBError dbError) {
             new Thread(new GetGradesFromVPGrades(this, gradesHandler)).start();
+            //new Thread(new Initialize(this, gradesHandler)).start();
             progressDialog = new ProgressDialog(this, ProgressDialog.STYLE_SPINNER);
             progressDialog.setMessage("Initializing");
             progressDialog.setIndeterminate(true);
@@ -190,6 +256,7 @@ public class MainActivity extends AppCompatActivity implements NavigationDrawerF
             }
         }
 
+        new Thread(new CallHome(this, updateHandler)).start();
         SetUp();
     }
 
@@ -204,6 +271,8 @@ public class MainActivity extends AppCompatActivity implements NavigationDrawerF
         }
         loadVPFragment(getSupportFragmentManager(), position);
         Log.d(TAG, Preferences.readStringFromPreferences(this, getString(R.string.SELECTED_GRADE), "NULL"));
+
+        //startActivity(new Intent(this, TableEditor.class));
     }
 
     @Override
@@ -249,10 +318,10 @@ public class MainActivity extends AppCompatActivity implements NavigationDrawerF
         } else if (id == R.id.sort) {
             dbHandler.sortGrades();
             drawerFragment.onResume();
-        } else if (id == R.id.updatedataset){
+        } else if (id == R.id.updatedataset) {
             manualupdate = true;
             startService(new Intent(this, UpdateDataSet.class));
-        } else if (id == R.id.fakedata){
+        } else if (id == R.id.fakedata) {
             HWGrade hwGrade;
             try {
                 hwGrade = dbHandler.getGrade(position);
@@ -260,11 +329,11 @@ public class MainActivity extends AppCompatActivity implements NavigationDrawerF
                 dbError.printStackTrace();
                 hwGrade = new HWGrade("TG11-2");
             }
-            Integer[] hour0 = {0,1};
-            Integer[] hour1 = {2,3};
-            Integer[] hour2 = {4,5};
-            Integer[] hour3 = {6,7};
-            Integer[] hour4 = {8,9};
+            Integer[] hour0 = {0, 1};
+            Integer[] hour1 = {2, 3};
+            Integer[] hour2 = {4, 5};
+            Integer[] hour3 = {6, 7};
+            Integer[] hour4 = {8, 9};
             VPData[] vpData = {new VPData(hwGrade, hour0, "S", "A1337", "Freisetzung", "", new Date()),
                     new VPData(hwGrade, hour1, "C", "A1337", "Freisetzung", "", new Date()),
                     new VPData(hwGrade, hour2, "H", "A1337", "Freisetzung", "", new Date()),
@@ -272,7 +341,95 @@ public class MainActivity extends AppCompatActivity implements NavigationDrawerF
                     new VPData(hwGrade, hour4, "L", "A1337", "Freisetzung", "", new Date())};
             dbHandler.addPlan(vpData);
             loadVPFragment(getSupportFragmentManager(), position);
+        } else if (id == R.id.showid) {
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setTitle("ID");
+            builder.setCancelable(false);
+            builder.setMessage(String.valueOf(Preferences.readIntFromPreferences(this, getString(R.string.ID), -1)));
+            builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    dialog.cancel();
+                    dialog.dismiss();
+                }
+            });
+            AlertDialog alertDialog = builder.create();
+            if (!isFinishing()) {
+                alertDialog.show();
+            }
+        } else if (id == R.id.showTableEditor) {
+            startActivity(new Intent(this, TableEditor.class));
+        } else if (id == R.id.deleteTimeTable) {
+            dbHandler.dropTimeTable();
+        } else if (id == R.id.getTimeTableCSV) {
+            try {
+                ClipboardManager clipboard = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
+                ClipData clip = ClipData.newPlainText("Stundenplan", TimeTableHelper.getCSV(dbHandler.getTimeTable(new HWGrade("TG11-2")), ",", "\n"));
+                clipboard.setPrimaryClip(clip);
+            } catch (DBError error) {
+                error.printStackTrace();
+            }
+        } else if (id == R.id.getQR) {
+            try {
+
+                Intent intent = new Intent("com.google.zxing.client.android.SCAN");
+                intent.putExtra("SCAN_MODE", "QR_CODE_MODE"); // "PRODUCT_MODE for bar codes
+
+                startActivityForResult(intent, 0);
+
+            } catch (Exception e) {
+
+                Uri marketUri = Uri.parse("market://details?id=com.google.zxing.client.android");
+                Intent marketIntent = new Intent(Intent.ACTION_VIEW, marketUri);
+                startActivity(marketIntent);
+
+            }
+        } else if (id == R.id.addTimeTableCSV) {
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setTitle("CSV Import");
+
+            // Set up the input
+            final EditText input = new EditText(this);
+            // Specify the type of input expected; this, for example, sets the input as a password, and will mask the text
+            input.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_MULTI_LINE);
+            builder.setView(input);
+
+            // Set up the buttons
+            builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    HWLesson[] lessons = TimeTableHelper.parseCSV(input.getText().toString(), ",", "\\r?\\n");
+                    for (HWLesson lesson : lessons) {
+                        dbHandler.addLesson(lesson);
+                    }
+                }
+            });
+            builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    dialog.cancel();
+                }
+            });
+
+            builder.show();
+        } else if(id == R.id.AlarmSP){
+            AlarmSP alarmSP = new AlarmSP();
+            alarmSP.SetAlarm(this);
+            //startService(new Intent(this, TimeTableService.class));
         }
+
+        /*else if (id == R.id.shareTimeTableCSV) {
+            try {
+                Intent sendIntent = new Intent();
+                sendIntent.setAction(Intent.ACTION_SEND);
+                sendIntent.putExtra(Intent.EXTRA_TITLE, "test.csv");
+                sendIntent.putExtra(Intent.EXTRA_TEXT, TimeTableHelper.getCSV(dbHandler.getTimeTable(new HWGrade("TG11-2")), ",", "\n"));
+                sendIntent.setType("text/csv");
+                startActivity(Intent.createChooser(sendIntent, "CSV"));
+            } catch (DBError error) {
+                error.printStackTrace();
+            }
+        }*/
 
         return super.onOptionsItemSelected(item);
     }
@@ -288,6 +445,22 @@ public class MainActivity extends AppCompatActivity implements NavigationDrawerF
         loadVPFragment(fragmentManager, position);
     }
 
+    //Receive of QR-Code
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == 0) {
+
+            if (resultCode == RESULT_OK) {
+                String contents = data.getStringExtra("SCAN_RESULT");
+                Toast.makeText(this, contents, Toast.LENGTH_SHORT).show();
+            }
+            if (resultCode == RESULT_CANCELED) {
+                //handle cancel
+            }
+        }
+    }
+
     private void loadVPFragment(FragmentManager fragmentManager, int position) {
         this.position = position;
         //HWGrade grade = null;
@@ -299,19 +472,41 @@ public class MainActivity extends AppCompatActivity implements NavigationDrawerF
             isVP = false;
         }*/
         /*if (isVP) {*/
-        shown = false;
-        VPFragment vpFragment = VPFragment.newInstance(position);
-        vpFragment.setRefreshListener(this);
-        fragmentManager.beginTransaction()
-                .replace(R.id.container, vpFragment)
-                .commit();
+        HWGrade grade;
+
         try {
-            String title = dbHandler.getGrade(position).get_GradeName();
+            grade = dbHandler.getGrade(position);
+            String title = grade.get_GradeName();
             toolbar.setTitle("Klasse: " + title);
-        } catch (DBError dbError) {
-            dbError.printStackTrace();
+
+            shown = false;
+            if (Preferences.readBooleanFromPreferences(this, getString(R.string.SHOW_VP), false)) {
+                VPFragment vpFragment = VPFragment.newInstance(grade);
+                vpFragment.setRefreshListener(this);
+                fragmentManager.beginTransaction()
+                        .replace(R.id.container, vpFragment)
+                        .commit();
+            }
+
+            if (Preferences.readBooleanFromPreferences(this, getString(R.string.SHOW_TABLE), false)) {
+                TimeTableFragment tableFragment = TimeTableFragment.newInstance(grade, Calendar.getInstance().get(Calendar.DAY_OF_WEEK), true);
+                tableFragment.setRefreshListener(this);
+                fragmentManager.beginTransaction()
+                        .replace(R.id.container, tableFragment)
+                        .commit();
+            }
+
+            if (Preferences.readBooleanFromPreferences(this, getString(R.string.SHOW_TABBEDTABLE), false)) {
+                TabbedTimeTableFragment tabbedTimeTableFragment = TabbedTimeTableFragment.newInstance(grade);
+                fragmentManager.beginTransaction()
+                        .replace(R.id.container, tabbedTimeTableFragment)
+                        .commit();
+            }
+        } catch (DBError e) {
+            e.printStackTrace();
             toolbar.setTitle("Vertretungsplan");
         }
+
         /*} else {
             if (!shown) {
                 fragmentManager.beginTransaction()

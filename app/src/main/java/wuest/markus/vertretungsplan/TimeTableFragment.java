@@ -1,7 +1,11 @@
 package wuest.markus.vertretungsplan;
 
-
+import android.app.ProgressDialog;
+import android.content.Context;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
@@ -16,27 +20,51 @@ import android.widget.ListView;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Collections;
+import java.util.GregorianCalendar;
 import java.util.List;
 
-public class VPFragment extends Fragment implements PlanAdapter.ClickListener, SwipeRefreshLayout.OnRefreshListener {
+public class TimeTableFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener, TableAdapter.ClickListener {
 
-    private static final String TAG = "VPFragment";
+    ProgressDialog progressDialog;
+
+    Handler updateHandler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            super.handleMessage(msg);
+            if (msg != null) {
+                final Context context = (Context) msg.obj;
+                final Bundle bundle = msg.getData();
+                progressDialog.dismiss();
+            }
+        }
+    };
+
+
+    private static final String TAG = "TimeTableFragment";
     //private static int position;
     private static HWGrade grade;
     private static final String GRADE = "grade";
+    private static int day;
+    private static final String DAY = "day";
+    private static boolean showFAB;
+    private static final String FAB = "fab";
     private SwipeRefreshLayout mSwipeRefreshLayout;
     private RefreshContentListener refreshListener;
 
-    private RecyclerView recyclerView;
-    private PlanAdapter planAdapter;
-    private List<VPData> data = Collections.emptyList();
 
-    public static VPFragment newInstance(HWGrade grade) {
-        //this.position = position;
-        VPFragment fragment = new VPFragment();
+    private RecyclerView recyclerView;
+    private TableAdapter tableAdapter;
+    private FloatingActionButton editFAB;
+    private List<HWLesson> data = Collections.emptyList();
+
+    public static TimeTableFragment newInstance(HWGrade grade, int day, boolean showFAB) {
+        TimeTableFragment fragment = new TimeTableFragment();
         Bundle args = new Bundle();
         args.putString(GRADE, grade.get_GradeName());
+        args.putInt(DAY, day);
+        args.putBoolean(FAB, showFAB);
         fragment.setArguments(args);
         return fragment;
     }
@@ -47,17 +75,23 @@ public class VPFragment extends Fragment implements PlanAdapter.ClickListener, S
         Log.v(TAG, "oC");
         if (savedInstanceState != null) {
             grade = new HWGrade(savedInstanceState.getString(GRADE));
+            day = savedInstanceState.getInt(DAY);
+            showFAB = savedInstanceState.getBoolean(FAB);
             Log.v(TAG, "savedInstanceState not null");
+        } else {
+            grade = new HWGrade(getArguments().getString(GRADE));
+            day = getArguments().getInt(DAY);
+            showFAB = getArguments().getBoolean(FAB);
         }
-        grade = new HWGrade(getArguments().getString(GRADE));
-        Log.v(TAG, "GRADE: " + grade.get_GradeName());
+        Log.v(TAG, "section_number: " + grade.get_GradeName());
         //if (position < 0) position = 0;
         this.data = new ArrayList<>();
         DBHandler dbHandler = new DBHandler(getContext(), null, null, 1);
         try {
-            VPData[] vpData = dbHandler.getVP(grade);
-            vpData = CombineData.combineVP(vpData);
-            this.data = Arrays.asList(vpData);
+            HWLesson[] hwLessons = dbHandler.getTimeTable(grade, day /*Calendar.getInstance().get(Calendar.DAY_OF_WEEK)*/);
+            int week = GregorianCalendar.getInstance().get(Calendar.WEEK_OF_YEAR);
+            hwLessons = CombineData.combineHWLessons(TimeTableHelper.selectLessonsFromRepeatType(hwLessons, week, getActivity()));
+            this.data = Arrays.asList(hwLessons);
             /*for (VPData data : vpData) {
                 this.data.add(data);
             }*/
@@ -69,46 +103,50 @@ public class VPFragment extends Fragment implements PlanAdapter.ClickListener, S
             }
         }
         dbHandler.close();
+
+        if (TimeTableHelper.updateQuarters(getContext(), new HWTime(Calendar.getInstance()))) {
+            new Thread(new GetRepeatTypes(getContext(), updateHandler)).start();
+            progressDialog = new ProgressDialog(getContext(), ProgressDialog.STYLE_SPINNER);
+            progressDialog.setMessage("Initializing");
+            progressDialog.setIndeterminate(true);
+            progressDialog.setCancelable(false);
+        }
     }
 
-    public VPFragment() {
+    public TimeTableFragment() {
         // Required empty public constructor
     }
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         Log.v(TAG, "oCV");
         // Inflate the layout for this fragment
-        View layout = inflater.inflate(R.layout.fragment_vp, container, false);
-        recyclerView = (RecyclerView) layout.findViewById(R.id.plan_recycler_view);
-        planAdapter = new PlanAdapter(getActivity(), data);
-        planAdapter.setClickListener(this);
-        Log.v(TAG, String.valueOf(planAdapter));
+        View layout = inflater.inflate(R.layout.fragment_time_table, container, false);
+        recyclerView = (RecyclerView) layout.findViewById(R.id.table_recycler_view);
+        tableAdapter = new TableAdapter(getActivity(), data);
+        tableAdapter.setClickListener(this);
+        Log.v(TAG, String.valueOf(tableAdapter));
         Log.v(TAG, String.valueOf(recyclerView));
-        recyclerView.setAdapter(planAdapter);
+        recyclerView.setAdapter(tableAdapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         mSwipeRefreshLayout = (SwipeRefreshLayout) layout.findViewById(R.id.swipe_to_reload_plan);
         mSwipeRefreshLayout.setOnRefreshListener(this);
-        /*if (data.isEmpty() && refreshListener != null) {
-            mSwipeRefreshLayout.setRefreshing(true);
-            refreshListener.refreshedContent(mSwipeRefreshLayout);
-        }*/
-//        TextView noVPText = (TextView) layout.findViewById(R.id.noVPText);
-        final ListView noVP = (ListView) layout.findViewById(R.id.noVP);
-        String[] i = {"Kein VP."};
+        editFAB = (FloatingActionButton) layout.findViewById(R.id.fab);
+
+        final ListView noTable = (ListView) layout.findViewById(R.id.noTable);
+        String[] i = {"Kein Stundenplan."};
         ArrayAdapter adapter = new ArrayAdapter<>(getContext(), R.layout.no_vp, i);
-        noVP.setAdapter(adapter);
+        noTable.setAdapter(adapter);
         if (data.isEmpty()) {
-//            noVPText.setVisibility(View.VISIBLE);
-            noVP.setVisibility(View.VISIBLE);
+            noTable.setVisibility(View.VISIBLE);
             recyclerView.setVisibility(View.GONE);
         } else {
-//            noVPText.setVisibility(View.GONE);
-            noVP.setVisibility(View.GONE);
+            noTable.setVisibility(View.GONE);
             recyclerView.setVisibility(View.VISIBLE);
         }
-        noVP.setOnScrollListener(new AbsListView.OnScrollListener() {
+        noTable.setOnScrollListener(new AbsListView.OnScrollListener() {
             @Override
             public void onScrollStateChanged(AbsListView view, int scrollState) {
 
@@ -117,15 +155,18 @@ public class VPFragment extends Fragment implements PlanAdapter.ClickListener, S
             @Override
             public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
                 if (data.isEmpty()) {
-                    int topRowVerticalPosition = (noVP == null || noVP.getChildCount() == 0) ? 0 : noVP.getChildAt(0).getTop();
+                    int topRowVerticalPosition = (noTable == null || noTable.getChildCount() == 0) ? 0 : noTable.getChildAt(0).getTop();
                     mSwipeRefreshLayout.setEnabled(firstVisibleItem == 0 && topRowVerticalPosition >= 0);
-                }
-                else {
+                } else {
                     int topRowVerticalPosition = (recyclerView == null || recyclerView.getChildCount() == 0) ? 0 : recyclerView.getChildAt(0).getTop();
                     mSwipeRefreshLayout.setEnabled(firstVisibleItem == 0 && topRowVerticalPosition >= 0);
                 }
             }
         });
+
+        if(!showFAB){
+            editFAB.hide();
+        }
         //mSwipeRefreshLayout.setOnRefreshListener();
         return layout;
         //return inflater.inflate(R.layout.fragment_vp, container, false);
@@ -136,18 +177,7 @@ public class VPFragment extends Fragment implements PlanAdapter.ClickListener, S
     }
 
     @Override
-    public void planItemClicked(View view, int position, boolean longpress) {
-
-    }
-
-    @Override
-    public void planItemLongClicked(View view, int position) {
-
-    }
-
-    @Override
     public void onRefresh() {
-        Log.v(TAG, "reload");
         mSwipeRefreshLayout.setRefreshing(true);
         if (refreshListener != null) {
             refreshListener.refreshedContent(mSwipeRefreshLayout);
@@ -156,11 +186,17 @@ public class VPFragment extends Fragment implements PlanAdapter.ClickListener, S
         }
     }
 
+    @Override
+    public void tableItemClicked(View view, int position, boolean longpress) {
+
+    }
+
+    @Override
+    public void tableItemLongClicked(View view, int position) {
+
+    }
+
     public interface RefreshContentListener {
         void refreshedContent(SwipeRefreshLayout refreshLayout);
     }
-
-    /*public List<VPData> getData() {
-        return this.data;
-    }*/
 }
