@@ -1,8 +1,6 @@
 package wuest.markus.vertretungsplan;
 
 import android.content.Context;
-import android.content.res.ColorStateList;
-import android.graphics.Color;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -16,7 +14,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class TableAdapter extends RecyclerView.Adapter<TableAdapter.TableViewHolder> {
+public class TableEditAdapter extends RecyclerView.Adapter<TableEditAdapter.TableViewHolder> {
 
     private static final String TAG = "PlanAdapter";
     private LayoutInflater inflater;
@@ -26,7 +24,7 @@ public class TableAdapter extends RecyclerView.Adapter<TableAdapter.TableViewHol
     //private HWLesson selectedLesson = null;
     private ClickListener clickListener;
 
-    public TableAdapter(Context context, List<HWLesson> table) {
+    public TableEditAdapter(Context context, List<HWLesson> table) {
         this.context = context;
         this.table = table;
         inflater = LayoutInflater.from(context);
@@ -45,6 +43,7 @@ public class TableAdapter extends RecyclerView.Adapter<TableAdapter.TableViewHol
     @Override
     public void onBindViewHolder(TableViewHolder holder, final int position) {
         if (table.get(position).getSubject().equals("PAUSE")) {
+            holder.checkBox.setVisibility(View.GONE);
             holder.textHour.setVisibility(View.GONE);
             holder.textTeacher.setVisibility(View.GONE);
             holder.textSubject.setVisibility(View.GONE);
@@ -62,6 +61,25 @@ public class TableAdapter extends RecyclerView.Adapter<TableAdapter.TableViewHol
             holder.textRepeatType.setVisibility(View.VISIBLE);
 
             holder.textBreak.setVisibility(View.GONE);
+            //EditMode
+            holder.checkBox.setVisibility(View.VISIBLE);
+            holder.checkBox.setPadding(25, 0, 0, 0);
+            holder.textHour.setPadding(0, 0, 0, 0);
+        }
+        HWLesson selectedLesson;
+        if (selectedLessons.isEmpty()) {
+            selectedLesson = null;
+        } else {
+            selectedLesson = table.get(selectedLessons.get(0));
+        }
+        if (selectedLesson != null && !(selectedLesson.getDay() == table.get(position).getDay() &&
+                selectedLesson.getTeacher().equals(table.get(position).getTeacher()) &&
+                selectedLesson.getSubject().equals(table.get(position).getSubject()) &&
+                selectedLesson.getRoom().equals(table.get(position).getRoom()) &&
+                selectedLesson.getRepeatType().equals(table.get(position).getRepeatType()))) {
+            holder.checkBox.setEnabled(false);
+        } else {
+            holder.checkBox.setEnabled(true);
         }
 
         holder.textTeacher.setText(table.get(position).getTeacher());
@@ -69,6 +87,39 @@ public class TableAdapter extends RecyclerView.Adapter<TableAdapter.TableViewHol
         holder.textRoom.setText(table.get(position).getRoom());
         //holder.textRoom.setText(TimeTableHelper.getRepeatTypeName(table.get(position).getRepeatType()));
         holder.textRepeatType.setText(table.get(position).getRepeatType());
+        holder.checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                Log.d(TAG, String.valueOf(isChecked));
+                HWLesson selectedLesson;
+                if (selectedLessons.isEmpty()) {
+                    selectedLesson = null;
+                } else {
+                    selectedLesson = table.get(selectedLessons.get(0));
+                }
+                if (isChecked) {
+                    selectedLessons.add(((Integer) position));
+                    if (selectedLesson == null) {
+                        selectedLesson = table.get(position);
+                        for (int i = 0; i < table.size(); i++) {
+                            HWLesson lesson = table.get(i);
+                            if (!(selectedLesson.getDay() == lesson.getDay() &&
+                                    selectedLesson.getTeacher().equals(lesson.getTeacher()) &&
+                                    selectedLesson.getSubject().equals(lesson.getSubject()) &&
+                                    selectedLesson.getRoom().equals(lesson.getRoom()) &&
+                                    selectedLesson.getRepeatType().equals(lesson.getRepeatType()))) {
+                                notifyItemChanged(i);
+                            }
+                        }
+                    }
+                } else {
+                    selectedLessons.remove(((Integer) position));
+                    if (selectedLessons.isEmpty()) {
+                        notifyDataSetChanged();
+                    }
+                }
+            }
+        });
     }
 
     @Override
@@ -82,6 +133,7 @@ public class TableAdapter extends RecyclerView.Adapter<TableAdapter.TableViewHol
         return table.size();
         //return size;
     }
+
 
     public class TableViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener {
         TextView textHour;
@@ -106,8 +158,6 @@ public class TableAdapter extends RecyclerView.Adapter<TableAdapter.TableViewHol
             textRepeatType = (TextView) itemView.findViewById(R.id.textRepeatType);
             checkBox = (CheckBox) itemView.findViewById(R.id.checkBox);
             textBreak = (TextView) itemView.findViewById(R.id.textBreak);
-
-            checkBox.setVisibility(View.GONE);
         }
 
         boolean longpress;
@@ -123,6 +173,33 @@ public class TableAdapter extends RecyclerView.Adapter<TableAdapter.TableViewHol
             clickListener.tableItemLongClicked(v, getAdapterPosition());
             longpress = true;
             return false;
+        }
+    }
+
+    public HWLesson getSelectedLesson() {
+        if (selectedLessons.isEmpty()) {
+            return null;
+        } else {
+            /*for (HWLesson lesson : table) {
+                for (int hour : lesson.getHours()) {
+                    for (int chour : selectedLessons) {
+                        if (hour == chour) {
+                            return new HWLesson(lesson.getGrade(), selectedLessons.toArray(new Integer[selectedLessons.size()]),
+                                    lesson.getDay(), lesson.getTeacher(), lesson.getSubject(), lesson.getRoom(), lesson.getRepeatType());
+                        }
+                    }
+                }
+            }*/
+            ArrayList<Integer> hours = new ArrayList<>();
+            for (int pos : selectedLessons) {
+                for (int hour : table.get(pos).getHours()) {
+                    hours.add(((Integer) hour));
+                }
+            }
+            HWLesson lesson = table.get(selectedLessons.get(0));
+            return new HWLesson(lesson.getGrade(), hours.toArray(new Integer[hours.size()]),
+                    lesson.getDay(), lesson.getTeacher(), lesson.getSubject(), lesson.getRoom(), lesson.getRepeatType());
+            //return null;
         }
     }
 

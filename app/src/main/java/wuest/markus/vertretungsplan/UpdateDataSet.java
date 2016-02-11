@@ -46,7 +46,7 @@ public class UpdateDataSet extends Service {
                 Toast.makeText(context, "UpdateDataSet", Toast.LENGTH_SHORT).show();
             }
             grade = new HWGrade(Preferences.readStringFromPreferences(context, getString(R.string.SELECTED_GRADE), "NULL"));
-            if (!grade.get_GradeName().equals("NULL")) {
+            if (!grade.getGradeName().equals("NULL")) {
                 dbHandler = new DBHandler(context, null, null, 1);
                 try {
                     oldData = dbHandler.getVP(grade);

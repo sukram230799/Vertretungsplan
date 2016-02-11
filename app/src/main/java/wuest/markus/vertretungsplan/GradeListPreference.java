@@ -36,7 +36,7 @@ public class GradeListPreference extends ListPreference {
         }
         ArrayList<String> grades = new ArrayList<>();
         for(HWGrade hwGrade : hwGrades){
-            grades.add(hwGrade.get_GradeName());
+            grades.add(hwGrade.getGradeName());
         }
         String[] entries = grades.toArray(new String[grades.size()]);
         setEntries(entries);

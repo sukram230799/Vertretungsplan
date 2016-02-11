@@ -129,7 +129,7 @@ public class VPWidgetConfigureActivity extends AppCompatActivity {
         List<String> hwGrades = new ArrayList<>();
         try {
             for(HWGrade hwGrade: dbHandler.getGrades()){
-                hwGrades.add(hwGrade.get_GradeName());
+                hwGrades.add(hwGrade.getGradeName());
             }
         } catch (DBError error){
             error.printStackTrace();

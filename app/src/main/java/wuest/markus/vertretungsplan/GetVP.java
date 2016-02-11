@@ -43,7 +43,7 @@ public class GetVP implements Runnable {
                 Document document = Jsoup.connect("http://vp.hw-schule.de/request.php")
                         .userAgent("wuest.markus.vertretungsplan")
                         .data("type", "getVertretungsplan")
-                        .data("id", grade.get_GradeName())
+                        .data("id", grade.getGradeName())
                         .post();
                 VPData[] vpData = parseData(document.html());
                 dbHandler.removeVP(grade);
@@ -53,7 +53,7 @@ public class GetVP implements Runnable {
             } catch (IOException e) {
                 Bundle bundle = new Bundle();
                 bundle.putString("Error", e.getMessage());
-                bundle.putString("HWGrade", grade.get_GradeName());
+                bundle.putString("HWGrade", grade.getGradeName());
                 message.setData(bundle);
                 e.printStackTrace();
             }

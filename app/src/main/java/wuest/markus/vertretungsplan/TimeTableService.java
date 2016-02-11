@@ -12,7 +12,6 @@ import android.support.v7.app.NotificationCompat;
 import android.util.Log;
 
 import java.util.Calendar;
-import java.util.Date;
 import java.util.GregorianCalendar;
 
 public class TimeTableService extends Service {
@@ -33,7 +32,7 @@ public class TimeTableService extends Service {
             HWTime time = new HWTime(calendar);
             int day = calendar.get(Calendar.DAY_OF_WEEK);
             int week = calendar.get(Calendar.WEEK_OF_YEAR);
-            if (grade.get_GradeName() != null && TimeTableHelper.lessonsLeft(dbHandler.getTimeTable(grade), time, week, day, context)) {
+            if (grade.getGradeName() != null && TimeTableHelper.lessonsLeft(dbHandler.getTimeTable(grade), time, week, day, context)) {
                 int nextHour = TimeTableHelper.getNextHour(new HWTime(calendar));
                 HWLesson[] lessonsBefore = null;
                 try {
@@ -87,8 +86,8 @@ public class TimeTableService extends Service {
                         //.setStyle(new NotificationCompat.BigTextStyle().bigText(message))
                 .build();
 
-        notification.defaults |= android.app.Notification.DEFAULT_VIBRATE;
-        notification.defaults |= android.app.Notification.DEFAULT_SOUND;
+        //notification.defaults |= android.app.Notification.DEFAULT_VIBRATE;
+        //notification.defaults |= android.app.Notification.DEFAULT_SOUND;
         NotificationManager manager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
         manager.notify(2, notification);
     }

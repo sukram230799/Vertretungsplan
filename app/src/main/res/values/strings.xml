@@ -91,4 +91,5 @@
     <string name="add_widget">Widget speichern</string>
     <string name="preview">Vorschau</string>
     <string name="title_activity_table_editor">TableEditor</string>
+    <string name="title_activity_select_lesson">Stunde(n) auswählen</string>
 </resources>

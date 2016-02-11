@@ -1,13 +1,14 @@
 package wuest.markus.vertretungsplan;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.util.Log;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.regex.Pattern;
@@ -114,7 +115,7 @@ public class TimeTableHelper {
         int q4s = Preferences.readIntFromPreferences(context, context.getString(R.string.Q4_S), -1);
         int q4e = Preferences.readIntFromPreferences(context, context.getString(R.string.Q4_E), -1);
 
-        return new int[] {q1s, q1e, q2s, q2e, q3s, q3e, q4s, q4e};
+        return new int[]{q1s, q1e, q2s, q2e, q3s, q3e, q4s, q4e};
     }
 
     public static boolean updateQuarters(Context context, HWTime time) {
@@ -276,12 +277,14 @@ public class TimeTableHelper {
         int lowestHour = 12;
         int highestHour = 0;
         for (HWLesson lesson : lessons) {
-            for (int hour : lesson.getHours()) {
-                if (lowestHour > hour) {
-                    lowestHour = hour;
-                }
-                if (highestHour < hour) {
-                    highestHour = hour;
+            if (lesson.getDay() == day) {
+                for (int hour : lesson.getHours()) {
+                    if (lowestHour > hour) {
+                        lowestHour = hour;
+                    }
+                    if (highestHour < hour) {
+                        highestHour = hour;
+                    }
                 }
             }
         }
@@ -329,7 +332,7 @@ public class TimeTableHelper {
         String CSV = "grade" + itemSeparator + "day" + itemSeparator + "hour" + itemSeparator + "teacher" + itemSeparator +
                 "subject" + itemSeparator + "room" + itemSeparator + "repeattype" + lineSeparator;
         for (HWLesson lesson : hwLessons) {
-            CSV += lesson.getGrade().get_GradeName() + itemSeparator +
+            CSV += lesson.getGrade().getGradeName() + itemSeparator +
                     lesson.getDay() + itemSeparator +
                     lesson.getHours()[0] + itemSeparator +
                     lesson.getTeacher() + itemSeparator +
@@ -367,5 +370,45 @@ public class TimeTableHelper {
             ));
         }
         return lessons.toArray(new HWLesson[lessons.size()]);
+    }
+
+    public static HWLesson[] fillGabs(HWLesson[] lessons, int week, int day, Context context) {
+        HWGrade grade = lessons[0].getGrade();
+        ArrayList<HWLesson> lessonArrayList = new ArrayList<>(Arrays.asList(lessons));
+        int[] hours = lengthOfDay(lessons, week, day, context);
+        ArrayList<Integer> placedHours = new ArrayList<>((hours[1] - hours[0] + 1));
+        for (HWLesson lesson : lessons) {
+            for (int hour : lesson.getHours()) {
+                placedHours.add(hour);
+            }
+        }
+        Collections.sort(placedHours);
+        int lastHour = 12;
+        for (int hour : placedHours) {
+            if (hour > (lastHour + 1)) {
+                lessonArrayList.add(placedHours.indexOf(hour), new HWLesson(grade, new Integer[]{hour - 1}, day, "", "PAUSE", "", ""));
+            }
+            lastHour = hour;
+        }
+        return lessonArrayList.toArray(new HWLesson[lessonArrayList.size()]);
+    }
+
+    public static String getDayName(int day){
+        switch (day) {
+            case 2:
+                return "Montag";
+            case 3:
+                return "Dienstag";
+            case 4:
+                return "Mittwoch";
+            case 5:
+                return "Donnerstag";
+            case 6:
+                return "Freitag";
+            case 7:
+                return "Samstag";
+            default:
+                return "Sonntag";
+        }
     }
 }

@@ -2,28 +2,21 @@ package wuest.markus.vertretungsplan;
 
 public class HWGrade {
 
-    private int _id;
-    private String _GradeName;
+    private String GradeName;
 
-    public HWGrade(){}
+    public HWGrade() {
+    }
 
     public HWGrade(String GradeName) {
-        this._GradeName = GradeName;
+        this.GradeName = GradeName;
     }
 
-    public void set_id(int _id) {
-        this._id = _id;
+
+    public void setGradeName(String gradeName) {
+        this.GradeName = gradeName;
     }
 
-    public void set_GradeName(String _GradeName) {
-        this._GradeName = _GradeName;
-    }
-
-    public int get_id() {
-        return _id;
-    }
-
-    public String get_GradeName() {
-        return _GradeName;
+    public String getGradeName() {
+        return GradeName;
     }
 }

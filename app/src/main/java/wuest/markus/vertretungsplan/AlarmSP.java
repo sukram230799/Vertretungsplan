@@ -11,7 +11,6 @@ import android.widget.Toast;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.GregorianCalendar;
 
 public class AlarmSP extends BroadcastReceiver {
@@ -60,7 +59,7 @@ public class AlarmSP extends BroadcastReceiver {
             error.printStackTrace();
         }*/
 
-        if (grade.get_GradeName() != null) {
+        if (grade.getGradeName() != null) {
             long time = TimeTableHelper.getHourTime(nextHour, currentTime)[0].getTimeInMillis() - (20 * 60 * 1000);
             Log.d(TAG, String.valueOf(time));
             Log.d(TAG, String.valueOf(System.currentTimeMillis() - time));

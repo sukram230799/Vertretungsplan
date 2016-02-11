@@ -26,6 +26,15 @@ public class TableEditor extends AppCompatActivity implements HourPickerDialog.N
     final TableEditor tableEditor = this;
     public final static String TAG = "TableEditor";
 
+    public static final String GRADE = "grade";
+    public static final String DAY = "day";
+    public static final String HOURS = "hours";
+    public static final String TEACHER = "teacher";
+    public static final String SUBJECT = "subject";
+    public static final String ROOM = "room";
+    public static final String REPEATTYPE = "repeatType";
+
+
     private AutoCompleteTextView textTeacher;
     private AutoCompleteTextView textDay;
     private AutoCompleteTextView textHour;
@@ -55,7 +64,6 @@ public class TableEditor extends AppCompatActivity implements HourPickerDialog.N
     private int day = 0;
 
 
-
     /*public TableEditor(HWLesson lesson) {
         this.lesson = lesson;
     }
@@ -66,6 +74,24 @@ public class TableEditor extends AppCompatActivity implements HourPickerDialog.N
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        Bundle bundle = getIntent().getExtras();
+        if (bundle != null) {
+            try {
+                lesson = new HWLesson(new HWGrade(bundle.getString(GRADE)),
+                        bundle.getIntegerArrayList(HOURS).toArray(new Integer[bundle.getIntegerArrayList(HOURS).size()]),
+                        bundle.getInt(DAY),
+                        bundle.getString(TEACHER),
+                        bundle.getString(SUBJECT),
+                        bundle.getString(ROOM),
+                        bundle.getString(REPEATTYPE));
+                startHour = lesson.getHours()[0];
+                endHour = lesson.getHours()[lesson.getHours().length - 1];
+            } catch (java.lang.NullPointerException e){
+                e.printStackTrace();
+            }
+            Log.d(TAG, String.valueOf(startHour));
+            Log.d(TAG, String.valueOf(endHour));
+        }
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_table_editor);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -81,8 +107,7 @@ public class TableEditor extends AppCompatActivity implements HourPickerDialog.N
         });*/
         try {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        }
-        catch (java.lang.NullPointerException e){
+        } catch (java.lang.NullPointerException e) {
             e.printStackTrace();
         }
         //getSupportActionBar().setHomeAsUpIndicator(android.R.drawable.ic_menu_close_clear_cancel);
@@ -125,7 +150,7 @@ public class TableEditor extends AppCompatActivity implements HourPickerDialog.N
             HWLesson[] selectedLessons = TimeTableHelper.selectLessonsFromRepeatType(hwLessons, GregorianCalendar.getInstance().get(Calendar.WEEK_OF_YEAR), this);
             for (HWLesson lesson : selectedLessons) {
                 if (lesson.getDay() == day && lesson.getHours()[0] >= startHour && lesson.getHours()[0] <= endHour) {
-
+                    //TODO investigate why this function is used.
                 }
             }
             for (HWLesson lesson : hwLessons) {
@@ -148,7 +173,7 @@ public class TableEditor extends AppCompatActivity implements HourPickerDialog.N
         ArrayList<String> grades = new ArrayList<>();
         try {
             for (HWGrade grade : dbHandler.getGrades()) {
-                grades.add(grade.get_GradeName());
+                grades.add(grade.getGradeName());
             }
         } catch (DBError error) {
             error.printStackTrace();
@@ -258,7 +283,7 @@ public class TableEditor extends AppCompatActivity implements HourPickerDialog.N
         setHour(textHour);
     }
 
-    private int getDay(){
+    private int getDay() {
         switch (textDay.getText().toString().trim().toLowerCase()) {
             case "montag":
                 return Calendar.MONDAY;
@@ -301,7 +326,7 @@ public class TableEditor extends AppCompatActivity implements HourPickerDialog.N
                 Log.d(TAG, String.valueOf(keyCode));
                 Log.d(TAG, String.valueOf(event.getCharacters()));
                 if ((event.getAction() == KeyEvent.ACTION_DOWN) && (keyCode == KeyEvent.KEYCODE_NAVIGATE_NEXT)) {
-                    if(getDay() == Calendar.SUNDAY){
+                    if (getDay() == Calendar.SUNDAY) {
                         textLayoutDay.setErrorEnabled(true);
                         textLayoutDay.setError("Bitte Tag eingeben.");
                     } else {
@@ -316,7 +341,7 @@ public class TableEditor extends AppCompatActivity implements HourPickerDialog.N
         textDay.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
             public void onFocusChange(View v, boolean hasFocus) {
-                if(!hasFocus && getDay() == Calendar.SUNDAY){
+                if (!hasFocus && getDay() == Calendar.SUNDAY) {
                     textLayoutDay.setErrorEnabled(true);
                     textLayoutDay.setError("Bitte gültigen Tag eingeben.");
                 } else {
@@ -460,11 +485,11 @@ public class TableEditor extends AppCompatActivity implements HourPickerDialog.N
         });
         if (lesson != null) {
             textTeacher.setText(lesson.getTeacher());
-            textDay.setText(lesson.getDay());
+            textDay.setText(TimeTableHelper.getDayName(lesson.getDay()));
             startHour = lesson.getHours()[0];
             endHour = lesson.getHours()[lesson.getHours().length - 1];
             setHour(textHour);
-            textGrade.setText(lesson.getGrade().get_GradeName());
+            textGrade.setText(lesson.getGrade().getGradeName());
             textSubject.setText(lesson.getSubject());
             textRoom.setText(lesson.getRoom());
             textRepeatType.setText(lesson.getRepeatType());

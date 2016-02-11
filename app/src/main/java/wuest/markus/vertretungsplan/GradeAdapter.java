@@ -65,9 +65,9 @@ public class GradeAdapter extends RecyclerView.Adapter<GradeAdapter.GradeViewHol
             chosenGrade = Preferences.readStringFromPreferences(context, context.getString(R.string.SELECTED_GRADE), "NULL");
             Log.v("DEBUG", chosenGrade);
         }
-        Log.v("DEBUG.onBVH", data.get(i).get_GradeName());
-        holder.title.setText(data.get(i).get_GradeName());
-        if (chosenGrade.equals(data.get(i).get_GradeName())) {
+        Log.v("DEBUG.onBVH", data.get(i).getGradeName());
+        holder.title.setText(data.get(i).getGradeName());
+        if (chosenGrade.equals(data.get(i).getGradeName())) {
             Log.v("DEBUG.found", chosenGrade);
             chosenGradePosition = i;
             //holder.title.setBackgroundColor(Color.parseColor("#888888"));
@@ -128,12 +128,12 @@ public class GradeAdapter extends RecyclerView.Adapter<GradeAdapter.GradeViewHol
             Log.d(TAG, "LONGCLICK");
             Vibrator vibrator = (Vibrator) context.getSystemService(Context.VIBRATOR_SERVICE);
             vibrator.vibrate(500);
-            Snackbar.make(v, "Klasse " + data.get(getAdapterPosition()).get_GradeName() + " wurde als Standard festgelegt.", Snackbar.LENGTH_LONG)
+            Snackbar.make(v, "Klasse " + data.get(getAdapterPosition()).getGradeName() + " wurde als Standard festgelegt.", Snackbar.LENGTH_LONG)
                     .setAction("Action", null).show();
-            Preferences.saveStringToPreferences(context, context.getString(R.string.SELECTED_GRADE), data.get(getAdapterPosition()).get_GradeName());
+            Preferences.saveStringToPreferences(context, context.getString(R.string.SELECTED_GRADE), data.get(getAdapterPosition()).getGradeName());
             notifyItemChanged(chosenGradePosition);
             notifyItemChanged(position);
-            chosenGrade = data.get(getAdapterPosition()).get_GradeName();
+            chosenGrade = data.get(getAdapterPosition()).getGradeName();
             //clickListener.gradeItemLongClicked(v, getAdapterPosition());
             longclick = true;
             onClick(v);

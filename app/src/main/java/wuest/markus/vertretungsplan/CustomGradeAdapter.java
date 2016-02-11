@@ -21,7 +21,7 @@ class CustomGradeAdapter extends ArrayAdapter<HWGrade>{
 
         TextView textGrade = (TextView) view.findViewById(R.id.textGrade);
 
-        textGrade.setText(hwGrade.get_GradeName());
+        textGrade.setText(hwGrade.getGradeName());
 
         return view;
     }

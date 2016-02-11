@@ -26,15 +26,10 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-
-import java.io.IOException;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.Random;
 
-public class MainActivity extends AppCompatActivity implements NavigationDrawerFragment.ItemSelectedListener, VPFragment.RefreshContentListener, TimeTableFragment.RefreshContentListener {
+public class MainActivity extends AppCompatActivity implements NavigationDrawerFragment.ItemSelectedListener, VPFragment.RefreshContentListener, TimeTableFragment.RefreshContentListener, TabbedTimeTableFragment.EditInterface, TimeTableFragment.EditInterface {
 
     Handler vpHandler = new Handler() {
         @Override
@@ -225,6 +220,8 @@ public class MainActivity extends AppCompatActivity implements NavigationDrawerF
     private Toolbar toolbar;
     private NavigationDrawerFragment drawerFragment;
 
+    private int tableType; //Resembles the kind of Fragment for example TimeTableFragment;
+    private boolean editTable;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -257,6 +254,18 @@ public class MainActivity extends AppCompatActivity implements NavigationDrawerF
         }
 
         new Thread(new CallHome(this, updateHandler)).start();
+        tableType = -1;
+        if (Preferences.readBooleanFromPreferences(this, getString(R.string.SHOW_VP), false)) {
+            tableType = 0;
+        }
+
+        if (Preferences.readBooleanFromPreferences(this, getString(R.string.SHOW_TABLE), false)) {
+            tableType = 1;
+        }
+
+        if (Preferences.readBooleanFromPreferences(this, getString(R.string.SHOW_TABBEDTABLE), false)) {
+            tableType = 2;
+        }
         SetUp();
     }
 
@@ -412,7 +421,7 @@ public class MainActivity extends AppCompatActivity implements NavigationDrawerF
             });
 
             builder.show();
-        } else if(id == R.id.AlarmSP){
+        } else if (id == R.id.AlarmSP) {
             AlarmSP alarmSP = new AlarmSP();
             alarmSP.SetAlarm(this);
             //startService(new Intent(this, TimeTableService.class));
@@ -476,31 +485,36 @@ public class MainActivity extends AppCompatActivity implements NavigationDrawerF
 
         try {
             grade = dbHandler.getGrade(position);
-            String title = grade.get_GradeName();
+            String title = grade.getGradeName();
             toolbar.setTitle("Klasse: " + title);
 
             shown = false;
-            if (Preferences.readBooleanFromPreferences(this, getString(R.string.SHOW_VP), false)) {
-                VPFragment vpFragment = VPFragment.newInstance(grade);
-                vpFragment.setRefreshListener(this);
-                fragmentManager.beginTransaction()
-                        .replace(R.id.container, vpFragment)
-                        .commit();
-            }
-
-            if (Preferences.readBooleanFromPreferences(this, getString(R.string.SHOW_TABLE), false)) {
-                TimeTableFragment tableFragment = TimeTableFragment.newInstance(grade, Calendar.getInstance().get(Calendar.DAY_OF_WEEK), true);
-                tableFragment.setRefreshListener(this);
-                fragmentManager.beginTransaction()
-                        .replace(R.id.container, tableFragment)
-                        .commit();
-            }
-
-            if (Preferences.readBooleanFromPreferences(this, getString(R.string.SHOW_TABBEDTABLE), false)) {
-                TabbedTimeTableFragment tabbedTimeTableFragment = TabbedTimeTableFragment.newInstance(grade);
-                fragmentManager.beginTransaction()
-                        .replace(R.id.container, tabbedTimeTableFragment)
-                        .commit();
+            Log.d(TAG, "TableType: " + tableType);
+            switch (tableType) {
+                case 0:
+                    VPFragment vpFragment = VPFragment.newInstance(grade);
+                    vpFragment.setRefreshListener(this);
+                    fragmentManager.beginTransaction()
+                            .replace(R.id.container, vpFragment)
+                            .commit();
+                    break;
+                case 1:
+                    TimeTableFragment timeTableFragment = TimeTableFragment.newInstance(grade, Calendar.getInstance().get(Calendar.DAY_OF_WEEK), true, false);
+                    timeTableFragment.setRefreshListener(this);
+                    timeTableFragment.setEditInterface(this);
+                    fragmentManager.beginTransaction()
+                            .replace(R.id.container, timeTableFragment)
+                            .commit();
+                    break;
+                case 2:
+                    TabbedTimeTableFragment tabbedTimeTableFragment = TabbedTimeTableFragment.newInstance(grade);
+                    tabbedTimeTableFragment.setEditInterface(this);
+                    fragmentManager.beginTransaction()
+                            .replace(R.id.container, tabbedTimeTableFragment)
+                            .commit();
+                    break;
+                default:
+                    Log.d(TAG, "No TableType");
             }
         } catch (DBError e) {
             e.printStackTrace();
@@ -532,5 +546,15 @@ public class MainActivity extends AppCompatActivity implements NavigationDrawerF
         new Thread(new GetVP(this, hwGrade, vpHandler)).start();
 
         Log.d(TAG, "reload");
+    }
+
+    @Override
+    public void onTimeTableEdit(int day, HWGrade grade) {
+        Intent intent = new Intent(this, SelectLessonActivity.class);
+        Bundle bundle = new Bundle();
+        bundle.putInt("DAY", day);
+        bundle.putString("GRADE", grade.getGradeName());
+        intent.putExtras(bundle);
+        startActivity(intent);
     }
 }

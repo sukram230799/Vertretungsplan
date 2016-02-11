@@ -121,7 +121,17 @@
         <service
             android:name=".TimeTableService"
             android:enabled="true"
-            android:exported="true"/>
+            android:exported="true" />
+
+        <activity
+            android:name=".SelectLessonActivity"
+            android:label="@string/title_activity_select_lesson"
+            android:parentActivityName=".MainActivity"
+            android:theme="@style/AppTheme">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="wuest.markus.vertretungsplan.MainActivity" />
+        </activity>
     </application>
 
 </manifest>

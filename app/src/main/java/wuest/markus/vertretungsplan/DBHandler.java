@@ -109,7 +109,7 @@ public class DBHandler extends SQLiteOpenHelper {
     public void addGrade(HWGrade hwGrade) {
         Log.d(TAG, "@addGrade()");
         ContentValues values = new ContentValues();
-        values.put(COLUMN_GRADE, hwGrade.get_GradeName());
+        values.put(COLUMN_GRADE, hwGrade.getGradeName());
         SQLiteDatabase db = getWritableDatabase();
         db.insert(TABLE_GRADES, null, values);
         //db.close(); //Never CLOSE DB!
@@ -128,7 +128,7 @@ public class DBHandler extends SQLiteOpenHelper {
                 //Log.d("saveAddGrade", "outer: " + outer++);
                 for (HWGrade newGrade : newGrades) {
                     //Log.d("saveAddGrade", "inner: " + inner++);
-                    if (oldGrade.get_GradeName().equals(newGrade.get_GradeName())) {
+                    if (oldGrade.getGradeName().equals(newGrade.getGradeName())) {
                         hwGradeArrayList.remove(newGrade);
                         //Log.d("saveAddGrade", "if: " + innerif++);
                     }
@@ -196,7 +196,7 @@ public class DBHandler extends SQLiteOpenHelper {
 
     public int getGradePosition(HWGrade grade) {
         SQLiteDatabase db = getWritableDatabase();
-        String query = "SELECT * FROM " + TABLE_GRADES + " WHERE " + COLUMN_GRADE + "=\"" + grade.get_GradeName() + "\";";
+        String query = "SELECT * FROM " + TABLE_GRADES + " WHERE " + COLUMN_GRADE + "=\"" + grade.getGradeName() + "\";";
         Cursor c = db.rawQuery(query, null);
         c.moveToFirst();
         if (!c.isAfterLast()) {
@@ -235,7 +235,7 @@ public class DBHandler extends SQLiteOpenHelper {
         boolean dontAdd = false;
         for (HWGrade hwGrade : gradeList) {
             for (HWGrade usedGrade : usedGrades) {
-                if (usedGrade.get_GradeName().equals(hwGrade.get_GradeName())) {
+                if (usedGrade.getGradeName().equals(hwGrade.getGradeName())) {
                     dontAdd = true;
                     break;
                 }
@@ -256,7 +256,7 @@ public class DBHandler extends SQLiteOpenHelper {
         SQLiteDatabase db = getWritableDatabase();
         String query;
         //String query = "SELECT * FROM " + TABLE_VP + " WHERE " + COLUMN_DATE + ">= date(" + sdf.format(new Date()) + ");"; //Not used because of sorting with deleting of old entrys!
-        query = "SELECT * FROM " + TABLE_VP + " WHERE " + COLUMN_GRADE + "=\"" + grade.get_GradeName() + "\" ORDER BY " + COLUMN_DATE + ", " + COLUMN_HOUR + " ASC";
+        query = "SELECT * FROM " + TABLE_VP + " WHERE " + COLUMN_GRADE + "=\"" + grade.getGradeName() + "\" ORDER BY " + COLUMN_DATE + ", " + COLUMN_HOUR + " ASC";
         Cursor c = db.rawQuery(query, null);
         c.moveToFirst();
         Log.d(TAG, "$getVP@while");
@@ -307,7 +307,7 @@ public class DBHandler extends SQLiteOpenHelper {
             for (Integer hour : data.get_hours()) {
                 Log.d(TAG, "$addDayPlan:for");
                 values.put(COLUMN_DATE, dbDateFormat.format(data.get_date()));
-                values.put(COLUMN_GRADE, data.get_grade().get_GradeName());
+                values.put(COLUMN_GRADE, data.get_grade().getGradeName());
                 values.put(COLUMN_HOUR, hour);
                 values.put(COLUMN_SUBJECT, data.get_subject());
                 values.put(COLUMN_ROOM, data.get_room());
@@ -321,12 +321,12 @@ public class DBHandler extends SQLiteOpenHelper {
     }
 
     void removeVP(HWGrade grade) {
-        String query = "DELETE FROM " + TABLE_VP + " WHERE " + COLUMN_GRADE + "=\"" + grade.get_GradeName() + "\";";
+        String query = "DELETE FROM " + TABLE_VP + " WHERE " + COLUMN_GRADE + "=\"" + grade.getGradeName() + "\";";
         getWritableDatabase().execSQL(query);
     }
 
     public boolean isVP(HWGrade grade) {
-        String query = "SELECT 1 FROM " + TABLE_VP + " WHERE " + COLUMN_GRADE + "=\"" + grade.get_GradeName() + "\";";
+        String query = "SELECT 1 FROM " + TABLE_VP + " WHERE " + COLUMN_GRADE + "=\"" + grade.getGradeName() + "\";";
         Cursor cursor = getWritableDatabase().rawQuery(query, null);
         cursor.moveToFirst();
         if (cursor.isAfterLast()) {
@@ -361,7 +361,7 @@ public class DBHandler extends SQLiteOpenHelper {
         Log.d(TAG, "@addLesson()");
         for (int hour : hwLesson.getHours()) {
             ContentValues values = new ContentValues();
-            values.put(COLUMN_GRADE, hwLesson.getGrade().get_GradeName());
+            values.put(COLUMN_GRADE, hwLesson.getGrade().getGradeName());
             values.put(COLUMN_HOUR, hour);
             values.put(COLUMN_DAY, hwLesson.getDay());
             values.put(COLUMN_TEACHER, hwLesson.getTeacher());
@@ -378,7 +378,7 @@ public class DBHandler extends SQLiteOpenHelper {
 
     public HWLesson[] getTimeTable(HWGrade grade) throws DBError {
         SQLiteDatabase db = getWritableDatabase();
-        String query = "SELECT * FROM " + TABLE_TIMETABLE + " WHERE " + COLUMN_GRADE + "=\"" + grade.get_GradeName() + "\" ORDER BY " + COLUMN_DAY + ", " + COLUMN_SUBJECT + ", " + COLUMN_HOUR + " ASC";
+        String query = "SELECT * FROM " + TABLE_TIMETABLE + " WHERE " + COLUMN_GRADE + "=\"" + grade.getGradeName() + "\" ORDER BY " + COLUMN_DAY + ", " + COLUMN_SUBJECT + ", " + COLUMN_HOUR + " ASC";
         Cursor c = db.rawQuery(query, null);
         ArrayList<HWLesson> hwLessons = parseHours(c, grade);
         if (hwLessons.isEmpty()) {
@@ -390,7 +390,7 @@ public class DBHandler extends SQLiteOpenHelper {
 
     public HWLesson[] getTimeTable(HWGrade grade, int day) throws DBError {
         SQLiteDatabase db = getWritableDatabase();
-        String query = "SELECT * FROM " + TABLE_TIMETABLE + " WHERE " + COLUMN_GRADE + "=\"" + grade.get_GradeName() + "\" AND " + COLUMN_DAY + "=\"" + day + "\" " + " ORDER BY " + COLUMN_DAY + ", " + COLUMN_HOUR + " ASC";
+        String query = "SELECT * FROM " + TABLE_TIMETABLE + " WHERE " + COLUMN_GRADE + "=\"" + grade.getGradeName() + "\" AND " + COLUMN_DAY + "=\"" + day + "\" " + " ORDER BY " + COLUMN_DAY + ", " + COLUMN_HOUR + " ASC";
         Cursor c = db.rawQuery(query, null);
         ArrayList<HWLesson> hwLessons = parseHours(c, grade);
         if (hwLessons.isEmpty()) {
@@ -402,7 +402,7 @@ public class DBHandler extends SQLiteOpenHelper {
 
     public HWLesson[] getTimeTableLesson(HWGrade grade, int day, int hour) throws DBError {
         SQLiteDatabase db = getWritableDatabase();
-        String query = "SELECT * FROM " + TABLE_TIMETABLE + " WHERE " + COLUMN_GRADE + "=\"" + grade.get_GradeName() + "\" AND " + COLUMN_DAY + "=\"" + day + "\" AND " + COLUMN_HOUR + "=\"" + hour + "\" ORDER BY " + COLUMN_DAY + ", " + COLUMN_HOUR + " ASC";
+        String query = "SELECT * FROM " + TABLE_TIMETABLE + " WHERE " + COLUMN_GRADE + "=\"" + grade.getGradeName() + "\" AND " + COLUMN_DAY + "=\"" + day + "\" AND " + COLUMN_HOUR + "=\"" + hour + "\" ORDER BY " + COLUMN_DAY + ", " + COLUMN_HOUR + " ASC";
         Log.d(TAG, query);
         Cursor c = db.rawQuery(query, null);
         ArrayList<HWLesson> hwLessons = parseHours(c, grade);

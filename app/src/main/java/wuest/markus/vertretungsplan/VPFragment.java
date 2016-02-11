@@ -36,7 +36,7 @@ public class VPFragment extends Fragment implements PlanAdapter.ClickListener, S
         //this.position = position;
         VPFragment fragment = new VPFragment();
         Bundle args = new Bundle();
-        args.putString(GRADE, grade.get_GradeName());
+        args.putString(GRADE, grade.getGradeName());
         fragment.setArguments(args);
         return fragment;
     }
@@ -50,7 +50,7 @@ public class VPFragment extends Fragment implements PlanAdapter.ClickListener, S
             Log.v(TAG, "savedInstanceState not null");
         }
         grade = new HWGrade(getArguments().getString(GRADE));
-        Log.v(TAG, "GRADE: " + grade.get_GradeName());
+        Log.v(TAG, "GRADE: " + grade.getGradeName());
         //if (position < 0) position = 0;
         this.data = new ArrayList<>();
         DBHandler dbHandler = new DBHandler(getContext(), null, null, 1);

@@ -5,7 +5,7 @@ import android.content.Context;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.support.design.widget.FloatingActionButton;
+//import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
@@ -18,6 +18,9 @@ import android.widget.AbsListView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
+import com.github.clans.fab.FloatingActionButton;
+import com.github.clans.fab.FloatingActionMenu;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -25,9 +28,10 @@ import java.util.Collections;
 import java.util.GregorianCalendar;
 import java.util.List;
 
-public class TimeTableFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener, TableAdapter.ClickListener {
+public class TimeTableFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener, TableAdapter.ClickListener, TableEditAdapter.ClickListener {
 
     ProgressDialog progressDialog;
+    public static boolean showCheckBoxes = false;
 
     Handler updateHandler = new Handler() {
         @Override
@@ -50,21 +54,35 @@ public class TimeTableFragment extends Fragment implements SwipeRefreshLayout.On
     private static final String DAY = "day";
     private static boolean showFAB;
     private static final String FAB = "fab";
+    private static boolean editMode;
+    private static final String EDIT_MODE = "editMode";
     private SwipeRefreshLayout mSwipeRefreshLayout;
     private RefreshContentListener refreshListener;
 
 
     private RecyclerView recyclerView;
-    private TableAdapter tableAdapter;
-    private FloatingActionButton editFAB;
-    private List<HWLesson> data = Collections.emptyList();
+    //private TableAdapter tableAdapter;
+    //private FloatingActionButton editFAB;
 
-    public static TimeTableFragment newInstance(HWGrade grade, int day, boolean showFAB) {
+    private FloatingActionMenu fab;
+    private FloatingActionButton shareFAB;
+    private FloatingActionButton editFAB;
+    private FloatingActionButton newFAB;
+
+    private List<HWLesson> data = Collections.emptyList();
+    private EditInterface editInterface;
+    TableEditAdapter tableEditAdapter;
+
+    public static TimeTableFragment newInstance(HWGrade grade, int day, boolean showFAB, boolean editMode) {
+        if (editMode) {
+            showFAB = false;
+        }
         TimeTableFragment fragment = new TimeTableFragment();
         Bundle args = new Bundle();
-        args.putString(GRADE, grade.get_GradeName());
+        args.putString(GRADE, grade.getGradeName());
         args.putInt(DAY, day);
         args.putBoolean(FAB, showFAB);
+        args.putBoolean(EDIT_MODE, editMode);
         fragment.setArguments(args);
         return fragment;
     }
@@ -77,20 +95,25 @@ public class TimeTableFragment extends Fragment implements SwipeRefreshLayout.On
             grade = new HWGrade(savedInstanceState.getString(GRADE));
             day = savedInstanceState.getInt(DAY);
             showFAB = savedInstanceState.getBoolean(FAB);
+            editMode = savedInstanceState.getBoolean(EDIT_MODE);
             Log.v(TAG, "savedInstanceState not null");
         } else {
             grade = new HWGrade(getArguments().getString(GRADE));
             day = getArguments().getInt(DAY);
             showFAB = getArguments().getBoolean(FAB);
+            editMode = getArguments().getBoolean(EDIT_MODE);
         }
-        Log.v(TAG, "section_number: " + grade.get_GradeName());
+        Log.v(TAG, "section_number: " + grade.getGradeName());
         //if (position < 0) position = 0;
         this.data = new ArrayList<>();
         DBHandler dbHandler = new DBHandler(getContext(), null, null, 1);
         try {
             HWLesson[] hwLessons = dbHandler.getTimeTable(grade, day /*Calendar.getInstance().get(Calendar.DAY_OF_WEEK)*/);
             int week = GregorianCalendar.getInstance().get(Calendar.WEEK_OF_YEAR);
-            hwLessons = CombineData.combineHWLessons(TimeTableHelper.selectLessonsFromRepeatType(hwLessons, week, getActivity()));
+            if (!editMode) {
+                hwLessons = TimeTableHelper.selectLessonsFromRepeatType(hwLessons, week, getActivity()); //No CombineData, because of better layout;
+            }
+            hwLessons = TimeTableHelper.fillGabs(hwLessons, week, day, getActivity());
             this.data = Arrays.asList(hwLessons);
             /*for (VPData data : vpData) {
                 this.data.add(data);
@@ -111,6 +134,7 @@ public class TimeTableFragment extends Fragment implements SwipeRefreshLayout.On
             progressDialog.setIndeterminate(true);
             progressDialog.setCancelable(false);
         }
+
     }
 
     public TimeTableFragment() {
@@ -125,19 +149,27 @@ public class TimeTableFragment extends Fragment implements SwipeRefreshLayout.On
         // Inflate the layout for this fragment
         View layout = inflater.inflate(R.layout.fragment_time_table, container, false);
         recyclerView = (RecyclerView) layout.findViewById(R.id.table_recycler_view);
-        tableAdapter = new TableAdapter(getActivity(), data);
-        tableAdapter.setClickListener(this);
-        Log.v(TAG, String.valueOf(tableAdapter));
-        Log.v(TAG, String.valueOf(recyclerView));
-        recyclerView.setAdapter(tableAdapter);
+        if (!editMode) {
+            TableAdapter tableAdapter = new TableAdapter(getActivity(), data);
+            tableAdapter.setClickListener(this);
+            recyclerView.setAdapter(tableAdapter);
+        } else {
+            tableEditAdapter = new TableEditAdapter(getActivity(), data);
+            tableEditAdapter.setClickListener(this);
+            recyclerView.setAdapter(tableEditAdapter);
+        }
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         mSwipeRefreshLayout = (SwipeRefreshLayout) layout.findViewById(R.id.swipe_to_reload_plan);
         mSwipeRefreshLayout.setOnRefreshListener(this);
-        editFAB = (FloatingActionButton) layout.findViewById(R.id.fab);
+
+        fab = (FloatingActionMenu) layout.findViewById(R.id.fab);
+        shareFAB = (FloatingActionButton) layout.findViewById(R.id.fab_share);
+        editFAB = (FloatingActionButton) layout.findViewById(R.id.fab_edit);
+        newFAB = (FloatingActionButton) layout.findViewById(R.id.fab_new);
 
         final ListView noTable = (ListView) layout.findViewById(R.id.noTable);
         String[] i = {"Kein Stundenplan."};
-        ArrayAdapter adapter = new ArrayAdapter<>(getContext(), R.layout.no_vp, i);
+        final ArrayAdapter adapter = new ArrayAdapter<>(getContext(), R.layout.no_vp, i);
         noTable.setAdapter(adapter);
         if (data.isEmpty()) {
             noTable.setVisibility(View.VISIBLE);
@@ -164,17 +196,41 @@ public class TimeTableFragment extends Fragment implements SwipeRefreshLayout.On
             }
         });
 
-        if(!showFAB){
-            editFAB.hide();
+        if (!showFAB) {
+            //fab.hide(false);
+            fab.hideMenu(false);
         }
         //mSwipeRefreshLayout.setOnRefreshListener();
+        if (editMode) {
+
+        } else {
+            editFAB.setClickable(true);
+            editFAB.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Log.d(TAG, "OnClick");
+                    showCheckBoxes = !showCheckBoxes;
+                    //tableAdapter.notifyDataSetChanged();
+                    //setShowCheckBoxes(showCheckBoxes);
+                    if (editInterface != null) {
+                        editInterface.onTimeTableEdit(day, grade);
+                    }
+                }
+            });
+        }
+
         return layout;
         //return inflater.inflate(R.layout.fragment_vp, container, false);
+    }
+
+    public HWLesson getSelectedLesson() {
+        return tableEditAdapter.getSelectedLesson();
     }
 
     public void setRefreshListener(RefreshContentListener refreshListener) {
         this.refreshListener = refreshListener;
     }
+
 
     @Override
     public void onRefresh() {
@@ -198,5 +254,13 @@ public class TimeTableFragment extends Fragment implements SwipeRefreshLayout.On
 
     public interface RefreshContentListener {
         void refreshedContent(SwipeRefreshLayout refreshLayout);
+    }
+
+    public void setEditInterface(EditInterface editInterface) {
+        this.editInterface = editInterface;
+    }
+
+    public interface EditInterface {
+        void onTimeTableEdit(int day, HWGrade grade);
     }
 }
