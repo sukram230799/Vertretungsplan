@@ -3,6 +3,8 @@ package wuest.markus.vertretungsplan;
 import android.content.Context;
 import android.util.Log;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -343,6 +345,30 @@ public class TimeTableHelper {
         return CSV;
     }
 
+    public static String getURLForShare(HWLesson[] hwLessons, String itemSeparator, String lineSeparator) {
+        HWLesson[] combinedLessons = CombineData.combineHWLessons(hwLessons);
+        if (hwLessons.length > 0) {
+            String URL = "http://vp-edit.ga/?grade=" + hwLessons[0].getGrade().getGradeName() + "&table=";
+            for (HWLesson lesson : combinedLessons) {
+                URL += lesson.getDay() + itemSeparator +
+                        CombineData.hoursString(lesson.getHours(), false) +
+                        lesson.getHours()[0] + itemSeparator +
+                        lesson.getTeacher() + itemSeparator +
+                        lesson.getSubject() + itemSeparator +
+                        lesson.getRoom() + itemSeparator +
+                        lesson.getRepeatType() + lineSeparator;
+                Log.d(TAG, CombineData.hoursString(lesson.getHours(), false));
+            }
+            return URL;
+            /*try {
+                return URLEncoder.encode(URL, "UTF-8");
+            } catch (UnsupportedEncodingException e) {
+                e.printStackTrace();
+            }*/
+        }
+        return "";
+    }
+
     public static HWLesson[] parseCSV(String CSV, String itemSeparator, String lineSeparator) {
         CSV = CSV.trim();
         Log.v(TAG, CSV);
@@ -393,7 +419,7 @@ public class TimeTableHelper {
         return lessonArrayList.toArray(new HWLesson[lessonArrayList.size()]);
     }
 
-    public static String getDayName(int day){
+    public static String getDayName(int day) {
         switch (day) {
             case 2:
                 return "Montag";

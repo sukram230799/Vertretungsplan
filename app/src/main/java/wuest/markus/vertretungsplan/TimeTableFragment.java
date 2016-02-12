@@ -213,8 +213,24 @@ public class TimeTableFragment extends Fragment implements SwipeRefreshLayout.On
                     //tableAdapter.notifyDataSetChanged();
                     //setShowCheckBoxes(showCheckBoxes);
                     if (editInterface != null) {
-                        editInterface.onTimeTableEdit(day, grade);
+                        editInterface.onEditLesson(day, grade);
                     }
+                }
+            });
+            newFAB.setClickable(true);
+            newFAB.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    fab.close(true);
+                    editInterface.onAddLesson(day, grade);
+                }
+            });
+            shareFAB.setClickable(true);
+            shareFAB.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    fab.close(true);
+                    editInterface.onShareTimeTable();
                 }
             });
         }
@@ -261,6 +277,8 @@ public class TimeTableFragment extends Fragment implements SwipeRefreshLayout.On
     }
 
     public interface EditInterface {
-        void onTimeTableEdit(int day, HWGrade grade);
+        void onEditLesson(int day, HWGrade grade);
+        void onAddLesson(int day, HWGrade grade);
+        void onShareTimeTable();
     }
 }

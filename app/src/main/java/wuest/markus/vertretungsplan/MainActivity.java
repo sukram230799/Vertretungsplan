@@ -26,6 +26,11 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.google.zxing.integration.android.IntentIntegrator;
+import com.google.zxing.integration.android.IntentResult;
+
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -457,6 +462,15 @@ public class MainActivity extends AppCompatActivity implements NavigationDrawerF
     //Receive of QR-Code
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        IntentResult result = IntentIntegrator.parseActivityResult(requestCode, resultCode, data);
+        if (result != null) {
+            String contents = result.getContents();
+            if (contents != null) {
+                Log.d(TAG, result.toString());
+            } else {
+                //showDialog(R.string.result_failed, getString(R.string.result_failed_why));
+            }
+        }
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == 0) {
 
@@ -549,12 +563,34 @@ public class MainActivity extends AppCompatActivity implements NavigationDrawerF
     }
 
     @Override
-    public void onTimeTableEdit(int day, HWGrade grade) {
+    public void onEditLesson(int day, HWGrade grade) {
         Intent intent = new Intent(this, SelectLessonActivity.class);
         Bundle bundle = new Bundle();
         bundle.putInt("DAY", day);
         bundle.putString("GRADE", grade.getGradeName());
         intent.putExtras(bundle);
         startActivity(intent);
+    }
+
+    @Override
+    public void onAddLesson(int day, HWGrade grade) {
+        startActivity(new Intent(this, TableEditor.class));
+    }
+
+    @Override
+    public void onShareTimeTable() {
+        try {
+            encodeBarcode("TEXT_TYPE", TimeTableHelper.getURLForShare(dbHandler.getTimeTable(new HWGrade("TG11-2")), ";", "+"));
+        } catch (DBError error) {
+            error.printStackTrace();
+        }
+
+    }
+
+    private void encodeBarcode(CharSequence type, CharSequence data) {
+        IntentIntegrator integrator = new IntentIntegrator(this);
+        integrator.autoWide();
+        integrator.addExtra("ENCODE_SHOW_CONTENTS", false);
+        integrator.shareText(data, type);
     }
 }

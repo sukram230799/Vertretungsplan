@@ -443,6 +443,22 @@ public class DBHandler extends SQLiteOpenHelper {
         return hwLessons;
     }
 
+    public void updateLesson(HWLesson oldLesson, HWLesson newLesson) {
+        SQLiteDatabase database = getWritableDatabase();
+        for (int hour : oldLesson.getHours()) {
+            String query = "DELETE FROM " + TABLE_TIMETABLE + " WHERE " +
+                    COLUMN_DAY + " = \"" + oldLesson.getDay() + "\" AND " +
+                    COLUMN_HOUR + " = \"" + hour + "\" AND " +
+                    COLUMN_TEACHER + " = \"" + oldLesson.getTeacher() + "\" AND " +
+                    COLUMN_SUBJECT + " = \"" + oldLesson.getSubject() + "\" AND " +
+                    COLUMN_ROOM + " = \"" + oldLesson.getRoom() + "\" AND " +
+                    COLUMN_REPEATTYPE + " = \"" + oldLesson.getRepeatType() + "\";";
+            Log.d(TAG, query);
+            database.execSQL(query);
+        }
+        addLesson(newLesson);
+    }
+
     public void dropTimeTable() {
         SQLiteDatabase db = getWritableDatabase();
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_TIMETABLE);
@@ -461,11 +477,11 @@ public class DBHandler extends SQLiteOpenHelper {
         db.execSQL(query);
     }
 
-    public void addMySubject(String subject){
+    public void addMySubject(String subject) {
 
     }
 
-    public String[] getMySubjects(){
+    public String[] getMySubjects() {
         return null;
     }
 }

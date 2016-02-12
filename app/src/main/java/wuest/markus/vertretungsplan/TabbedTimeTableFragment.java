@@ -83,7 +83,23 @@ public class TabbedTimeTableFragment extends Fragment {
                 fab.close(true);
                 showCheckBoxes = !showCheckBoxes;
                 //pagerAdapter.setEdit(showCheckBoxes);
-                editInterface.onTimeTableEdit(pager.getCurrentItem() + 2, grade);
+                editInterface.onEditLesson(pager.getCurrentItem() + 2, grade);
+            }
+        });
+        newFAB.setClickable(true);
+        newFAB.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                fab.close(true);
+                editInterface.onAddLesson(pager.getCurrentItem() + 2, grade);
+            }
+        });
+        shareFAB.setClickable(true);
+        shareFAB.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                fab.close(true);
+                editInterface.onShareTimeTable();
             }
         });
 
@@ -111,6 +127,10 @@ public class TabbedTimeTableFragment extends Fragment {
     }
 
     public interface EditInterface {
-        void onTimeTableEdit(int day, HWGrade grade);
+        void onEditLesson(int day, HWGrade grade);
+
+        void onAddLesson(int day, HWGrade grade);
+
+        void onShareTimeTable();
     }
 }

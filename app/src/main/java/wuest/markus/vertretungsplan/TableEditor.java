@@ -86,7 +86,7 @@ public class TableEditor extends AppCompatActivity implements HourPickerDialog.N
                         bundle.getString(REPEATTYPE));
                 startHour = lesson.getHours()[0];
                 endHour = lesson.getHours()[lesson.getHours().length - 1];
-            } catch (java.lang.NullPointerException e){
+            } catch (java.lang.NullPointerException e) {
                 e.printStackTrace();
             }
             Log.d(TAG, String.valueOf(startHour));
@@ -257,14 +257,24 @@ public class TableEditor extends AppCompatActivity implements HourPickerDialog.N
                     textSubject.getText().toString().trim().length() > 0 &&
                     textRoom.getText().toString().trim().length() > 0 &&
                     textRepeatType.getText().toString().trim().length() > 0) {
-
-                dbHandler.addLesson(new HWLesson(new HWGrade(textGrade.getText().toString()),
-                        hours.toArray(new Integer[hours.size()]),
-                        day,
-                        textTeacher.getText().toString(),
-                        textSubject.getText().toString(),
-                        textRoom.getText().toString(),
-                        textRepeatType.getText().toString()));
+                if (lesson == null) {
+                    dbHandler.addLesson(new HWLesson(new HWGrade(textGrade.getText().toString()),
+                            hours.toArray(new Integer[hours.size()]),
+                            day,
+                            textTeacher.getText().toString(),
+                            textSubject.getText().toString(),
+                            textRoom.getText().toString(),
+                            textRepeatType.getText().toString()));
+                } else {
+                    dbHandler.updateLesson(lesson, new HWLesson(new HWGrade(textGrade.getText().toString()),
+                                    hours.toArray(new Integer[hours.size()]),
+                                    day,
+                                    textTeacher.getText().toString(),
+                                    textSubject.getText().toString(),
+                                    textRoom.getText().toString(),
+                                    textRepeatType.getText().toString())
+                    );
+                }
                 finish();
             }
 

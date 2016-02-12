@@ -267,19 +267,18 @@ public class CombineData {
                 }
             }
             Collections.sort(hoursArrayList);
-            for (int hour : hoursArrayList) {
-                combinedList.add(new HWLesson(hwLesson.getGrade(),
-                        new Integer[]{hour},
-                        hwLesson.getDay(),
-                        hwLesson.getTeacher(),
-                        hwLesson.getSubject(),
-                        hwLesson.getRoom(),
-                        hwLesson.getRepeatType()
-                ));
-            }
+            combinedList.add(new HWLesson(hwLesson.getGrade(),
+                    hoursArrayList.toArray(new Integer[hoursArrayList.size()]),
+                    hwLesson.getDay(),
+                    hwLesson.getTeacher(),
+                    hwLesson.getSubject(),
+                    hwLesson.getRoom(),
+                    hwLesson.getRepeatType()
+            ));
         }
         return combinedList.toArray(new HWLesson[combinedList.size()]);
     }
+
 
     public static class ChangedHour {
         private Integer hour;
