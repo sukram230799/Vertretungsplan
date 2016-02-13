@@ -12,7 +12,7 @@ public class VPWidgetTextProcess {
     public static String[] processData(Context context, VPData vpData) {
         String Wochentag;
         Calendar c = new GregorianCalendar();
-        c.setTime(vpData.get_date());
+        c.setTime(vpData.getDate());
         switch (c.get(Calendar.DAY_OF_WEEK)) {
             case Calendar.MONDAY:
                 Wochentag = context.getString(R.string.dayMonday);
@@ -41,12 +41,12 @@ public class VPWidgetTextProcess {
         }
 
         return new String[] {
-                context.getString(R.string.datebuilder, Wochentag, dateFormat.format(vpData.get_date())),
-                CombineData.hoursString(vpData.get_hours(), false),
-                vpData.get_subject(),
-                vpData.get_room(),
-                vpData.get_info1(),
-                vpData.get_info2()};
+                context.getString(R.string.datebuilder, Wochentag, dateFormat.format(vpData.getDate())),
+                CombineData.hoursString(vpData.getHours(), false),
+                vpData.getSubject(),
+                vpData.getRoom(),
+                vpData.getInfo1(),
+                vpData.getInfo2()};
 
 
     }

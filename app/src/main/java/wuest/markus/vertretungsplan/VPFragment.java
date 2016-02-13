@@ -19,7 +19,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-public class VPFragment extends Fragment implements PlanAdapter.ClickListener, SwipeRefreshLayout.OnRefreshListener {
+public class VPFragment extends Fragment implements VPAdapter.ClickListener, SwipeRefreshLayout.OnRefreshListener {
 
     private static final String TAG = "VPFragment";
     //private static int position;
@@ -29,7 +29,7 @@ public class VPFragment extends Fragment implements PlanAdapter.ClickListener, S
     private RefreshContentListener refreshListener;
 
     private RecyclerView recyclerView;
-    private PlanAdapter planAdapter;
+    private VPAdapter VPAdapter;
     private List<VPData> data = Collections.emptyList();
 
     public static VPFragment newInstance(HWGrade grade) {
@@ -82,11 +82,11 @@ public class VPFragment extends Fragment implements PlanAdapter.ClickListener, S
         // Inflate the layout for this fragment
         View layout = inflater.inflate(R.layout.fragment_vp, container, false);
         recyclerView = (RecyclerView) layout.findViewById(R.id.plan_recycler_view);
-        planAdapter = new PlanAdapter(getActivity(), data);
-        planAdapter.setClickListener(this);
-        Log.v(TAG, String.valueOf(planAdapter));
+        VPAdapter = new VPAdapter(getActivity(), data);
+        VPAdapter.setClickListener(this);
+        Log.v(TAG, String.valueOf(VPAdapter));
         Log.v(TAG, String.valueOf(recyclerView));
-        recyclerView.setAdapter(planAdapter);
+        recyclerView.setAdapter(VPAdapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         mSwipeRefreshLayout = (SwipeRefreshLayout) layout.findViewById(R.id.swipe_to_reload_plan);
         mSwipeRefreshLayout.setOnRefreshListener(this);

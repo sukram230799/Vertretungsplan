@@ -98,7 +98,7 @@ public class TabbedTimeTableFragment extends Fragment {
         shareFAB.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                fab.close(true);
+                fab.close(false);
                 editInterface.onShareTimeTable();
             }
         });

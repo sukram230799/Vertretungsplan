@@ -3,8 +3,6 @@ package wuest.markus.vertretungsplan;
 
 import android.content.Context;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -19,8 +17,6 @@ import android.view.ViewGroup;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.prefs.PreferenceChangeEvent;
-import java.util.prefs.PreferenceChangeListener;
 
 
 /**
@@ -30,7 +26,7 @@ public class NavigationDrawerFragment extends Fragment implements GradeAdapter.C
 
     private ActionBarDrawerToggle mDrawerToggle;
     private DrawerLayout mDrawerLayout;
-    public static final String KEY_USER_LEARNED_DRAWER = "user_learned_drawer";
+    public static final String KEY_USER_LEARNED_DRAWER = "user_learned_drawer_v2";
 
     private boolean mUserLearnedDrawer;
     private boolean mFromSavedInstanceState;
@@ -39,20 +35,19 @@ public class NavigationDrawerFragment extends Fragment implements GradeAdapter.C
 
     private RecyclerView recyclerView;
     private GradeAdapter gradeAdapter;
-    private NavigationDrawerFragment navigationDrawerFragment = this;
 
     private ItemSelectedListener itemSelectedListener;
     public int selectedItem;
 
 
-    private Handler handler = new Handler() {
+    /*private Handler handler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
             gradeAdapter = new GradeAdapter(getActivity(), getData(getActivity()));
             gradeAdapter.setClickListener(navigationDrawerFragment);
             recyclerView.setAdapter(gradeAdapter);
         }
-    };
+    };*/
 
     public NavigationDrawerFragment() {
         //preferences = new Preferences(getActivity());
@@ -66,7 +61,7 @@ public class NavigationDrawerFragment extends Fragment implements GradeAdapter.C
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mUserLearnedDrawer = Boolean.valueOf(Preferences.readStringFromPreferences(getActivity(), KEY_USER_LEARNED_DRAWER, "false"));
+        mUserLearnedDrawer = Preferences.readBooleanFromPreferences(getActivity(), KEY_USER_LEARNED_DRAWER, false);
         if (savedInstanceState == null) {
             mFromSavedInstanceState = true;
         }
@@ -124,7 +119,7 @@ public class NavigationDrawerFragment extends Fragment implements GradeAdapter.C
                 super.onDrawerOpened(drawerView);
                 if (!mUserLearnedDrawer) {
                     mUserLearnedDrawer = true;
-                    Preferences.saveStringToPreferences(getActivity(), KEY_USER_LEARNED_DRAWER, mUserLearnedDrawer + "");
+                    Preferences.saveBooleanToPreferences(getActivity(), KEY_USER_LEARNED_DRAWER, mUserLearnedDrawer);
                 }
                 getActivity().supportInvalidateOptionsMenu();
                 //super.onDrawerOpened(drawerView);

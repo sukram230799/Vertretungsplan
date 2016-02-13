@@ -18,7 +18,7 @@ import java.util.List;
 
 public class TableAdapter extends RecyclerView.Adapter<TableAdapter.TableViewHolder> {
 
-    private static final String TAG = "PlanAdapter";
+    private static final String TAG = "VPAdapter";
     private LayoutInflater inflater;
     private Context context;
     List<HWLesson> table = Collections.emptyList();
@@ -69,6 +69,17 @@ public class TableAdapter extends RecyclerView.Adapter<TableAdapter.TableViewHol
         holder.textRoom.setText(table.get(position).getRoom());
         //holder.textRoom.setText(TimeTableHelper.getRepeatTypeName(table.get(position).getRepeatType()));
         holder.textRepeatType.setText(table.get(position).getRepeatType());
+
+        if (table.get(position).changedRoom) {
+            holder.textRoom.setTextColor(Color.parseColor("#8aFF0000"));
+        } else {
+            holder.textRoom.setTextColor(Color.parseColor("#8a000000"));
+        }
+        if (table.get(position).changedSubject) {
+            holder.textSubject.setTextColor(Color.parseColor("#8aFF0000"));
+        } else {
+            holder.textSubject.setTextColor(Color.parseColor("#8a000000"));
+        }
     }
 
     @Override

@@ -88,10 +88,10 @@ public class VPWidgetAdapter implements RemoteViewsFactory {
                         context.getPackageName(), R.layout.widget_minimal_row);
 
                         /*
-                        context.getString(R.string.datebuilder, Wochentag, dateFormat.format(vpDataArrayList.get(position).get_date())) + " " +
-                        CombineData.hoursString(vpDataArrayList.get(position).get_hours()) + " " +
-                        vpDataArrayList.get(position).get_subject() + " in: " +
-                        vpDataArrayList.get(position).get_room();*/
+                        context.getString(R.string.datebuilder, Wochentag, dateFormat.format(vpDataArrayList.get(position).getDate())) + " " +
+                        CombineData.hoursString(vpDataArrayList.get(position).getHours()) + " " +
+                        vpDataArrayList.get(position).getSubject() + " in: " +
+                        vpDataArrayList.get(position).getRoom();*/
                 remoteView.setTextViewText(R.id.textBrief, VPWidgetTextProcess.brief(text));
                 break;
             default:
@@ -102,10 +102,10 @@ public class VPWidgetAdapter implements RemoteViewsFactory {
         }
         //remoteView.setTextViewText(R.id.textHour, "");
 /*
-        String text = context.getString(R.string.datebuilder, Wochentag, dateFormat.format(vpDataArrayList.get(position).get_date())) + " " +
-                CombineData.hoursString(vpDataArrayList.get(position).get_hours()) + " " +
-                vpDataArrayList.get(position).get_subject() + " in: " +
-                vpDataArrayList.get(position).get_room();
+        String text = context.getString(R.string.datebuilder, Wochentag, dateFormat.format(vpDataArrayList.get(position).getDate())) + " " +
+                CombineData.hoursString(vpDataArrayList.get(position).getHours()) + " " +
+                vpDataArrayList.get(position).getSubject() + " in: " +
+                vpDataArrayList.get(position).getRoom();
         Log.d(TAG, text);
         */
         Log.d(TAG, "-getViewAt");

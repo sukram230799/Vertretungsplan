@@ -14,8 +14,8 @@ import java.util.Collections;
 import java.util.GregorianCalendar;
 import java.util.List;
 
-public class PlanAdapter extends RecyclerView.Adapter<PlanAdapter.PlanViewHolder> {
-    private static final String TAG = "PlanAdapter";
+public class VPAdapter extends RecyclerView.Adapter<VPAdapter.PlanViewHolder> {
+    private static final String TAG = "VPAdapter";
     private LayoutInflater inflater;
     private Context context;
     List<VPData> data = Collections.emptyList();
@@ -23,14 +23,14 @@ public class PlanAdapter extends RecyclerView.Adapter<PlanAdapter.PlanViewHolder
 
     public static final SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy");
 
-    public PlanAdapter(Context context, List<VPData> data) {
-        Log.v(TAG, "@PlanAdapter");
+    public VPAdapter(Context context, List<VPData> data) {
+        Log.v(TAG, "@VPAdapter");
         Log.v(TAG, "" + data.size());
         Log.v(TAG, String.valueOf(context));
         this.context = context;
         this.data = data;
         inflater = LayoutInflater.from(context);
-        Log.v(TAG, "-PlanAdapter");
+        Log.v(TAG, "-VPAdapter");
     }
 
     public void deleteItem(int position) {
@@ -45,7 +45,7 @@ public class PlanAdapter extends RecyclerView.Adapter<PlanAdapter.PlanViewHolder
     @Override
     public PlanViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         Log.v(TAG, "oCVH");
-        View view = inflater.inflate(R.layout.custom_plan_row, parent, false);
+        View view = inflater.inflate(R.layout.custom_vp_row, parent, false);
         return new PlanViewHolder(view);
     }
 
@@ -54,7 +54,7 @@ public class PlanAdapter extends RecyclerView.Adapter<PlanAdapter.PlanViewHolder
         Log.v(TAG, "oBVH");
         String Wochentag;
         Calendar c = new GregorianCalendar();
-        c.setTime(data.get(position).get_date());
+        c.setTime(data.get(position).getDate());
         switch (c.get(Calendar.DAY_OF_WEEK)) {
             case Calendar.MONDAY:
                 Wochentag = context.getString(R.string.dayMonday);
@@ -81,12 +81,12 @@ public class PlanAdapter extends RecyclerView.Adapter<PlanAdapter.PlanViewHolder
                 Wochentag = context.getString(R.string.dayInvalid);
                 break;
         }
-        holder.textDate.setText(context.getString(R.string.datebuilder, Wochentag, dateFormat.format(data.get(position).get_date())));
-        holder.textHour.setText(CombineData.hoursString(data.get(position).get_hours(), false));
-        holder.textSubject.setText(data.get(position).get_subject());
-        holder.textRoom.setText(data.get(position).get_room());
-        holder.textInfo1.setText(data.get(position).get_info1());
-        holder.textInfo2.setText(data.get(position).get_info2());
+        holder.textDate.setText(context.getString(R.string.datebuilder, Wochentag, dateFormat.format(data.get(position).getDate())));
+        holder.textHour.setText(CombineData.hoursString(data.get(position).getHours(), false));
+        holder.textSubject.setText(data.get(position).getSubject());
+        holder.textRoom.setText(data.get(position).getRoom());
+        holder.textInfo1.setText(data.get(position).getInfo1());
+        holder.textInfo2.setText(data.get(position).getInfo2());
     }
 
     @Override

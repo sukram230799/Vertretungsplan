@@ -113,6 +113,12 @@ public class TimeTableFragment extends Fragment implements SwipeRefreshLayout.On
             if (!editMode) {
                 hwLessons = TimeTableHelper.selectLessonsFromRepeatType(hwLessons, week, getActivity()); //No CombineData, because of better layout;
             }
+            try {
+                VPData[] vpData = dbHandler.getVP(grade);
+                //hwLessons = TimeTableHelper.combineVPSP(hwLessons, vpData, false, false);
+            } catch (DBError e){
+                e.printStackTrace();
+            }
             hwLessons = TimeTableHelper.fillGabs(hwLessons, week, day, getActivity());
             this.data = Arrays.asList(hwLessons);
             /*for (VPData data : vpData) {
@@ -229,7 +235,7 @@ public class TimeTableFragment extends Fragment implements SwipeRefreshLayout.On
             shareFAB.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    fab.close(true);
+                    fab.close(false);
                     editInterface.onShareTimeTable();
                 }
             });

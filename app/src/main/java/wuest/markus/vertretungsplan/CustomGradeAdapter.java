@@ -10,7 +10,7 @@ import android.widget.TextView;
 class CustomGradeAdapter extends ArrayAdapter<HWGrade>{
 
     public CustomGradeAdapter(Context context, HWGrade[] resource) {
-        super(context, R.layout.custom_plan_row, resource);
+        super(context, R.layout.custom_vp_row, resource);
     }
 
     @Override

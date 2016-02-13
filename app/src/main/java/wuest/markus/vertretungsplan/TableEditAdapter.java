@@ -16,7 +16,7 @@ import java.util.List;
 
 public class TableEditAdapter extends RecyclerView.Adapter<TableEditAdapter.TableViewHolder> {
 
-    private static final String TAG = "PlanAdapter";
+    private static final String TAG = "VPAdapter";
     private LayoutInflater inflater;
     private Context context;
     List<HWLesson> table = Collections.emptyList();

@@ -15,7 +15,7 @@ import java.util.Date;
 
 public class DBHandler extends SQLiteOpenHelper {
 
-    private static final int DATABASE_VERSION = 3;
+    private static final int DATABASE_VERSION = 4;
     private static final String DATABASE_NAME = "Vertretungsplan.db";
     private static Context context;
 
@@ -33,6 +33,7 @@ public class DBHandler extends SQLiteOpenHelper {
     public static final String COLUMN_DAY = "day";
     public static final String COLUMN_TEACHER = "teacher";
     public static final String COLUMN_REPEATTYPE = "repeattype";
+    public static final String TABLE_SUBSCRIBED_SUBJECTS = "subscribed_subjects";
 
     public static final SimpleDateFormat dbDateFormat = new SimpleDateFormat("yyyy-MM-dd");
 
@@ -84,7 +85,12 @@ public class DBHandler extends SQLiteOpenHelper {
                 ");";
         Log.d(TAG, "@onCreate: " + query);
         db.execSQL(query);
-
+        //Subscribed Subjects
+        query = "CREATE TABLE IF NOT EXISTS " + TABLE_SUBSCRIBED_SUBJECTS + "(" +
+                COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                COLUMN_SUBJECT + " TEXT " +
+                ");";
+        db.execSQL(query);
         Log.d(TAG, "-onCreate");
     }
 
@@ -92,15 +98,13 @@ public class DBHandler extends SQLiteOpenHelper {
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         Log.d(TAG, "@onUpgrade()");
         //No Migration!
-        if (newVersion == 3) {
-            db.execSQL("DROP TABLE IF EXISTS " + TABLE_TIMETABLE);
-        }
-        if (oldVersion < 2 && oldVersion > 0) {
-            db.execSQL("DROP TABLE IF EXISTS " + TABLE_VP);
-        } else {
+        if (oldVersion > newVersion) {
             db.execSQL("DROP TABLE IF EXISTS " + TABLE_GRADES);
             db.execSQL("DROP TABLE IF EXISTS " + TABLE_VP);
+            db.execSQL("DROP TABLE IF EXISTS " + TABLE_TIMETABLE);
+            db.execSQL("DROP TABLE IF EXISTS " + TABLE_SUBSCRIBED_SUBJECTS);
         }
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_VP);
         onCreate(db);
         Log.d(TAG, "-onUpgrade()");
     }
@@ -304,15 +308,15 @@ public class DBHandler extends SQLiteOpenHelper {
         ContentValues values = new ContentValues();
         Log.d(TAG, "$addDayPlan:before for");
         for (VPData data : vpDatas) {
-            for (Integer hour : data.get_hours()) {
+            for (Integer hour : data.getHours()) {
                 Log.d(TAG, "$addDayPlan:for");
-                values.put(COLUMN_DATE, dbDateFormat.format(data.get_date()));
-                values.put(COLUMN_GRADE, data.get_grade().getGradeName());
+                values.put(COLUMN_DATE, dbDateFormat.format(data.getDate()));
+                values.put(COLUMN_GRADE, data.getGrade().getGradeName());
                 values.put(COLUMN_HOUR, hour);
-                values.put(COLUMN_SUBJECT, data.get_subject());
-                values.put(COLUMN_ROOM, data.get_room());
-                values.put(COLUMN_INFO1, data.get_info1());
-                values.put(COLUMN_INFO2, data.get_info2());
+                values.put(COLUMN_SUBJECT, data.getSubject());
+                values.put(COLUMN_ROOM, data.getRoom());
+                values.put(COLUMN_INFO1, data.getInfo1());
+                values.put(COLUMN_INFO2, data.getInfo2());
                 db.insert(TABLE_VP, null, values);
                 values = new ContentValues();
             }
@@ -477,11 +481,25 @@ public class DBHandler extends SQLiteOpenHelper {
         db.execSQL(query);
     }
 
-    public void addMySubject(String subject) {
-
+    public void addSubscribedSubject(String subject) {
+        ContentValues values = new ContentValues();
+        values.put(COLUMN_SUBJECT, subject);
+        SQLiteDatabase db = getWritableDatabase();
+        db.insert(TABLE_SUBSCRIBED_SUBJECTS, null, values);
     }
 
-    public String[] getMySubjects() {
-        return null;
+    public String[] getSubscribedSubjects() {
+        SQLiteDatabase db = getWritableDatabase();
+        ArrayList<String> subscribedSubjects = new ArrayList<>();
+        String query = "SELECT * FROM " + TABLE_SUBSCRIBED_SUBJECTS + ";";
+        Cursor c = db.rawQuery(query, null);
+        c.moveToFirst();
+        while (!c.isAfterLast()) {
+            if (c.getString(c.getColumnIndex(COLUMN_SUBJECT)) != null) {
+                subscribedSubjects.add(c.getString(c.getColumnIndex(COLUMN_SUBJECT)));
+            }
+            c.moveToNext();
+        }
+        return subscribedSubjects.toArray(new String[subscribedSubjects.size()]);
     }
 }

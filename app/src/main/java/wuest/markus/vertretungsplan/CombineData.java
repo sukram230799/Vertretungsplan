@@ -19,25 +19,25 @@ public class CombineData {
         while (!participants.isEmpty()) {
             ArrayList<Integer> hoursArrayList = new ArrayList<>();
             VPData data = participants.get(0);
-            for (int hour : data.get_hours()) {
+            for (int hour : data.getHours()) {
                 hoursArrayList.add(hour);
             }
             participants.remove(0);
             for (VPData compare : participants.toArray(new VPData[participants.size()])) {
-                Log.v(TAG, String.valueOf(data.get_date().equals(compare.get_date())));
-                Log.v(TAG, String.valueOf(data.get_grade().getGradeName().equals(compare.get_grade().getGradeName())));
-                Log.v(TAG, String.valueOf(data.get_subject().equals(compare.get_subject())));
-                Log.v(TAG, String.valueOf(data.get_room().equals(compare.get_room())));
-                Log.v(TAG, String.valueOf(data.get_info1().equals(compare.get_info1())));
-                Log.v(TAG, String.valueOf(data.get_info2().equals(compare.get_info2())));
-                if (data.get_date().equals(compare.get_date()) &&
-                        data.get_grade().getGradeName().equals(compare.get_grade().getGradeName()) &&
-                        data.get_subject().equals(compare.get_subject()) &&
-                        data.get_room().equals(compare.get_room()) &&
-                        data.get_info1().equals(compare.get_info1()) &&
-                        data.get_info2().equals(compare.get_info2())
+                Log.v(TAG, String.valueOf(data.getDate().equals(compare.getDate())));
+                Log.v(TAG, String.valueOf(data.getGrade().getGradeName().equals(compare.getGrade().getGradeName())));
+                Log.v(TAG, String.valueOf(data.getSubject().equals(compare.getSubject())));
+                Log.v(TAG, String.valueOf(data.getRoom().equals(compare.getRoom())));
+                Log.v(TAG, String.valueOf(data.getInfo1().equals(compare.getInfo1())));
+                Log.v(TAG, String.valueOf(data.getInfo2().equals(compare.getInfo2())));
+                if (data.getDate().equals(compare.getDate()) &&
+                        data.getGrade().getGradeName().equals(compare.getGrade().getGradeName()) &&
+                        data.getSubject().equals(compare.getSubject()) &&
+                        data.getRoom().equals(compare.getRoom()) &&
+                        data.getInfo1().equals(compare.getInfo1()) &&
+                        data.getInfo2().equals(compare.getInfo2())
                         ) {
-                    for (int hour : compare.get_hours()) {
+                    for (int hour : compare.getHours()) {
                         if (!hoursArrayList.contains(hour)) {
                             hoursArrayList.add(hour);
                         }
@@ -46,13 +46,13 @@ public class CombineData {
                 }
             }
             Collections.sort(hoursArrayList);
-            combinedList.add(new VPData(data.get_grade(),
+            combinedList.add(new VPData(data.getGrade(),
                     hoursArrayList.toArray(new Integer[hoursArrayList.size()]),
-                    data.get_subject(),
-                    data.get_room(),
-                    data.get_info1(),
-                    data.get_info2(),
-                    data.get_date()
+                    data.getSubject(),
+                    data.getRoom(),
+                    data.getInfo1(),
+                    data.getInfo2(),
+                    data.getDate()
             ));
         }
         return combinedList.toArray(new VPData[combinedList.size()]);
@@ -71,13 +71,13 @@ public class CombineData {
         ArrayList<VPData> changesList = new ArrayList<>();
         for (VPData oldData : oldDataArray) {
             for (VPData data : combinedData) {
-                if (!(Arrays.equals(oldData.get_hours(), data.get_hours())) &&
-                        oldData.get_date().equals(data.get_date()) &&
-                        oldData.get_grade().getGradeName().equals(data.get_grade().getGradeName()) &&
-                        oldData.get_subject().equals(data.get_subject()) &&
-                        oldData.get_room().equals(data.get_room()) &&
-                        oldData.get_info1().equals(data.get_info1()) &&
-                        oldData.get_info2().equals(data.get_info2())
+                if (!(Arrays.equals(oldData.getHours(), data.getHours())) &&
+                        oldData.getDate().equals(data.getDate()) &&
+                        oldData.getGrade().getGradeName().equals(data.getGrade().getGradeName()) &&
+                        oldData.getSubject().equals(data.getSubject()) &&
+                        oldData.getRoom().equals(data.getRoom()) &&
+                        oldData.getInfo1().equals(data.getInfo1()) &&
+                        oldData.getInfo2().equals(data.getInfo2())
                         ) {
                 }
             }
@@ -138,9 +138,9 @@ public class CombineData {
         if (oldDataArray != null) {
             oldDataList = new ArrayList<>(oldDataArray.length);
             for (VPData data : oldDataArray) {
-                for (Integer hour : data.get_hours()) {
+                for (Integer hour : data.getHours()) {
                     Integer[] hours = {hour};
-                    oldDataList.add(new VPData(data.get_grade(), hours, data.get_subject(), data.get_room(), data.get_info1(), data.get_info2(), data.get_date()));
+                    oldDataList.add(new VPData(data.getGrade(), hours, data.getSubject(), data.getRoom(), data.getInfo1(), data.getInfo2(), data.getDate()));
                 }
             }
         } else {
@@ -149,9 +149,9 @@ public class CombineData {
         if (newDataArray != null) {
             newDataList = new ArrayList<>(newDataArray.length);
             for (VPData data : newDataArray) {
-                for (Integer hour : data.get_hours()) {
+                for (Integer hour : data.getHours()) {
                     Integer[] hours = {hour};
-                    newDataList.add(new VPData(data.get_grade(), hours, data.get_subject(), data.get_room(), data.get_info1(), data.get_info2(), data.get_date()));
+                    newDataList.add(new VPData(data.getGrade(), hours, data.getSubject(), data.getRoom(), data.getInfo1(), data.getInfo2(), data.getDate()));
                 }
             }
         } else {
@@ -162,13 +162,13 @@ public class CombineData {
         for (VPData oldData : /**/oldDataList/*/oldDataArray*/) {
             for (VPData newData : /**/newDataList/*/newDataArray*/) {
                 if (
-                        oldData.get_hours()[0].equals(newData.get_hours()[0]) &&
-                                oldData.get_grade().getGradeName().equals(newData.get_grade().getGradeName()) &&
-                                oldData.get_date().equals(newData.get_date()) &&
-                                oldData.get_subject().equals(newData.get_subject()) &&
-                                oldData.get_room().equals(newData.get_room()) &&
-                                oldData.get_info1().equals(newData.get_info1()) &&
-                                oldData.get_info2().equals(newData.get_info2())
+                        oldData.getHours()[0].equals(newData.getHours()[0]) &&
+                                oldData.getGrade().getGradeName().equals(newData.getGrade().getGradeName()) &&
+                                oldData.getDate().equals(newData.getDate()) &&
+                                oldData.getSubject().equals(newData.getSubject()) &&
+                                oldData.getRoom().equals(newData.getRoom()) &&
+                                oldData.getInfo1().equals(newData.getInfo1()) &&
+                                oldData.getInfo2().equals(newData.getInfo2())
                         ) {
                     //if (oldData.equals(newData)) {
                     oldRemove.add(oldData);
@@ -186,13 +186,13 @@ public class CombineData {
         }
         ArrayList<String> changes = new ArrayList<>();
         for (VPData data : oldDataList) {
-            if (!changes.contains(GetVP.dateFormat.format(data.get_date()) + "|" + data.get_hours()[0])) {
-                changes.add(GetVP.dateFormat.format(data.get_date()) + "|" + data.get_hours()[0]);
+            if (!changes.contains(GetVP.dateFormat.format(data.getDate()) + "|" + data.getHours()[0])) {
+                changes.add(GetVP.dateFormat.format(data.getDate()) + "|" + data.getHours()[0]);
             }
         }
         for (VPData data : newDataList) {
-            if (!changes.contains(GetVP.dateFormat.format(data.get_date()) + "|" + data.get_hours()[0])) {
-                changes.add(GetVP.dateFormat.format(data.get_date()) + "|" + data.get_hours()[0]);
+            if (!changes.contains(GetVP.dateFormat.format(data.getDate()) + "|" + data.getHours()[0])) {
+                changes.add(GetVP.dateFormat.format(data.getDate()) + "|" + data.getHours()[0]);
             }
         }
         ArrayList<ChangedHour> ChangedHour = new ArrayList<>();
@@ -245,12 +245,12 @@ public class CombineData {
             }
             participants.remove(0);
             for (HWLesson compare : participants.toArray(new HWLesson[participants.size()])) {
-                /*Log.v(TAG, String.valueOf(hwLesson.get_date().equals(compare.get_date())));
-                Log.v(TAG, String.valueOf(hwLesson.get_grade().getGradeName().equals(compare.get_grade().getGradeName())));
-                Log.v(TAG, String.valueOf(hwLesson.get_subject().equals(compare.get_subject())));
-                Log.v(TAG, String.valueOf(hwLesson.get_room().equals(compare.get_room())));
-                Log.v(TAG, String.valueOf(hwLesson.get_info1().equals(compare.get_info1())));
-                Log.v(TAG, String.valueOf(hwLesson.get_info2().equals(compare.get_info2())));*/
+                /*Log.v(TAG, String.valueOf(hwLesson.getDate().equals(compare.getDate())));
+                Log.v(TAG, String.valueOf(hwLesson.getGrade().getGradeName().equals(compare.getGrade().getGradeName())));
+                Log.v(TAG, String.valueOf(hwLesson.getSubject().equals(compare.getSubject())));
+                Log.v(TAG, String.valueOf(hwLesson.getRoom().equals(compare.getRoom())));
+                Log.v(TAG, String.valueOf(hwLesson.getInfo1().equals(compare.getInfo1())));
+                Log.v(TAG, String.valueOf(hwLesson.getInfo2().equals(compare.getInfo2())));*/
                 if (hwLesson.getDay() == compare.getDay() &&
                         hwLesson.getGrade().getGradeName().equals(compare.getGrade().getGradeName()) &&
                         hwLesson.getTeacher().equals(compare.getTeacher()) &&

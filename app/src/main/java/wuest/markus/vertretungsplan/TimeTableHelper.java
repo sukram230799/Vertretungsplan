@@ -350,9 +350,12 @@ public class TimeTableHelper {
         if (hwLessons.length > 0) {
             String URL = "http://vp-edit.ga/?grade=" + hwLessons[0].getGrade().getGradeName() + "&table=";
             for (HWLesson lesson : combinedLessons) {
+                String hours = "";
+                for (int hour : lesson.getHours()) {
+                    hours += hour + "_";
+                }
                 URL += lesson.getDay() + itemSeparator +
-                        CombineData.hoursString(lesson.getHours(), false) +
-                        lesson.getHours()[0] + itemSeparator +
+                        hours + itemSeparator +
                         lesson.getTeacher() + itemSeparator +
                         lesson.getSubject() + itemSeparator +
                         lesson.getRoom() + itemSeparator +
@@ -398,6 +401,40 @@ public class TimeTableHelper {
         return lessons.toArray(new HWLesson[lessons.size()]);
     }
 
+    public static HWLesson[] parseURL(String URL, String itemSeparator, String lineSeparator) {
+        URL = URL.trim();
+        Log.v(TAG, URL);
+        String[] urlParts = URL.split("=");
+        for (String part : urlParts) {
+            Log.v(TAG, part);
+        }
+        if (urlParts.length >= 3) {
+            if (urlParts[0].equals("http://vp-edit.ga/?grade")) {
+                ArrayList<HWLesson> hwLessons = new ArrayList<>();
+                Log.v(TAG, urlParts[1]);
+                HWGrade grade = new HWGrade(urlParts[1].split("&")[0]);
+                Log.v(TAG, grade.getGradeName());
+                String[] lessons = urlParts[2].split(lineSeparator);
+                for (String lesson : lessons) {
+                    Log.v(TAG, lesson);
+                    String[] lessonInfo = lesson.split(itemSeparator);
+                    ArrayList<Integer> hours = new ArrayList<>();
+                    for (String hour : lessonInfo[1].split("_")) {
+                        hours.add(Integer.parseInt(hour));
+                    }
+                    hwLessons.add(new HWLesson(grade, hours.toArray(new Integer[hours.size()]),
+                            Integer.parseInt(lessonInfo[0]),
+                            lessonInfo[2],
+                            lessonInfo[3],
+                            lessonInfo[4],
+                            lessonInfo[5]));
+                }
+                return hwLessons.toArray(new HWLesson[hwLessons.size()]);
+            }
+        }
+        return new HWLesson[0];
+    }
+
     public static HWLesson[] fillGabs(HWLesson[] lessons, int week, int day, Context context) {
         HWGrade grade = lessons[0].getGrade();
         ArrayList<HWLesson> lessonArrayList = new ArrayList<>(Arrays.asList(lessons));
@@ -436,5 +473,65 @@ public class TimeTableHelper {
             default:
                 return "Sonntag";
         }
+    }
+
+    public static HWPlan[] combineVPSP(HWLesson[] sp, VPData[] vp, boolean combinedSP, boolean combinedVP) {
+        ArrayList<HWPlan> hwPlanArrayList = new ArrayList<>();
+        ArrayList<VPData> vpArrayList;
+        ArrayList<HWLesson> spArrayList;
+        if (combinedVP) {
+            vpArrayList = new ArrayList<>();
+            for (VPData data : vp) {
+                for (int hour : data.getHours()) {
+                    vpArrayList.add(new VPData(data.getGrade(), new Integer[]{hour}, data.getSubject(), data.getRoom(),
+                            data.getInfo1(), data.getInfo2(), data.getDate()));
+                }
+            }
+        } else {
+            vpArrayList = new ArrayList<>(Arrays.asList(vp));
+        }
+        if (combinedSP) {
+            spArrayList = new ArrayList<>();
+            for (HWLesson lesson : sp) {
+                for (int hour : lesson.getHours()) {
+                    spArrayList.add(new HWLesson(lesson.getGrade(), new Integer[]{hour}, lesson.getDay(), lesson.getTeacher(),
+                            lesson.getSubject(), lesson.getRoom(), lesson.getRepeatType()));
+                }
+            }
+        } else {
+            spArrayList = new ArrayList<>(Arrays.asList(sp));
+        }
+        for (int i = 0; i < spArrayList.size(); i++) {
+            HWLesson lesson = spArrayList.get(i);
+            boolean add = false;
+            for (VPData vpData : vpArrayList) {
+                Calendar calendar = new GregorianCalendar();
+                calendar.setTime(vpData.getDate());
+                int day = calendar.get(Calendar.DAY_OF_WEEK);
+                if (lesson.getDay() == day &&
+                        Arrays.equals(lesson.getHours(), vpData.getHours())) {
+                    hwPlanArrayList.add(new HWPlan(lesson.getGrade(), lesson.getHours()[0], lesson.getDay(), lesson.getTeacher(),
+                            lesson.getSubject(), lesson.getRoom(), lesson.getRepeatType(), vpData.getSubject(), vpData.getRoom(),
+                            vpData.getInfo1(), vpData.getInfo2(), vpData.getDate()));
+                    vpArrayList.remove(vpData);
+                    add = true;
+                    break; //No double add!
+                }
+            }
+            if (!add) { //No double add!
+                hwPlanArrayList.add(new HWPlan(lesson.getGrade(), lesson.getHours()[0], lesson.getDay(), lesson.getTeacher(),
+                        lesson.getSubject(), lesson.getRoom(), lesson.getRepeatType(), null, null,
+                        null, null, null));
+            }
+        }
+        for (VPData vpData : vpArrayList) {
+            Calendar calendar = new GregorianCalendar();
+            calendar.setTime(vpData.getDate());
+            int day = calendar.get(Calendar.DAY_OF_WEEK);
+            hwPlanArrayList.add(new HWPlan(vpData.getGrade(), vpData.getHours()[0], day, null,
+                    null, null, null, vpData.getSubject(), vpData.getRoom(),
+                    vpData.getInfo1(), vpData.getInfo2(), vpData.getDate()));
+        }
+        return hwPlanArrayList.toArray(new HWPlan[hwPlanArrayList.size()]);
     }
 }

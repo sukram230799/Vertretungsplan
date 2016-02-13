@@ -26,15 +26,10 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import com.google.zxing.integration.android.IntentIntegrator;
-import com.google.zxing.integration.android.IntentResult;
-
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 import java.util.Calendar;
 import java.util.Date;
 
-public class MainActivity extends AppCompatActivity implements NavigationDrawerFragment.ItemSelectedListener, VPFragment.RefreshContentListener, TimeTableFragment.RefreshContentListener, TabbedTimeTableFragment.EditInterface, TimeTableFragment.EditInterface {
+public class MainActivity extends AppCompatActivity implements /*Navigation*/DrawerFragment.ItemSelectedListener, VPFragment.RefreshContentListener, TimeTableFragment.RefreshContentListener, TabbedTimeTableFragment.EditInterface, TimeTableFragment.EditInterface {
 
     Handler vpHandler = new Handler() {
         @Override
@@ -223,7 +218,7 @@ public class MainActivity extends AppCompatActivity implements NavigationDrawerF
     static boolean manualupdate = false;
 
     private Toolbar toolbar;
-    private NavigationDrawerFragment drawerFragment;
+    private /*Navigation*/DrawerFragment drawerFragment;
 
     private int tableType; //Resembles the kind of Fragment for example TimeTableFragment;
     private boolean editTable;
@@ -272,12 +267,21 @@ public class MainActivity extends AppCompatActivity implements NavigationDrawerF
             tableType = 2;
         }
         SetUp();
+
+        String grade = Preferences.readStringFromPreferences(this, getString(R.string.SELECTED_GRADE), null);
+        String group = Preferences.readStringFromPreferences(this, getString(R.string.SELECTED_GROUP), null);
+        if (grade == null || group == null || grade.equals("") || group.equals("")) {
+            ConfigureDialog configureDialog = new ConfigureDialog();
+            configureDialog.show(getSupportFragmentManager(), "fragment_configure_dialog");
+        }
     }
 
     public void SetUp() {
-        drawerFragment = (NavigationDrawerFragment)
-                getSupportFragmentManager().findFragmentById(R.id.fragment_navigation_drawer);
-        drawerFragment.setUp(R.id.fragment_navigation_drawer, (DrawerLayout) findViewById(R.id.drawer_layout), toolbar);
+        drawerFragment = (/*Navigation*/DrawerFragment)
+                //getSupportFragmentManager().findFragmentById(R.id.fragment_navigation_drawer);
+                getSupportFragmentManager().findFragmentById(R.id.fragment_drawer);
+        //drawerFragment.setUp(R.id.fragment_navigation_drawer, (DrawerLayout) findViewById(R.id.drawer_layout), toolbar);
+        drawerFragment.setUp(R.id.fragment_drawer, (DrawerLayout) findViewById(R.id.drawer_layout), toolbar);
         drawerFragment.setItemSelectedListener(this);
         position = dbHandler.getGradePosition(new HWGrade(Preferences.readStringFromPreferences(this, getString(R.string.SELECTED_GRADE), "NULL")));
         if (position < 0) {
@@ -452,6 +456,14 @@ public class MainActivity extends AppCompatActivity implements NavigationDrawerF
     private boolean shown = false;
 
     @Override
+    public void drawerItemSelected(View view, int position, boolean longclick) {
+        Log.d(TAG, "TableType: " + position);
+        tableType = position;
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        loadVPFragment(fragmentManager, this.position);
+    }
+
+    @Override
     public void gradeItemSelected(View view, int position, boolean longclick) {
         this.position = position;
         Log.d("DEBUG.Item", String.valueOf(position));
@@ -462,7 +474,7 @@ public class MainActivity extends AppCompatActivity implements NavigationDrawerF
     //Receive of QR-Code
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        IntentResult result = IntentIntegrator.parseActivityResult(requestCode, resultCode, data);
+        /*IntentResult result = IntentIntegrator.parseActivityResult(requestCode, resultCode, data);
         if (result != null) {
             String contents = result.getContents();
             if (contents != null) {
@@ -470,13 +482,18 @@ public class MainActivity extends AppCompatActivity implements NavigationDrawerF
             } else {
                 //showDialog(R.string.result_failed, getString(R.string.result_failed_why));
             }
-        }
+        }*/
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == 0) {
 
             if (resultCode == RESULT_OK) {
                 String contents = data.getStringExtra("SCAN_RESULT");
                 Toast.makeText(this, contents, Toast.LENGTH_SHORT).show();
+                HWLesson[] newLessons = TimeTableHelper.parseURL(contents, ";", "\\+");
+                //HWLesson[] oldLessons = new HWLesson[0];
+                for (HWLesson lesson : newLessons) {
+                    dbHandler.addLesson(lesson);
+                }
             }
             if (resultCode == RESULT_CANCELED) {
                 //handle cancel
@@ -588,9 +605,32 @@ public class MainActivity extends AppCompatActivity implements NavigationDrawerF
     }
 
     private void encodeBarcode(CharSequence type, CharSequence data) {
-        IntentIntegrator integrator = new IntentIntegrator(this);
-        integrator.autoWide();
-        integrator.addExtra("ENCODE_SHOW_CONTENTS", false);
-        integrator.shareText(data, type);
+        try {
+            /*IntentIntegrator integrator = new IntentIntegrator(this);
+            integrator.autoWide();
+            integrator.addExtra("ENCODE_SHOW_CONTENTS", false);
+            integrator.shareText(data, type);*/
+            Intent intent = new Intent();
+            intent.setAction("com.google.zxing.client.android.ENCODE");
+
+            intent.putExtra("ENCODE_TYPE", type);
+            intent.putExtra("ENCODE_DATA", data);
+            intent.putExtra(Intent.EXTRA_TITLE, "Stundenplan");
+            //intent.putExtra(Intents.Encode.FORMAT, BarcodeFormat.CODABAR.toString());
+
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
+
+            intent.putExtra("ENCODE_SHOW_CONTENTS", false);
+            //attachMoreExtras(intent); Same as above!
+            startActivity(intent);
+            //startActivityForResult(intent, 230799);
+        } catch (Exception e) {
+
+            Uri marketUri = Uri.parse("market://details?id=com.google.zxing.client.android");
+            Intent marketIntent = new Intent(Intent.ACTION_VIEW, marketUri);
+            startActivity(marketIntent);
+
+        }
     }
 }

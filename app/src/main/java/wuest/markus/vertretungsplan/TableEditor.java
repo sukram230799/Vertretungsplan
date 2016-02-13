@@ -138,7 +138,7 @@ public class TableEditor extends AppCompatActivity implements HourPickerDialog.N
 
         dbHandler = new DBHandler(this, null, null, 0);
 
-        ArrayList<String> teachers = new ArrayList(20);
+        ArrayList<String> teachers = new ArrayList<>(20);
         ArrayList<String> subjects = new ArrayList<>(30);
         ArrayList<String> rooms = new ArrayList<>(50);
         //lesson;
@@ -258,28 +258,28 @@ public class TableEditor extends AppCompatActivity implements HourPickerDialog.N
                     textRoom.getText().toString().trim().length() > 0 &&
                     textRepeatType.getText().toString().trim().length() > 0) {
                 if (lesson == null) {
-                    dbHandler.addLesson(new HWLesson(new HWGrade(textGrade.getText().toString()),
+                    dbHandler.addLesson(new HWLesson(new HWGrade(textGrade.getText().toString().trim()),
                             hours.toArray(new Integer[hours.size()]),
                             day,
-                            textTeacher.getText().toString(),
-                            textSubject.getText().toString(),
-                            textRoom.getText().toString(),
-                            textRepeatType.getText().toString()));
+                            textTeacher.getText().toString().trim(),
+                            textSubject.getText().toString().trim(),
+                            textRoom.getText().toString().trim(),
+                            textRepeatType.getText().toString().trim()));
                 } else {
-                    dbHandler.updateLesson(lesson, new HWLesson(new HWGrade(textGrade.getText().toString()),
+                    dbHandler.updateLesson(lesson, new HWLesson(new HWGrade(textGrade.getText().toString().trim()),
                                     hours.toArray(new Integer[hours.size()]),
                                     day,
-                                    textTeacher.getText().toString(),
-                                    textSubject.getText().toString(),
-                                    textRoom.getText().toString(),
-                                    textRepeatType.getText().toString())
+                                    textTeacher.getText().toString().trim(),
+                                    textSubject.getText().toString().trim(),
+                                    textRoom.getText().toString().trim(),
+                                    textRepeatType.getText().toString().trim())
                     );
                 }
                 finish();
             }
 
             Log.d(TAG, startHour + " - " + endHour);
-            Log.d(TAG, textRepeatType.getText().toString());
+            Log.d(TAG, textRepeatType.getText().toString().trim());
             return true;
         }
         return super.onOptionsItemSelected(item);

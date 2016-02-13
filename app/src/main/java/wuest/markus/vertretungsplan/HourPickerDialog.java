@@ -21,7 +21,7 @@ public class HourPickerDialog extends DialogFragment implements NumberPicker.OnV
     private int endHourValue = 1;
 
     static Context context;
-    private NumberDialogInterface dialogInterface;
+    private NumberDialogInterface numberDialogInterface;
 
 //    private View view;
     private View coordinatorView;
@@ -64,7 +64,7 @@ public class HourPickerDialog extends DialogFragment implements NumberPicker.OnV
     }*/
 
     public void setNumberDialogInterface(HourPickerDialog.NumberDialogInterface dialogInterface){
-        this.dialogInterface = dialogInterface;
+        this.numberDialogInterface = dialogInterface;
     }
 
     @NonNull
@@ -95,14 +95,14 @@ public class HourPickerDialog extends DialogFragment implements NumberPicker.OnV
 
 
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-        builder.setTitle("Bitte Stund wählen");
+        builder.setTitle("Bitte Stunde wählen");
 
         builder.setView(view);
 
-        builder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+        builder.setPositiveButton("Speichern", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                dialogInterface.onValueSaved(startHour.getValue(), endHour.getValue());
+                numberDialogInterface.onValueSaved(startHour.getValue(), endHour.getValue());
                 dismiss();
             }
         });
