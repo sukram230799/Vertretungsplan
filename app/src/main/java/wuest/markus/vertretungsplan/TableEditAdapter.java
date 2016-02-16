@@ -85,7 +85,7 @@ public class TableEditAdapter extends RecyclerView.Adapter<TableEditAdapter.Tabl
         holder.textTeacher.setText(table.get(position).getTeacher());
         holder.textSubject.setText(table.get(position).getSubject());
         holder.textRoom.setText(table.get(position).getRoom());
-        //holder.textRoom.setText(TimeTableHelper.getRepeatTypeName(table.get(position).getRepeatType()));
+        //holder.spTextRoom.setText(TimeTableHelper.getRepeatTypeName(plan.get(position).getRepeatType()));
         holder.textRepeatType.setText(table.get(position).getRepeatType());
         holder.checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
@@ -125,7 +125,7 @@ public class TableEditAdapter extends RecyclerView.Adapter<TableEditAdapter.Tabl
     @Override
     public int getItemCount() {
         /*int size = 0;
-        for(HWLesson lesson : table){
+        for(HWLesson lesson : plan){
             for(int hour : lesson.getHours()){
                 size++;
             }
@@ -180,7 +180,7 @@ public class TableEditAdapter extends RecyclerView.Adapter<TableEditAdapter.Tabl
         if (selectedLessons.isEmpty()) {
             return null;
         } else {
-            /*for (HWLesson lesson : table) {
+            /*for (HWLesson lesson : plan) {
                 for (int hour : lesson.getHours()) {
                     for (int chour : selectedLessons) {
                         if (hour == chour) {

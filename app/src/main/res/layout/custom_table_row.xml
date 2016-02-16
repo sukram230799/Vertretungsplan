@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="85dp"
+    android:layout_height="wrap_content"
     android:background="@color/planBackground"
     android:orientation="horizontal"
     android:paddingBottom="0dp"
@@ -11,8 +11,8 @@
 
     <android.support.v7.widget.CardView
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:minHeight="100dp"
+        android:layout_height="85dp"
+        android:transitionName="test"
         android:translationZ="10dp">
 
         <!--<TableLayout
@@ -116,8 +116,18 @@
                 android:text="PAUSE"
                 android:textAppearance="?android:attr/textAppearanceMedium"
                 android:textColor="#8aFF0000" />
+
+            <ImageView
+                android:id="@+id/imageView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:alpha=".53"
+                android:src="@drawable/ic_help_black_18dp"
+                android:visibility="gone" />
         </RelativeLayout>
         <!--</TableRow>
     </TableLayout>-->
     </android.support.v7.widget.CardView>
+
 </LinearLayout>

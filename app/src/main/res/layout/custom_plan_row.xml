@@ -1,0 +1,295 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/planBackground"
+    android:orientation="horizontal"
+    android:paddingBottom="0dp"
+    android:paddingLeft="5dp"
+    android:paddingRight="5dp"
+    android:paddingTop="5dp">
+
+    <android.support.v7.widget.CardView
+        android:id="@+id/cardLayout"
+        android:layout_width="match_parent"
+        android:background="@color/planForeground"
+        android:transitionName="test"
+        android:translationZ="10dp"
+        android:layout_height="85dp"
+        android:animateLayoutChanges="false">
+
+        <!--<TableLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/planForeground"
+            android:stretchColumns="3">
+
+            <TableRow android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:minHeight="100dp">-->
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/planForeground"
+            android:orientation="vertical">
+
+            <RelativeLayout
+                android:id="@+id/spLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="false"
+                android:layout_alignParentEnd="false"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentRight="false"
+                android:layout_alignParentStart="true"
+                android:layout_alignParentTop="true"
+                android:background="@color/planForeground"
+                android:paddingBottom="10dp"
+                android:paddingTop="10dp">
+
+                <CheckBox
+                    android:id="@+id/checkBox"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentLeft="true"
+                    android:layout_alignParentStart="true"
+                    android:layout_centerVertical="true"
+                    android:layout_gravity="center_vertical"
+                    android:checked="false"
+                    android:visibility="visible" />
+
+                <TextView
+                    android:id="@+id/spTextHour"
+                    android:layout_width="50dp"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_gravity="center_vertical"
+                    android:layout_toEndOf="@+id/checkBox"
+                    android:layout_toRightOf="@+id/checkBox"
+                    android:gravity="center_vertical"
+                    android:paddingLeft="15dp"
+                    android:text="1"
+                    android:textAppearance="?android:attr/textAppearanceMedium" />
+                <!-- Because of the checkbox: No need for paddingLeft -->
+
+                <TextView
+                    android:id="@+id/spTextTeacher"
+                    android:layout_width="50dp"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_gravity="center_vertical"
+                    android:layout_toEndOf="@+id/spTextHour"
+                    android:layout_toRightOf="@+id/spTextHour"
+                    android:gravity="center_vertical"
+                    android:text="BOB"
+                    android:textAppearance="?android:attr/textAppearanceMedium" />
+
+                <TextView
+                    android:id="@+id/spTextSubject"
+                    android:layout_width="75dp"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_gravity="center_vertical"
+                    android:layout_toEndOf="@+id/spTextTeacher"
+                    android:layout_toRightOf="@+id/spTextTeacher"
+                    android:gravity="center_vertical"
+                    android:text="CH"
+                    android:textAppearance="?android:attr/textAppearanceMedium" />
+
+                <TextView
+                    android:id="@+id/spTextRoom"
+                    android:layout_width="50dp"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_gravity="center_vertical"
+                    android:layout_toLeftOf="@+id/spTextRepeatType"
+                    android:layout_toStartOf="@+id/spTextRepeatType"
+                    android:gravity="center_vertical|right"
+                    android:text="A301"
+                    android:textAppearance="?android:attr/textAppearanceMedium" />
+
+                <TextView
+                    android:id="@+id/spTextRepeatType"
+                    android:layout_width="75dp"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentEnd="true"
+                    android:layout_alignParentRight="true"
+                    android:layout_centerVertical="true"
+                    android:layout_gravity="center_vertical"
+                    android:gravity="center_vertical|right"
+                    android:paddingRight="25dp"
+                    android:password="false"
+                    android:text="G151"
+                    android:textAppearance="?android:attr/textAppearanceMedium" />
+
+
+                <TextView
+                    android:id="@+id/spTextBreak"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerHorizontal="true"
+                    android:layout_centerVertical="true"
+                    android:layout_gravity="center_vertical"
+                    android:gravity="center_vertical|right"
+                    android:text="PAUSE"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:textColor="#8aFF0000" />
+
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:id="@+id/vpLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"
+                android:layout_below="@+id/spLayout"
+                android:background="@color/planForeground"
+                android:paddingLeft="15dp"
+                android:visibility="gone">
+
+                <TextView
+                    android:id="@+id/vpTextDate"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="5dp"
+                    android:text="@string/notLoadedText"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:textColor="#8a000000" />
+
+                <TextView
+                    android:id="@+id/fixedHour"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignLeft="@+id/vpTextDate"
+                    android:layout_alignStart="@+id/vpTextDate"
+
+                    android:layout_below="@+id/vpTextDate"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginStart="10dp"
+                    android:text="@string/fixedHour"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:textColor="#8a000000" />
+
+                <TextView
+                    android:id="@+id/vpTextHour"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignTop="@+id/fixedHour"
+                    android:layout_marginLeft="30dp"
+                    android:layout_marginStart="30dp"
+                    android:layout_toEndOf="@+id/fixedHour"
+                    android:layout_toRightOf="@+id/fixedHour"
+                    android:text="@string/notLoadedText"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:textColor="#8a000000" />
+
+                <TextView
+                    android:id="@+id/fixedSubject"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignLeft="@+id/vpTextDate"
+                    android:layout_alignStart="@+id/vpTextDate"
+
+                    android:layout_below="@+id/fixedHour"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginStart="10dp"
+                    android:text="@string/fixedSubject"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:textColor="#8a000000" />
+
+                <TextView
+                    android:id="@+id/vpTextSubject"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignLeft="@+id/vpTextHour"
+                    android:layout_alignStart="@+id/vpTextHour"
+
+                    android:layout_below="@+id/vpTextHour"
+                    android:text="@string/notLoadedText"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:textColor="#8a000000" />
+
+                <TextView
+                    android:id="@+id/fixedRoom"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignLeft="@+id/vpTextDate"
+                    android:layout_alignStart="@+id/vpTextDate"
+
+                    android:layout_alignTop="@+id/vpTextRoom"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginStart="10dp"
+                    android:text="@string/fixedRoom"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:textColor="#8a000000" />
+
+                <TextView
+                    android:id="@+id/vpTextRoom"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignLeft="@+id/vpTextSubject"
+                    android:layout_alignStart="@+id/vpTextSubject"
+
+                    android:layout_below="@+id/vpTextSubject"
+                    android:text="@string/notLoadedText"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:textColor="#8a000000" />
+
+                <TextView
+                    android:id="@+id/fixedInfo"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignLeft="@+id/vpTextDate"
+                    android:layout_alignStart="@+id/vpTextDate"
+
+                    android:layout_below="@+id/vpTextRoom"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginStart="10dp"
+                    android:text="@string/fixedInfo"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:textColor="#8a000000" />
+
+                <TextView
+                    android:id="@+id/vpTextInfo1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignLeft="@+id/vpTextSubject"
+                    android:layout_alignStart="@+id/vpTextSubject"
+
+                    android:layout_alignTop="@+id/fixedInfo"
+                    android:text="@string/notLoadedText"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:textColor="#8a000000" />
+
+
+                <TextView
+                    android:id="@+id/vpTextInfo2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignLeft="@+id/vpTextInfo1"
+                    android:layout_alignStart="@+id/vpTextInfo1"
+
+                    android:layout_below="@+id/vpTextInfo1"
+                    android:text="@string/notLoadedText"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:textColor="#8a000000" />
+
+            </RelativeLayout>
+
+            <ImageView
+                android:id="@+id/imageView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_marginRight="5dp"
+                android:layout_marginTop="5dp"
+                android:alpha=".53"
+                android:src="@drawable/ic_help_black_18dp"
+                android:visibility="visible" />
+        </RelativeLayout>
+        <!--</TableRow>
+    </TableLayout>-->
+    </android.support.v7.widget.CardView>
+
+</LinearLayout>

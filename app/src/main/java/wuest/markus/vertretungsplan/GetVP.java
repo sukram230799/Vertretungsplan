@@ -92,7 +92,7 @@ public class GetVP implements Runnable {
                 //Selecting the Table
                 for (Element row : day.select("tr.reihe")) {
                     //In this section the rows with their hours are seperated!
-                    //v This step is made because Jsoup expects a whole table
+                    //v This step is made because Jsoup expects a whole plan
                     Document rowDoc = Jsoup.parseBodyFragment("<table><tr>" + row.html() + "</tr></table>");
                     int hour;
                     for (Element hourEl : rowDoc.select("td.spalte1")) {

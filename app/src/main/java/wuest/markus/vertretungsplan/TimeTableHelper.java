@@ -23,16 +23,43 @@ public class TimeTableHelper {
     public static final String format = "dd.MM.yyyy HH:mm,z";
     public static final SimpleDateFormat sdf = new SimpleDateFormat(format);
 
-    public static HWLesson[] selectLessonsFromRepeatType(HWLesson[] hwLessons, int week, Context context) {
+    public static HWLesson[] selectLessonsFromDayRepeatType(HWLesson[] hwLessons, int week, int day, String[] subscribedSubjects, Context context) {
         ArrayList<HWLesson> hwLessonArrayList = new ArrayList<>(hwLessons.length);
         for (HWLesson lesson : hwLessons) {
-            if (isRepeatType(lesson.getRepeatType(), week, context)) {
+            if (lesson.getDay() == day) {
+                hwLessonArrayList.add(lesson);
+            }
+        }
+        return selectLessonsFromRepeatType(hwLessonArrayList.toArray(new HWLesson[hwLessonArrayList.size()]), week, subscribedSubjects, context);
+    }
+
+    public static HWLesson[] selectLessonsFromRepeatType(HWLesson[] hwLessons, int week, String[] subscribedSubjects, Context context) {
+        ArrayList<HWLesson> hwLessonArrayList = new ArrayList<>(hwLessons.length);
+        for (HWLesson lesson : hwLessons) {
+            if (isRepeatType(lesson.getRepeatType(), week, context) && isSubscribedSubject(lesson.getSubject(), subscribedSubjects)) {
                 hwLessonArrayList.add(lesson);
             }
         }
         return hwLessonArrayList.toArray(new HWLesson[hwLessonArrayList.size()]);
     }
 
+    private static boolean isSubscribedSubject(String subject, String[] subscribedSubjects) {
+        if(subscribedSubjects == null){
+            return true;
+        }
+        String[] parts = subject.split("-");
+        String subIndicator = parts[parts.length - 1];
+        if (subIndicator.equals("W") || subIndicator.equals("WP")) {
+            for(String subscribedSubject : subscribedSubjects){
+                if(subject.equals(subscribedSubject)){
+                    return true;
+                }
+            }
+            return false;
+        } else {
+            return true;
+        }
+    }
 
     public static boolean isRepeatType(String repeatType, int week, Context context) {
         //Log.d(TAG, sdf.format(calendar.getTime()) + "isRepeatType");
@@ -41,7 +68,8 @@ public class TimeTableHelper {
         String[] repeatTypes = repeatType.split("/");
         if (repeatTypes.length > 0) {
             repeatType = repeatTypes[0];
-        } else if (repeatTypes.length > 1) {
+        }
+        if (repeatTypes.length > 1) {
             String group = repeatTypes[repeatTypes.length - 1];
             String selectedGroup = Preferences.readStringFromPreferences(context, context.getString(R.string.SELECTED_GROUP), null);
             if (selectedGroup != null && !group.equals(selectedGroup)) {
@@ -275,7 +303,6 @@ public class TimeTableHelper {
     }
 
     public static int[] lengthOfDay(HWLesson[] lessons, int week, int day, Context context) {
-        lessons = selectLessonsFromRepeatType(lessons, week, context);
         int lowestHour = 12;
         int highestHour = 0;
         for (HWLesson lesson : lessons) {
@@ -289,6 +316,9 @@ public class TimeTableHelper {
                     }
                 }
             }
+        }
+        if (lowestHour > highestHour) {
+            return new int[]{0, 0};
         }
         return new int[]{lowestHour, highestHour};
     }
@@ -436,24 +466,44 @@ public class TimeTableHelper {
     }
 
     public static HWLesson[] fillGabs(HWLesson[] lessons, int week, int day, Context context) {
-        HWGrade grade = lessons[0].getGrade();
-        ArrayList<HWLesson> lessonArrayList = new ArrayList<>(Arrays.asList(lessons));
-        int[] hours = lengthOfDay(lessons, week, day, context);
-        ArrayList<Integer> placedHours = new ArrayList<>((hours[1] - hours[0] + 1));
-        for (HWLesson lesson : lessons) {
-            for (int hour : lesson.getHours()) {
-                placedHours.add(hour);
+        return fillGabs(lessons, week, day, context, false);
+    }
+
+    public static HWLesson[] fillGabs(HWLesson[] lessons, int week, int day, Context context, boolean fillWholeDay) {
+        HWGrade grade;
+        if (lessons.length > 0 || fillWholeDay) {
+            if (lessons.length <= 0) {
+                grade = new HWGrade(Preferences.readStringFromPreferences(context, context.getString(R.string.SELECTED_GRADE), ""));
+            } else {
+                grade = lessons[0].getGrade();
             }
-        }
-        Collections.sort(placedHours);
-        int lastHour = 12;
-        for (int hour : placedHours) {
-            if (hour > (lastHour + 1)) {
-                lessonArrayList.add(placedHours.indexOf(hour), new HWLesson(grade, new Integer[]{hour - 1}, day, "", "PAUSE", "", ""));
+            ArrayList<HWLesson> lessonArrayList = new ArrayList<>(Arrays.asList(lessons));
+            int[] hours;
+            if (!fillWholeDay) {
+                hours = lengthOfDay(lessons, week, day, context);
+            } else {
+                hours = new int[]{1, 12};
             }
-            lastHour = hour;
+
+            Log.d(TAG, String.valueOf(hours[0]));
+            Log.d(TAG, String.valueOf(hours[1]));
+            ArrayList<Integer> placedHours = new ArrayList<>((hours[1] - hours[0] + 1));
+            for (HWLesson lesson : lessons) {
+                for (int hour : lesson.getHours()) {
+                    placedHours.add(hour);
+                }
+            }
+            Collections.sort(placedHours);
+            int lastHour = 12;
+            for (int hour : placedHours) {
+                if (hour > (lastHour + 1)) {
+                    lessonArrayList.add(placedHours.indexOf(hour), new HWLesson(grade, new Integer[]{hour - 1}, day, "", "PAUSE", "", ""));
+                }
+                lastHour = hour;
+            }
+            return lessonArrayList.toArray(new HWLesson[lessonArrayList.size()]);
         }
-        return lessonArrayList.toArray(new HWLesson[lessonArrayList.size()]);
+        return new HWLesson[0];
     }
 
     public static String getDayName(int day) {
@@ -475,6 +525,30 @@ public class TimeTableHelper {
         }
     }
 
+    public static VPData[] selectVPDataFromWeekDay(VPData[] vpDataArrray, int weekDay) {
+        ArrayList<VPData> dataArrayList = new ArrayList<>(vpDataArrray.length);
+        for (VPData data : vpDataArrray) {
+            Calendar calendar = new GregorianCalendar();
+            calendar.setTime(data.getDate());
+            if (calendar.get(Calendar.DAY_OF_WEEK) == weekDay) {
+                dataArrayList.add(data);
+            }
+        }
+        dataArrayList.trimToSize();
+        return dataArrayList.toArray(new VPData[dataArrayList.size()]);
+    }
+
+    //public static HWPlan[] combineVPSP(HWLesson[] sp, VPData[] vp, boolean combinedSP, boolean combinedVP) {
+    //    return combineVPSP(sp, vp, combinedSP, combinedVP, -1);
+    //}
+
+    /**
+     * @param sp         "HWLesson[] pre selected"
+     * @param vp         "VPData[] pre selected"
+     * @param combinedSP "true if Hours are combined"
+     * @param combinedVP "true if Hours are combined"
+     * @return "Combined SP and VP"
+     */
     public static HWPlan[] combineVPSP(HWLesson[] sp, VPData[] vp, boolean combinedSP, boolean combinedVP) {
         ArrayList<HWPlan> hwPlanArrayList = new ArrayList<>();
         ArrayList<VPData> vpArrayList;
@@ -533,5 +607,19 @@ public class TimeTableHelper {
                     vpData.getInfo1(), vpData.getInfo2(), vpData.getDate()));
         }
         return hwPlanArrayList.toArray(new HWPlan[hwPlanArrayList.size()]);
+    }
+    public static String[] findSubscribableSubjects(HWLesson[] lessons){
+        ArrayList<String> subjectArrayList = new ArrayList<>();
+        for(HWLesson lesson : lessons){
+            String subject = lesson.getSubject();
+            String[] parts = subject.split("-");
+            String subIndicator = parts[parts.length - 1];
+            if (subIndicator.equals("W") || subIndicator.equals("WP")) {
+                if(!subjectArrayList.contains(subject)){
+                    subjectArrayList.add(subject);
+                }
+            }
+        }
+        return subjectArrayList.toArray(new String[subjectArrayList.size()]);
     }
 }

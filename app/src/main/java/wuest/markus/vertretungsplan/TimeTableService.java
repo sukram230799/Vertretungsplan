@@ -35,12 +35,13 @@ public class TimeTableService extends Service {
             if (grade.getGradeName() != null && TimeTableHelper.lessonsLeft(dbHandler.getTimeTable(grade), time, week, day, context)) {
                 int nextHour = TimeTableHelper.getNextHour(new HWTime(calendar));
                 HWLesson[] lessonsBefore = null;
+                String[] subscribedSubjects = dbHandler.getSubscribedSubjects();
                 try {
-                    lessonsBefore = TimeTableHelper.selectLessonsFromRepeatType(dbHandler.getTimeTableLesson(grade, day, nextHour - 1), week, context);
+                    lessonsBefore = TimeTableHelper.selectLessonsFromRepeatType(dbHandler.getTimeTableLesson(grade, day, nextHour - 1), week, subscribedSubjects, context);
                 } catch (DBError error) {
                     error.printStackTrace();
                 }
-                HWLesson[] lessons = TimeTableHelper.selectLessonsFromRepeatType(dbHandler.getTimeTableLesson(grade, day, nextHour), week, context);
+                HWLesson[] lessons = TimeTableHelper.selectLessonsFromRepeatType(dbHandler.getTimeTableLesson(grade, day, nextHour), week, subscribedSubjects, context);
                 if (lessons.length > 0 && (lessonsBefore == null || lessonsBefore.length > 0 &&
                         (!lessonsBefore[0].getTeacher().equals(lessons[0].getTeacher()) ||
                                 !lessonsBefore[0].getSubject().equals(lessons[0].getSubject()) ||

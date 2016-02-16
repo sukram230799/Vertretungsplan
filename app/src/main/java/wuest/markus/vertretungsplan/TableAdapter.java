@@ -18,7 +18,7 @@ import java.util.List;
 
 public class TableAdapter extends RecyclerView.Adapter<TableAdapter.TableViewHolder> {
 
-    private static final String TAG = "VPAdapter";
+    private static final String TAG = "TableAdapter";
     private LayoutInflater inflater;
     private Context context;
     List<HWLesson> table = Collections.emptyList();
@@ -67,7 +67,7 @@ public class TableAdapter extends RecyclerView.Adapter<TableAdapter.TableViewHol
         holder.textTeacher.setText(table.get(position).getTeacher());
         holder.textSubject.setText(table.get(position).getSubject());
         holder.textRoom.setText(table.get(position).getRoom());
-        //holder.textRoom.setText(TimeTableHelper.getRepeatTypeName(table.get(position).getRepeatType()));
+        //holder.spTextRoom.setText(TimeTableHelper.getRepeatTypeName(plan.get(position).getRepeatType()));
         holder.textRepeatType.setText(table.get(position).getRepeatType());
 
         if (table.get(position).changedRoom) {
@@ -85,7 +85,7 @@ public class TableAdapter extends RecyclerView.Adapter<TableAdapter.TableViewHol
     @Override
     public int getItemCount() {
         /*int size = 0;
-        for(HWLesson lesson : table){
+        for(HWLesson lesson : plan){
             for(int hour : lesson.getHours()){
                 size++;
             }

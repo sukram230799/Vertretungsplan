@@ -52,9 +52,10 @@ public class VPAdapter extends RecyclerView.Adapter<VPAdapter.PlanViewHolder> {
     @Override
     public void onBindViewHolder(PlanViewHolder holder, int position) {
         Log.v(TAG, "oBVH");
+        VPData vpData = data.get(position);
         String Wochentag;
         Calendar c = new GregorianCalendar();
-        c.setTime(data.get(position).getDate());
+        c.setTime(vpData.getDate());
         switch (c.get(Calendar.DAY_OF_WEEK)) {
             case Calendar.MONDAY:
                 Wochentag = context.getString(R.string.dayMonday);
@@ -81,12 +82,12 @@ public class VPAdapter extends RecyclerView.Adapter<VPAdapter.PlanViewHolder> {
                 Wochentag = context.getString(R.string.dayInvalid);
                 break;
         }
-        holder.textDate.setText(context.getString(R.string.datebuilder, Wochentag, dateFormat.format(data.get(position).getDate())));
-        holder.textHour.setText(CombineData.hoursString(data.get(position).getHours(), false));
-        holder.textSubject.setText(data.get(position).getSubject());
-        holder.textRoom.setText(data.get(position).getRoom());
-        holder.textInfo1.setText(data.get(position).getInfo1());
-        holder.textInfo2.setText(data.get(position).getInfo2());
+        holder.textDate.setText(context.getString(R.string.datebuilder, Wochentag, dateFormat.format(vpData.getDate())));
+        holder.textHour.setText(CombineData.hoursString(vpData.getHours(), false));
+        holder.textSubject.setText(vpData.getSubject());
+        holder.textRoom.setText(vpData.getRoom());
+        holder.textInfo1.setText(vpData.getInfo1());
+        holder.textInfo2.setText(vpData.getInfo2());
     }
 
     @Override

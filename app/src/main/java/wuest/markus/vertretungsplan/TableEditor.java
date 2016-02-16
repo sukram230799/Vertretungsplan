@@ -147,7 +147,7 @@ public class TableEditor extends AppCompatActivity implements HourPickerDialog.N
         try {
             hwLessons = dbHandler.getTimeTable(new HWGrade("TG11-2"));
             hwLessons = CombineData.combineHWLessons(hwLessons);
-            HWLesson[] selectedLessons = TimeTableHelper.selectLessonsFromRepeatType(hwLessons, GregorianCalendar.getInstance().get(Calendar.WEEK_OF_YEAR), this);
+            HWLesson[] selectedLessons = TimeTableHelper.selectLessonsFromRepeatType(hwLessons, GregorianCalendar.getInstance().get(Calendar.WEEK_OF_YEAR), null, this);
             for (HWLesson lesson : selectedLessons) {
                 if (lesson.getDay() == day && lesson.getHours()[0] >= startHour && lesson.getHours()[0] <= endHour) {
                     //TODO investigate why this function is used.

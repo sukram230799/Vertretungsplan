@@ -481,6 +481,15 @@ public class DBHandler extends SQLiteOpenHelper {
         db.execSQL(query);
     }
 
+    public void setSubscribedSubjects(String[] subjects) {
+        SQLiteDatabase db = getWritableDatabase();
+        String query = "DELETE FROM " + TABLE_SUBSCRIBED_SUBJECTS + ";";
+        db.execSQL(query);
+        for (String subject : subjects) {
+            addSubscribedSubject(subject);
+        }
+    }
+
     public void addSubscribedSubject(String subject) {
         ContentValues values = new ContentValues();
         values.put(COLUMN_SUBJECT, subject);

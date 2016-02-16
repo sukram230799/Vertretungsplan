@@ -20,7 +20,7 @@ public class DrawerAdapter extends RecyclerView.Adapter<DrawerAdapter.DrawerView
     private LayoutInflater inflater;
     private Context context;
     List<String> data = Collections.emptyList();
-    private String chosenType = "NULL";
+    //private String chosenType = "NULL"; //Done wit Type
     private int chosenTypePosition = -1;
     private ClickListener clickListener;
     int selected = -1;
@@ -43,15 +43,14 @@ public class DrawerAdapter extends RecyclerView.Adapter<DrawerAdapter.DrawerView
     @Override
     public void onBindViewHolder(DrawerAdapter.DrawerViewHolder holder, int position) {
         holder.position = position;
-        if (chosenType.equals("NULL")) {
-            chosenType = Preferences.readStringFromPreferences(context, context.getString(R.string.SELECTED_GRADE), "NULL");
-            Log.v("DEBUG", chosenType);
+        if (chosenTypePosition == -1) {
+            chosenTypePosition = Preferences.readIntFromPreferences(context, context.getString(R.string.SELECTED_TYPE), -1);
+            Log.v("DEBUG", ""+chosenTypePosition);
         }
         Log.v("DEBUG.onBVH", data.get(position));
         holder.title.setText(data.get(position));
-        if (chosenType.equals(data.get(position))) {
-            Log.v("DEBUG.found", chosenType);
-            chosenTypePosition = position;
+        if (chosenTypePosition == position) {
+            Log.v("DEBUG.found", ""+chosenTypePosition);
             //holder.title.setBackgroundColor(Color.parseColor("#888888"));
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 holder.title.setBackgroundColor(context.getResources().getColor(R.color.colorPrimary, context.getTheme()));//getColor(R.color.colorPrimary));
@@ -113,9 +112,11 @@ public class DrawerAdapter extends RecyclerView.Adapter<DrawerAdapter.DrawerView
             Snackbar.make(v, data.get(getAdapterPosition()) + " wurde als Standard festgelegt.", Snackbar.LENGTH_LONG)
                     .setAction("Action", null).show();
             //Preferences.saveStringToPreferences(context, context.getString(R.string.SELECTED_GRADE), data.get(getAdapterPosition()).getGradeName());
+            Preferences.saveIntToPreferences(context, context.getString(R.string.SELECTED_TYPE), getAdapterPosition());
             notifyItemChanged(chosenTypePosition);
             notifyItemChanged(position);
-            chosenType = data.get(getAdapterPosition());
+            //chosenType = data.get(getAdapterPosition());
+            chosenTypePosition = getAdapterPosition();
             //clickListener.gradeItemLongClicked(v, getAdapterPosition());
             longclick = true;
             onClick(v);

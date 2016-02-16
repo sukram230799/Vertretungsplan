@@ -100,7 +100,7 @@ public class VPWidgetAdapter implements RemoteViewsFactory {
                 remoteView.setTextViewText(R.id.textBrief, "Bitte Widget neu erstellen.");
                 break;
         }
-        //remoteView.setTextViewText(R.id.textHour, "");
+        //remoteView.setTextViewText(R.id.spTextHour, "");
 /*
         String text = context.getString(R.string.datebuilder, Wochentag, dateFormat.format(vpDataArrayList.get(position).getDate())) + " " +
                 CombineData.hoursString(vpDataArrayList.get(position).getHours()) + " " +

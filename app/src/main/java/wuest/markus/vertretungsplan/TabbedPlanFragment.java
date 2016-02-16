@@ -1,12 +1,10 @@
 package wuest.markus.vertretungsplan;
 
-import android.content.Context;
 import android.os.Bundle;
-//import android.support.design.widget.FloatingActionButton;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.PagerTabStrip;
 import android.support.v4.view.ViewPager;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,15 +14,18 @@ import com.github.clans.fab.FloatingActionMenu;
 
 import java.util.Calendar;
 
-public class TabbedTimeTableFragment extends Fragment {
+/**
+ * Created by Markus on 16.02.2016.
+ */
+public class TabbedPlanFragment extends Fragment{
 
     private static HWGrade grade;
     private static final String GRADE = "grade";
 
-    public static final String TAG = "TabbedTimeTableFragment";
+    public static final String TAG = "TabbedPlanFragment";
 
     ViewPager pager;
-    TimeTablePagerAdapter pagerAdapter;
+    PlanPagerAdapter pagerAdapter;
     PagerTabStrip pagerTabStrip;
 
     private FloatingActionMenu fab;
@@ -34,13 +35,8 @@ public class TabbedTimeTableFragment extends Fragment {
 
     EditInterface editInterface;
 
-    public TabbedTimeTableFragment() {
-        // Required empty public constructor
-    }
-
-    public static TabbedTimeTableFragment newInstance(HWGrade grade) {
-        Log.d(TAG, "newInstance");
-        TabbedTimeTableFragment fragment = new TabbedTimeTableFragment();
+    public static TabbedPlanFragment newInstance(HWGrade grade) {
+        TabbedPlanFragment fragment = new TabbedPlanFragment();
         Bundle args = new Bundle();
         args.putString(GRADE, grade.getGradeName());
         fragment.setArguments(args);
@@ -55,12 +51,11 @@ public class TabbedTimeTableFragment extends Fragment {
         }
     }
 
+    @Nullable
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_tabbed_time_table, container, false);
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {View view = inflater.inflate(R.layout.fragment_tabbed_time_table, container, false);
         pager = (ViewPager) view.findViewById(R.id.pager);
-        pagerAdapter = new TimeTablePagerAdapter(getChildFragmentManager(), grade);
+        pagerAdapter = new PlanPagerAdapter(getChildFragmentManager(), grade);
         pagerTabStrip = (PagerTabStrip) view.findViewById(R.id.pager_tab_strip);
         pager.setAdapter(pagerAdapter);
         pager.setCurrentItem(Calendar.getInstance().get(Calendar.DAY_OF_WEEK) - 2);
@@ -101,22 +96,6 @@ public class TabbedTimeTableFragment extends Fragment {
         });
 
         return view;
-    }
-
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-        /*if (context instanceof OnFragmentInteractionListener) {
-            mListener = (OnFragmentInteractionListener) context;
-        } else {
-            throw new RuntimeException(context.toString()
-                    + " must implement OnFragmentInteractionListener");
-        }*/
-    }
-
-    @Override
-    public void onDetach() {
-        super.onDetach();
     }
 
     public void setEditInterface(EditInterface editInterface) {

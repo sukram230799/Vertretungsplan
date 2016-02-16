@@ -29,7 +29,7 @@ import android.widget.Toast;
 import java.util.Calendar;
 import java.util.Date;
 
-public class MainActivity extends AppCompatActivity implements /*Navigation*/DrawerFragment.ItemSelectedListener, VPFragment.RefreshContentListener, TimeTableFragment.RefreshContentListener, TabbedTimeTableFragment.EditInterface, TimeTableFragment.EditInterface {
+public class MainActivity extends AppCompatActivity implements /*Navigation*/DrawerFragment.ItemSelectedListener, VPFragment.RefreshContentListener, TimeTableFragment.RefreshContentListener, TabbedTimeTableFragment.EditInterface, TimeTableFragment.EditInterface, PlanFragment.EditInterface, SubjectChooserDialog.OnReloadData, TabbedPlanFragment.EditInterface {
 
     Handler vpHandler = new Handler() {
         @Override
@@ -218,7 +218,7 @@ public class MainActivity extends AppCompatActivity implements /*Navigation*/Dra
     static boolean manualupdate = false;
 
     private Toolbar toolbar;
-    private /*Navigation*/DrawerFragment drawerFragment;
+    private /*Navigation*/ DrawerFragment drawerFragment;
 
     private int tableType; //Resembles the kind of Fragment for example TimeTableFragment;
     private boolean editTable;
@@ -257,14 +257,12 @@ public class MainActivity extends AppCompatActivity implements /*Navigation*/Dra
         tableType = -1;
         if (Preferences.readBooleanFromPreferences(this, getString(R.string.SHOW_VP), false)) {
             tableType = 0;
-        }
-
-        if (Preferences.readBooleanFromPreferences(this, getString(R.string.SHOW_TABLE), false)) {
+        } else if (Preferences.readBooleanFromPreferences(this, getString(R.string.SHOW_TABLE), false)) {
             tableType = 1;
-        }
-
-        if (Preferences.readBooleanFromPreferences(this, getString(R.string.SHOW_TABBEDTABLE), false)) {
+        } else if (Preferences.readBooleanFromPreferences(this, getString(R.string.SHOW_TABBEDTABLE), false)) {
             tableType = 2;
+        } else {
+            tableType = 3;
         }
         SetUp();
 
@@ -347,16 +345,16 @@ public class MainActivity extends AppCompatActivity implements /*Navigation*/Dra
                 dbError.printStackTrace();
                 hwGrade = new HWGrade("TG11-2");
             }
-            Integer[] hour0 = {0, 1};
-            Integer[] hour1 = {2, 3};
-            Integer[] hour2 = {4, 5};
-            Integer[] hour3 = {6, 7};
-            Integer[] hour4 = {8, 9};
-            VPData[] vpData = {new VPData(hwGrade, hour0, "S", "A1337", "Freisetzung", "", new Date()),
-                    new VPData(hwGrade, hour1, "C", "A1337", "Freisetzung", "", new Date()),
-                    new VPData(hwGrade, hour2, "H", "A1337", "Freisetzung", "", new Date()),
-                    new VPData(hwGrade, hour3, "U", "A1337", "Freisetzung", "", new Date()),
-                    new VPData(hwGrade, hour4, "L", "A1337", "Freisetzung", "", new Date())};
+            Integer[] hour0 = {1, 2};
+            Integer[] hour1 = {3, 4};
+            Integer[] hour2 = {5, 6};
+            Integer[] hour3 = {8, 9};
+            Integer[] hour4 = {10, 11};
+            VPData[] vpData = {new VPData(hwGrade, hour0, "F", "A1337", "Freisetzung", "", new Date()),
+                    new VPData(hwGrade, hour1, "A", "A1337", "Freisetzung", "", new Date()),
+                    new VPData(hwGrade, hour2, "K", "A1337", "Freisetzung", "", new Date()),
+                    new VPData(hwGrade, hour3, "E", "A1337", "Freisetzung", "", new Date()),
+                    new VPData(hwGrade, hour4, "!", "A1337", "Freisetzung", "", new Date())};
             dbHandler.addPlan(vpData);
             loadVPFragment(getSupportFragmentManager(), position);
         } else if (id == R.id.showid) {
@@ -498,6 +496,9 @@ public class MainActivity extends AppCompatActivity implements /*Navigation*/Dra
             if (resultCode == RESULT_CANCELED) {
                 //handle cancel
             }
+            SubjectChooserDialog subjectChooserDialog = new SubjectChooserDialog();
+            subjectChooserDialog.setOnReloadData(this);
+            subjectChooserDialog.show(getSupportFragmentManager(), "fragment_subject_chooser_dialog");
         }
     }
 
@@ -544,6 +545,19 @@ public class MainActivity extends AppCompatActivity implements /*Navigation*/Dra
                             .replace(R.id.container, tabbedTimeTableFragment)
                             .commit();
                     break;
+                case 3:
+                    PlanFragment planFragment = PlanFragment.newInstance(grade, Calendar.getInstance().get(Calendar.DAY_OF_WEEK), true);
+                    planFragment.setEditInterface(this);
+                    fragmentManager.beginTransaction()
+                            .replace(R.id.container, planFragment)
+                            .commit();
+                    break;
+                case 4:
+                    TabbedPlanFragment tabbedPlanFragment = TabbedPlanFragment.newInstance(grade);
+                    tabbedPlanFragment.setEditInterface(this);
+                    fragmentManager.beginTransaction()
+                            .replace(R.id.container, tabbedPlanFragment)
+                            .commit();
                 default:
                     Log.d(TAG, "No TableType");
             }
@@ -632,5 +646,10 @@ public class MainActivity extends AppCompatActivity implements /*Navigation*/Dra
             startActivity(marketIntent);
 
         }
+    }
+
+    @Override
+    public void reloadData() {
+        loadVPFragment(getSupportFragmentManager(), position);
     }
 }
