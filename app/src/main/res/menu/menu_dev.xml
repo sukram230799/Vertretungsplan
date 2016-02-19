@@ -4,13 +4,23 @@
     tools:context=".MainActivity">
     <item
         android:id="@+id/action_settings"
-        android:orderInCategory="100"
+        android:orderInCategory="1"
         android:title="@string/action_settings"
         app:showAsAction="never" />
-    <item
+    <!--<item
         android:id="@+id/about"
-        android:orderInCategory="100"
+        android:orderInCategory="2"
         android:title="@string/about"
+        app:showAsAction="never" />-->
+    <item
+        android:id="@+id/changeGroupGrade"
+        android:orderInCategory="4"
+        android:title="Gruppe/Klasse ändern"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/selectSubjects"
+        android:orderInCategory="5"
+        android:title="Wahlfächer"
         app:showAsAction="never" />
     <item
         android:id="@+id/showTableEditor"
@@ -67,5 +77,4 @@
         android:orderInCategory="100"
         android:title="AlarmSP"
         app:showAsAction="never" />
-
 </menu>

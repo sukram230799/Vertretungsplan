@@ -493,6 +493,7 @@ public class TableEditor extends AppCompatActivity implements HourPickerDialog.N
             public void afterTextChanged(Editable s) {
             }
         });
+        textGrade.setText(Preferences.readStringFromPreferences(this, getString(R.string.SELECTED_GRADE), ""));
         if (lesson != null) {
             textTeacher.setText(lesson.getTeacher());
             textDay.setText(TimeTableHelper.getDayName(lesson.getDay()));

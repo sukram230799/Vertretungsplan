@@ -12,7 +12,9 @@ import android.view.ViewGroup;
 import com.github.clans.fab.FloatingActionButton;
 import com.github.clans.fab.FloatingActionMenu;
 
+import java.sql.Time;
 import java.util.Calendar;
+import java.util.GregorianCalendar;
 
 /**
  * Created by Markus on 16.02.2016.
@@ -56,6 +58,10 @@ public class TabbedPlanFragment extends Fragment{
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {View view = inflater.inflate(R.layout.fragment_tabbed_time_table, container, false);
         pager = (ViewPager) view.findViewById(R.id.pager);
         pagerAdapter = new PlanPagerAdapter(getChildFragmentManager(), grade);
+        /*Calendar now = new GregorianCalendar();
+        pagerAdapter.registerNewDate(new HWTime(now), false);
+        pagerAdapter.registerNewDate(new HWTime(now.get(Calendar.HOUR_OF_DAY), now.get(Calendar.MINUTE), now.get(Calendar.DAY_OF_MONTH) + 1,
+                now.get(Calendar.MONTH), now.get(Calendar.YEAR)), true);*/
         pagerTabStrip = (PagerTabStrip) view.findViewById(R.id.pager_tab_strip);
         pager.setAdapter(pagerAdapter);
         pager.setCurrentItem(Calendar.getInstance().get(Calendar.DAY_OF_WEEK) - 2);

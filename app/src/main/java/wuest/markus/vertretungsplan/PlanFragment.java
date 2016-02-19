@@ -51,10 +51,17 @@ public class PlanFragment extends Fragment implements SwipeRefreshLayout.OnRefre
     //private static int position;
     private static HWGrade grade;
     private static final String GRADE = "grade";
-    private static int day;
-    private static final String DAY = "day";
+    private static int weekDay;
+    private static final String WEEK_DAY = "weekDay";
     private static boolean showFAB;
     private static final String FAB = "fab";
+
+    private static HWTime time;
+
+    private static final String YEAR = "year";
+    private static final String MONTH = "month";
+    private static final String DAY = "day";
+
     //private static boolean editMode;
     //private static final String EDIT_MODE = "editMode";
     private SwipeRefreshLayout mSwipeRefreshLayout;
@@ -74,11 +81,23 @@ public class PlanFragment extends Fragment implements SwipeRefreshLayout.OnRefre
     private EditInterface editInterface;
     PlanAdapter planAdapter;
 
+    public static PlanFragment newInstance(HWGrade grade, HWTime time, boolean showFab) {
+        PlanFragment fragment = new PlanFragment();
+        Bundle args = new Bundle();
+        args.putString(GRADE, grade.getGradeName());
+        args.putInt(YEAR, time.getYear());
+        args.putInt(MONTH, time.getMonth());
+        args.putInt(DAY, time.getDay());
+        args.putBoolean(FAB, showFab);
+        fragment.setArguments(args);
+        return fragment;
+    }
+
     public static PlanFragment newInstance(HWGrade grade, int day, boolean showFAB) {
         PlanFragment fragment = new PlanFragment();
         Bundle args = new Bundle();
         args.putString(GRADE, grade.getGradeName());
-        args.putInt(DAY, day);
+        args.putInt(WEEK_DAY, day);
         args.putBoolean(FAB, showFAB);
         fragment.setArguments(args);
         return fragment;
@@ -90,28 +109,40 @@ public class PlanFragment extends Fragment implements SwipeRefreshLayout.OnRefre
         Log.v(TAG, "oC");
         if (savedInstanceState != null) {
             grade = new HWGrade(savedInstanceState.getString(GRADE));
-            day = savedInstanceState.getInt(DAY);
+            weekDay = savedInstanceState.getInt(WEEK_DAY, -1);
             showFAB = savedInstanceState.getBoolean(FAB);
             Log.v(TAG, "savedInstanceState not null");
+            if(weekDay == -1){
+                time = new HWTime(0,0,savedInstanceState.getInt(YEAR), savedInstanceState.getInt(MONTH), savedInstanceState.getInt(DAY));
+                Calendar calendar = new GregorianCalendar();
+                calendar.setTime(time.toDate());
+                weekDay = calendar.get(Calendar.DAY_OF_WEEK);
+            }
         } else {
             grade = new HWGrade(getArguments().getString(GRADE));
-            day = getArguments().getInt(DAY);
+            weekDay = getArguments().getInt(WEEK_DAY, -1);
             showFAB = getArguments().getBoolean(FAB);
+            if(weekDay == -1){
+                time = new HWTime(0,0,getArguments().getInt(YEAR), getArguments().getInt(MONTH), getArguments().getInt(DAY));
+                Calendar calendar = new GregorianCalendar();
+                calendar.setTime(time.toDate());
+                weekDay = calendar.get(Calendar.DAY_OF_WEEK);
+            }
         }
         Log.v(TAG, "section_number: " + grade.getGradeName());
         //if (position < 0) position = 0;
         this.data = new ArrayList<>();
         DBHandler dbHandler = new DBHandler(getContext(), null, null, 1);
         try {
-            HWLesson[] hwLessons = dbHandler.getTimeTable(grade, day /*Calendar.getInstance().get(Calendar.DAY_OF_WEEK)*/);
+            HWLesson[] hwLessons = dbHandler.getTimeTable(grade, weekDay /*Calendar.getInstance().get(Calendar.DAY_OF_WEEK)*/);
             HWPlan[] plan;
             String[] subscribedSubjects = dbHandler.getSubscribedSubjects();
             int week = GregorianCalendar.getInstance().get(Calendar.WEEK_OF_YEAR);
             hwLessons = TimeTableHelper.selectLessonsFromRepeatType(hwLessons, week, subscribedSubjects, getActivity()); //No CombineData, because of better layout;
-            hwLessons = TimeTableHelper.fillGabs(hwLessons, week, day, getActivity());
+            hwLessons = TimeTableHelper.fillGabs(hwLessons, week, weekDay, getActivity());
             try {
                 VPData[] vpData = dbHandler.getVP(grade);
-                vpData = TimeTableHelper.selectVPDataFromWeekDay(vpData, day);
+                vpData = TimeTableHelper.selectVPDataFromWeekDay(vpData, weekDay);
                 plan = TimeTableHelper.combineVPSP(hwLessons, vpData, false, false);
             } catch (DBError e) {
                 e.printStackTrace();
@@ -205,7 +236,7 @@ public class PlanFragment extends Fragment implements SwipeRefreshLayout.OnRefre
                 //tableAdapter.notifyDataSetChanged();
                 //setShowCheckBoxes(showCheckBoxes);
                 if (editInterface != null) {
-                    editInterface.onEditLesson(day, grade);
+                    editInterface.onEditLesson(weekDay, grade);
                 }
             }
         });
@@ -214,7 +245,7 @@ public class PlanFragment extends Fragment implements SwipeRefreshLayout.OnRefre
             @Override
             public void onClick(View v) {
                 fab.close(true);
-                editInterface.onAddLesson(day, grade);
+                editInterface.onAddLesson(weekDay, grade);
             }
         });
         shareFAB.setClickable(true);

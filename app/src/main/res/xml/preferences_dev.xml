@@ -51,17 +51,5 @@
             android:defaultValue="false"
             android:key="@string/NO_EXPIRE"
             android:title="@string/noexpire" />
-        <CheckBoxPreference
-            android:defaultValue="false"
-            android:key="@string/SHOW_TABBEDTABLE"
-            android:title="Tabbed Table" />
-        <CheckBoxPreference
-            android:defaultValue="false"
-            android:key="@string/SHOW_TABLE"
-            android:title="Table" />
-        <CheckBoxPreference
-            android:defaultValue="false"
-            android:key="@string/SHOW_VP"
-            android:title="VP" />
     </PreferenceCategory>
 </PreferenceScreen>

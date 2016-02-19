@@ -46,12 +46,12 @@
                     android:id="@+id/input_grade"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="Klasse"
+                    android:hint="@string/grade"
                     android:imeOptions="actionNext"
                     android:inputType="textCapCharacters"
                     android:nextFocusDown="@+id/input_day"
                     android:singleLine="true"
-                    android:text="TG11-2">
+                    android:text="">
 
                     <requestFocus />
                 </AutoCompleteTextView>
@@ -66,7 +66,7 @@
                     android:id="@+id/input_day"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="Tag"
+                    android:hint="@string/day"
                     android:imeOptions="actionNext"
                     android:inputType="textCapWords"
                     android:nextFocusDown="@+id/input_hour"
@@ -100,7 +100,7 @@
                     android:id="@+id/input_teacher"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="Lehrer"
+                    android:hint="@string/teacher"
                     android:imeOptions="actionNext"
                     android:inputType="textCapCharacters"
                     android:nextFocusDown="@+id/input_subject"
@@ -117,7 +117,7 @@
                     android:id="@+id/input_subject"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="Fach"
+                    android:hint="@string/subject"
                     android:imeOptions="actionNext"
                     android:inputType="textCapCharacters"
                     android:nextFocusDown="@+id/input_room"
@@ -133,7 +133,7 @@
                     android:id="@+id/input_room"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="Raum"
+                    android:hint="@string/room"
                     android:imeOptions="actionNext"
                     android:inputType="textCapCharacters"
                     android:nextFocusDown="@+id/input_repeattype"
@@ -149,7 +149,7 @@
                     android:id="@+id/input_repeattype"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="Wiederholung"
+                    android:hint="@string/repeattype"
                     android:imeOptions="actionDone"
                     android:inputType="textCapCharacters"
                     android:singleLine="true" />

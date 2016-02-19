@@ -44,14 +44,14 @@ public class TimeTableHelper {
     }
 
     private static boolean isSubscribedSubject(String subject, String[] subscribedSubjects) {
-        if(subscribedSubjects == null){
+        if (subscribedSubjects == null) {
             return true;
         }
         String[] parts = subject.split("-");
         String subIndicator = parts[parts.length - 1];
-        if (subIndicator.equals("W") || subIndicator.equals("WP")) {
-            for(String subscribedSubject : subscribedSubjects){
-                if(subject.equals(subscribedSubject)){
+        if (subIndicator.equals("W") || subIndicator.equals("WP") || subject.equals("KR") || subject.equals("ETH") || subject.equals("EVR")) {
+            for (String subscribedSubject : subscribedSubjects) {
+                if (subject.equals(subscribedSubject)) {
                     return true;
                 }
             }
@@ -98,33 +98,33 @@ public class TimeTableHelper {
         } else if (repeatType.startsWith("G") && evenWeek) {
             if (repeatType.equals("G")) {
                 return true;
-            } else if (repeatType.equals("G1") && !secondHalf(week)) {
+            } else if (repeatType.equals("G1") && !secondHalf(week, q3s, q4e)) {
                 return true;
-            } else if (repeatType.equals("G151") && !secondHalf(week) && week < q1e) {
+            } else if (repeatType.equals("G151") && !secondHalf(week, q3s, q4e) && week < q1e) {
                 return true;
-            } else if (repeatType.equals("G152") && !secondHalf(week) && week > q2s) {
+            } else if (repeatType.equals("G152") && !secondHalf(week, q3s, q4e) && week > q2s) {
                 return true;
-            } else if (repeatType.equals("G2") && secondHalf(week)) {
+            } else if (repeatType.equals("G2") && secondHalf(week, q3s, q4e)) {
                 return true;
-            } else if (repeatType.equals("G251") && secondHalf(week) && week < q3e) {
+            } else if (repeatType.equals("G251") && secondHalf(week, q3s, q4e) && week < q3e) {
                 return true;
-            } else if (repeatType.equals("G252") && secondHalf(week) && week > q4s) {
+            } else if (repeatType.equals("G252") && secondHalf(week, q3s, q4e) && week > q4s) {
                 return true;
             }
         } else if (repeatType.startsWith("U") && !evenWeek) {
             if (repeatType.equals("U")) {
                 return true;
-            } else if (repeatType.equals("U1") && !secondHalf(week)) {
+            } else if (repeatType.equals("U1") && !secondHalf(week, q3s, q4e)) {
                 return true;
-            } else if (repeatType.equals("U2") && secondHalf(week)) {
+            } else if (repeatType.equals("U2") && secondHalf(week, q3s, q4e)) {
                 return true;
             }
         } else if (repeatType.startsWith("T")) {
             if (checkT(week, Integer.parseInt(repeatType.charAt(1) + ""))) {
                 if (repeatType.length() > 2) {
-                    if (repeatType.charAt(2) == '1' && !secondHalf(week)) {
+                    if (repeatType.charAt(2) == '1' && !secondHalf(week, q3s, q4e)) {
                         return true;
-                    } else if (repeatType.charAt(2) == '2' && secondHalf(week)) {
+                    } else if (repeatType.charAt(2) == '2' && secondHalf(week, q3s, q4e)) {
                         return true;
                     }
                 } else {
@@ -164,8 +164,8 @@ public class TimeTableHelper {
         return (lastUpdate == null || !lastUpdate.equals(yearS + "/" + yearE));
     }
 
-    public static boolean secondHalf(int week) {
-        return week <= 6;
+    public static boolean secondHalf(int week, int q3s, int q4e) {
+        return (week >= q3s) && (week <= q4e);
     }
 
     public static boolean oddQuarter(int week) {
@@ -608,14 +608,15 @@ public class TimeTableHelper {
         }
         return hwPlanArrayList.toArray(new HWPlan[hwPlanArrayList.size()]);
     }
-    public static String[] findSubscribableSubjects(HWLesson[] lessons){
+
+    public static String[] findSubscribableSubjects(HWLesson[] lessons) {
         ArrayList<String> subjectArrayList = new ArrayList<>();
-        for(HWLesson lesson : lessons){
+        for (HWLesson lesson : lessons) {
             String subject = lesson.getSubject();
             String[] parts = subject.split("-");
             String subIndicator = parts[parts.length - 1];
-            if (subIndicator.equals("W") || subIndicator.equals("WP")) {
-                if(!subjectArrayList.contains(subject)){
+            if (subIndicator.equals("W") || subIndicator.equals("WP") || subject.equals("KR") || subject.equals("ETH") || subject.equals("EVR")) {
+                if (!subjectArrayList.contains(subject)) {
                     subjectArrayList.add(subject);
                 }
             }

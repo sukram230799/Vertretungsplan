@@ -26,7 +26,15 @@
     <string name="daySunday">Sonntag</string>
     <string name="dayInvalid">Die Woche hat zuviele Tage!</string>
     <string name="datebuilder">%1$s, den %2$s</string>
+    <string name="fillwith_builder">Bitte %1$s eingeben.</string>
 
+    <string name="teacher">Lehrer</string>
+    <string name="grade">Klasse</string>
+    <string name="day">Tag</string>
+    <string name="hour">Stunde</string>
+    <string name="subject">Fach</string>
+    <string name="room">Raum</string>
+    <string name="repeattype">Wiederholunstyp (W, U, G, ...)</string>
 
     <string name="long_loading">Laden dauert ungewönlich lang!\nInternet Verbindung überprüfen!</string>
     <string name="close">Beenden</string>

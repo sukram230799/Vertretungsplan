@@ -15,20 +15,17 @@ import java.util.Arrays;
 /**
  * Created by Markus on 16.02.2016.
  */
-public class SubjectChooserDialog extends DialogFragment implements SubjectChooserAdapter.OnCheckedChangeListener {
-
-    private ListView listView;
-    private SubjectChooserAdapter adapter;
+public class SubjectChooserDialog extends DialogFragment {
 
     private String[] subjects;
-
     private ArrayList<String> selectedSubjects;
+
+    private ArrayList<Integer> mSelectedItems;
     private OnReloadData onReloadData;
 
     @NonNull
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
-        View view = getActivity().getLayoutInflater().inflate(R.layout.fragment_subject_chooser_dialog, null);
         try {
             DBHandler dbHandler = new DBHandler(getActivity(), null, null, 0);
             HWLesson[] lessons = dbHandler.getTimeTable(new HWGrade(Preferences.readStringFromPreferences(getActivity(), getActivity().getString(R.string.SELECTED_GRADE), "")));
@@ -39,48 +36,72 @@ public class SubjectChooserDialog extends DialogFragment implements SubjectChoos
             subjects = new String[0];
             selectedSubjects = new ArrayList<>();
         }
-        listView = (ListView) view.findViewById(R.id.list_view);
-        //adapter = new SubjectChooserAdapter(subjects, getActivity());
-        adapter = new SubjectChooserAdapter(getActivity(), R.id.list_view, Arrays.asList(subjects));
-        adapter.setSelectedSubjects(selectedSubjects);
-        adapter.setOnCheckedChangeListener(this);
-        listView.setAdapter(adapter);
-
-        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-        builder.setTitle("Konfiguration");
-
-        builder.setView(view);
-
-        builder.setPositiveButton("Speichern", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                DBHandler dbHandler = new DBHandler(getActivity(), null, null, 0);
-                dbHandler.setSubscribedSubjects(selectedSubjects.toArray(new String[selectedSubjects.size()]));
-                if(onReloadData != null){
-                    onReloadData.reloadData();
+        boolean[] selectedItem = new boolean[subjects.length];
+        mSelectedItems = new ArrayList();  // Where we track the selected items
+        for (int i = 0; i < subjects.length; i++) {
+            String subject = subjects[i];
+            boolean found = false;
+            for (String selectedSubject : selectedSubjects) {
+                if (subject.equals(selectedSubject)) {
+                    found = true;
+                    mSelectedItems.add(i);
+                    break;
                 }
             }
-        });
-        return builder.show();
-    }
-
-    @Override
-    public void onCheckedChanged(int position, boolean isChecked) {
-        String subject = subjects[position];
-        if(isChecked){
-            if(!selectedSubjects.contains(subject)){
-                selectedSubjects.add(subject);
-            }
-        } else {
-            selectedSubjects.remove(subject);
+            selectedItem[i] = found;
         }
+
+        final AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        // Set the dialog title
+        builder.setTitle("Wahlfächer wählen")
+                // Specify the list array, the items to be selected by default (null for none),
+                // and the listener through which to receive callbacks when items are selected
+                .setMultiChoiceItems(subjects, selectedItem,
+                        new DialogInterface.OnMultiChoiceClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which,
+                                                boolean isChecked) {
+                                if (isChecked) {
+                                    // If the user checked the item, add it to the selected items
+                                    mSelectedItems.add(which);
+                                } else if (mSelectedItems.contains(which)) {
+                                    // Else, if the item is already in the array, remove it
+                                    mSelectedItems.remove(Integer.valueOf(which));
+                                }
+                            }
+                        })
+                        // Set the action buttons
+                .setPositiveButton("Speichern", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int id) {
+                        // User clicked OK, so save the mSelectedItems results somewhere
+                        // or return them to the component that opened the dialog
+                        DBHandler dbHandler = new DBHandler(getActivity(), null, null, 0);
+                        selectedSubjects = new ArrayList<>();
+                        for (int position : mSelectedItems) {
+                            selectedSubjects.add(subjects[position]);
+                        }
+                        dbHandler.setSubscribedSubjects(selectedSubjects.toArray(new String[selectedSubjects.size()]));
+                        if (onReloadData != null) {
+                            onReloadData.reloadData();
+                        }
+                    }
+                })
+                .setNegativeButton("Abbrechen", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int id) {
+                        onReloadData.reloadData();
+                    }
+                });
+
+        return builder.create();
     }
 
-    public void setOnReloadData(OnReloadData onReloadData){
+    public void setOnReloadData(OnReloadData onReloadData) {
         this.onReloadData = onReloadData;
     }
 
-    public interface OnReloadData{
+    public interface OnReloadData {
         void reloadData();
     }
 }

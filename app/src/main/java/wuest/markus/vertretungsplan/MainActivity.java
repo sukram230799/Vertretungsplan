@@ -254,16 +254,8 @@ public class MainActivity extends AppCompatActivity implements /*Navigation*/Dra
         }
 
         new Thread(new CallHome(this, updateHandler)).start();
-        tableType = -1;
-        if (Preferences.readBooleanFromPreferences(this, getString(R.string.SHOW_VP), false)) {
-            tableType = 0;
-        } else if (Preferences.readBooleanFromPreferences(this, getString(R.string.SHOW_TABLE), false)) {
-            tableType = 1;
-        } else if (Preferences.readBooleanFromPreferences(this, getString(R.string.SHOW_TABBEDTABLE), false)) {
-            tableType = 2;
-        } else {
-            tableType = 3;
-        }
+
+        tableType = Preferences.readIntFromPreferences(this, getString(R.string.SELECTED_TYPE), 0);
         SetUp();
 
         String grade = Preferences.readStringFromPreferences(this, getString(R.string.SELECTED_GRADE), null);
@@ -397,7 +389,11 @@ public class MainActivity extends AppCompatActivity implements /*Navigation*/Dra
 
                 Uri marketUri = Uri.parse("market://details?id=com.google.zxing.client.android");
                 Intent marketIntent = new Intent(Intent.ACTION_VIEW, marketUri);
-                startActivity(marketIntent);
+                try {
+                    startActivity(marketIntent);
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
 
             }
         } else if (id == R.id.addTimeTableCSV) {
@@ -432,6 +428,9 @@ public class MainActivity extends AppCompatActivity implements /*Navigation*/Dra
             AlarmSP alarmSP = new AlarmSP();
             alarmSP.SetAlarm(this);
             //startService(new Intent(this, TimeTableService.class));
+        } else if (id == R.id.changeGroupGrade) {
+            ConfigureDialog configureDialog = new ConfigureDialog();
+            configureDialog.show(getSupportFragmentManager(), "fragment_configure_dialog");
         }
 
         /*else if (id == R.id.shareTimeTableCSV) {
@@ -499,6 +498,7 @@ public class MainActivity extends AppCompatActivity implements /*Navigation*/Dra
             SubjectChooserDialog subjectChooserDialog = new SubjectChooserDialog();
             subjectChooserDialog.setOnReloadData(this);
             subjectChooserDialog.show(getSupportFragmentManager(), "fragment_subject_chooser_dialog");
+
         }
     }
 
@@ -611,7 +611,7 @@ public class MainActivity extends AppCompatActivity implements /*Navigation*/Dra
     @Override
     public void onShareTimeTable() {
         try {
-            encodeBarcode("TEXT_TYPE", TimeTableHelper.getURLForShare(dbHandler.getTimeTable(new HWGrade("TG11-2")), ";", "+"));
+            encodeBarcode("TEXT_TYPE", TimeTableHelper.getURLForShare(dbHandler.getTimeTable(new HWGrade(Preferences.readStringFromPreferences(this, getString(R.string.SELECTED_GRADE), "TG11-2"))), ";", "+"));
         } catch (DBError error) {
             error.printStackTrace();
         }
