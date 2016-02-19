@@ -431,6 +431,8 @@ public class MainActivity extends AppCompatActivity implements /*Navigation*/Dra
         } else if (id == R.id.changeGroupGrade) {
             ConfigureDialog configureDialog = new ConfigureDialog();
             configureDialog.show(getSupportFragmentManager(), "fragment_configure_dialog");
+        } else if (id == R.id.selectSubjects){
+            subjectChooser();
         }
 
         /*else if (id == R.id.shareTimeTableCSV) {
@@ -495,10 +497,7 @@ public class MainActivity extends AppCompatActivity implements /*Navigation*/Dra
             if (resultCode == RESULT_CANCELED) {
                 //handle cancel
             }
-            SubjectChooserDialog subjectChooserDialog = new SubjectChooserDialog();
-            subjectChooserDialog.setOnReloadData(this);
-            subjectChooserDialog.show(getSupportFragmentManager(), "fragment_subject_chooser_dialog");
-
+            subjectChooser();
         }
     }
 
@@ -651,5 +650,11 @@ public class MainActivity extends AppCompatActivity implements /*Navigation*/Dra
     @Override
     public void reloadData() {
         loadVPFragment(getSupportFragmentManager(), position);
+    }
+
+    private void subjectChooser(){
+        SubjectChooserDialog subjectChooserDialog = new SubjectChooserDialog();
+        subjectChooserDialog.setOnReloadData(this);
+        subjectChooserDialog.show(getSupportFragmentManager(), "fragment_subject_chooser_dialog");
     }
 }
