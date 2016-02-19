@@ -639,10 +639,13 @@ public class MainActivity extends AppCompatActivity implements /*Navigation*/Dra
             startActivity(intent);
             //startActivityForResult(intent, 230799);
         } catch (Exception e) {
-
-            Uri marketUri = Uri.parse("market://details?id=com.google.zxing.client.android");
-            Intent marketIntent = new Intent(Intent.ACTION_VIEW, marketUri);
-            startActivity(marketIntent);
+            try {
+                Uri marketUri = Uri.parse("market://details?id=com.google.zxing.client.android");
+                Intent marketIntent = new Intent(Intent.ACTION_VIEW, marketUri);
+                startActivity(marketIntent);
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
 
         }
     }
