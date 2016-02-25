@@ -25,33 +25,31 @@ public class VPWidget extends AppWidgetProvider {
 
         CharSequence gradePref = String.valueOf(VPWidgetConfigureActivity.loadGradePref(context, appWidgetId));
 
+        RemoteViews remoteViews = new RemoteViews(context.getPackageName(), R.layout.vpwidget);
+
         Intent serviceIntent = new Intent(context, VPWidgetService.class);
         serviceIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
         serviceIntent.setData(Uri.parse(serviceIntent.toUri(Intent.URI_INTENT_SCHEME)));
-        Log.d(TAG, "vpWidget");
-        RemoteViews vpWidget = new RemoteViews(context.getPackageName(), R.layout.vpwidget);
+        Log.d(TAG, "vpWidget" + appWidgetId);
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
-            Log.d(TAG, "BV: " + Build.VERSION.SDK_INT);
-            vpWidget.setRemoteAdapter(R.id.vpwidget, serviceIntent);
-        } else  {
-            Log.d(TAG, "BV: " + Build.VERSION.SDK_INT);
-            vpWidget.setRemoteAdapter(appWidgetId, R.id.vpwidget, serviceIntent);
-        }
+        remoteViews.setRemoteAdapter(R.id.vpwidget, serviceIntent);
 
+        remoteViews.setEmptyView(R.id.vpwidget, R.id.empty_view);
         Intent onClickIntent = new Intent(context, MainActivity.class);
         PendingIntent onClickPendingIntent = PendingIntent.getActivity(context, 0, onClickIntent, PendingIntent.FLAG_UPDATE_CURRENT);
         Log.d(TAG, "onClickIntent");
-        vpWidget.setPendingIntentTemplate(R.id.vpwidget, onClickPendingIntent);
+        remoteViews.setPendingIntentTemplate(R.id.vpwidget, onClickPendingIntent);
         Log.d(TAG, "setPendingIntent");
         // Instruct the widget manager to update the widget
-        appWidgetManager.updateAppWidget(appWidgetId, vpWidget);
+        appWidgetManager.notifyAppWidgetViewDataChanged(appWidgetId, R.id.vpwidget);
+        appWidgetManager.updateAppWidget(appWidgetId, remoteViews);
         Log.d(TAG, "-updateAppWidget");
     }
 
     @Override
     public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
         Log.d(TAG, "@onUpdate");
+        Log.d(TAG, appWidgetManager.toString());
         // There may be multiple widgets active, so update all of them
         for (int appWidgetId : appWidgetIds) {
             updateAppWidget(context, appWidgetManager, appWidgetId);

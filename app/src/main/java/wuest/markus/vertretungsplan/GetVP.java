@@ -1,10 +1,15 @@
 package wuest.markus.vertretungsplan;
 
+import android.appwidget.AppWidgetManager;
+import android.content.ComponentName;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
+import android.widget.RemoteViews;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -63,6 +68,7 @@ public class GetVP implements Runnable {
             }
         }
         Log.v(TAG, "-getVP");
+        updateWidget();
     }
 
     private VPData[] parseData(String webpage) {
@@ -134,5 +140,14 @@ public class GetVP implements Runnable {
                 stringArrayList.get(0),
                 stringArrayList.get(1),
                 date);
+    }
+    private void updateWidget(){
+        VPWidgetConfigureActivity.updateAllWidget(context);
+        AppWidgetManager widgetManager = AppWidgetManager.getInstance(context);
+        ComponentName widgetComponent = new ComponentName(context, VPWidget.class);
+        int[] widgetIds = widgetManager.getAppWidgetIds(widgetComponent);
+        for(int widgetId: widgetIds){
+            //VPWidget.updateAppWidget(context, widgetManager, widgetId);
+        }
     }
 }

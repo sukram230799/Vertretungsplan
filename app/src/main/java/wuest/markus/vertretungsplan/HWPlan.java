@@ -6,6 +6,19 @@ public class HWPlan {
 
     private HWGrade grade;
     private int hour;
+    private String hourString;
+
+    public String getHourString() {
+        if(hourString == null || hourString.isEmpty()) {
+            return String.valueOf(hour);
+        }
+        return hourString;
+    }
+
+    public void setHourString(String hourString) {
+        this.hourString = hourString;
+    }
+
     private int day;
     private String teacher;
     private String spSubject;

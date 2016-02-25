@@ -139,11 +139,12 @@ public class PlanFragment extends Fragment implements SwipeRefreshLayout.OnRefre
             String[] subscribedSubjects = dbHandler.getSubscribedSubjects();
             int week = GregorianCalendar.getInstance().get(Calendar.WEEK_OF_YEAR);
             hwLessons = TimeTableHelper.selectLessonsFromRepeatType(hwLessons, week, subscribedSubjects, getActivity()); //No CombineData, because of better layout;
-            hwLessons = TimeTableHelper.fillGabs(hwLessons, week, weekDay, getActivity());
+            //hwLessons = TimeTableHelper.fillGabs(hwLessons, week, weekDay, getActivity());
             try {
                 VPData[] vpData = dbHandler.getVP(grade);
                 vpData = TimeTableHelper.selectVPDataFromWeekDay(vpData, weekDay);
                 plan = TimeTableHelper.combineVPSP(hwLessons, vpData, false, false);
+                plan = TimeTableHelper.fillPlanGabs(plan, weekDay);
             } catch (DBError e) {
                 e.printStackTrace();
                 plan = TimeTableHelper.combineVPSP(hwLessons, new VPData[0], false, false);

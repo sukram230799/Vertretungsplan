@@ -14,16 +14,13 @@
         android:layout_height="match_parent"
         android:background="@color/planForeground">
 
+        <include layout="@layout/base_vp_row" />
+
+<!--
         <TableLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             >
-            <!--android:layout_margin="5dp"
-            android:layout_marginBottom="0dp"
-            android:layout_marginLeft="5dp"
-            android:layout_marginRight="5dp"
-            android:layout_marginTop="5dp"-->
-            <!-- android:background="#ffffff"-->
             <TextView
                 android:id="@+id/textDate"
                 android:layout_width="wrap_content"
@@ -31,21 +28,6 @@
                 android:layout_margin="5dp"
                 android:text="@string/notLoadedText"
                 android:textAppearance="?android:attr/textAppearanceMedium" />
-
-            <!--
-        <TableRow
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_marginRight="5dp">
-            <TextView
-                android:id="@+id/fixedDate"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_column="0"
-                android:layout_margin="5dp"
-                android:text="@string/fixedDate"
-                android:textAppearance="?android:attr/textAppearanceMedium" />
-        </TableRow>-->
 
             <TableRow
                 android:layout_width="match_parent"
@@ -163,6 +145,6 @@
                     android:text="@string/notLoadedText"
                     android:textAppearance="?android:attr/textAppearanceMedium" />
             </TableRow>
-        </TableLayout>
+        </TableLayout>-->
     </android.support.v7.widget.CardView>
 </LinearLayout>

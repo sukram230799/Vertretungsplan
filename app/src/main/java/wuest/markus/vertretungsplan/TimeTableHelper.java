@@ -431,7 +431,9 @@ public class TimeTableHelper {
         return lessons.toArray(new HWLesson[lessons.size()]);
     }
 
-    public static HWLesson[] parseURL(String URL, String itemSeparator, String lineSeparator) {
+    public static HWLesson[] parseURL(String URL, Context context) {
+        String lineSeparator = Preferences.readStringFromPreferences(context, context.getString(R.string.LINE_SEP), "\\+");
+        String itemSeparator = Preferences.readStringFromPreferences(context, context.getString(R.string.ITEM_SEP), ";");
         URL = URL.trim();
         Log.v(TAG, URL);
         String[] urlParts = URL.split("=");
@@ -497,7 +499,13 @@ public class TimeTableHelper {
             int lastHour = 12;
             for (int hour : placedHours) {
                 if (hour > (lastHour + 1)) {
-                    lessonArrayList.add(placedHours.indexOf(hour), new HWLesson(grade, new Integer[]{hour - 1}, day, "", "PAUSE", "", ""));
+                    Integer[] breakHours = new Integer[hour - lastHour - 1];
+                    for (int breakHour = lastHour + 1; breakHour < hour; breakHour++) {
+                        Log.d(TAG, breakHour + "_" + lastHour + "_" + hour);
+                        breakHours[hour - breakHour - 1] = breakHour;
+                    }
+                    Arrays.sort(breakHours);
+                    lessonArrayList.add(placedHours.indexOf(hour), new HWLesson(grade, breakHours, day, "", "PAUSE", "", ""));
                 }
                 lastHour = hour;
             }
@@ -607,6 +615,35 @@ public class TimeTableHelper {
                     vpData.getInfo1(), vpData.getInfo2(), vpData.getDate()));
         }
         return hwPlanArrayList.toArray(new HWPlan[hwPlanArrayList.size()]);
+    }
+
+    public static HWPlan[] fillPlanGabs(HWPlan[] plans, int day) {
+        HWGrade grade = new HWGrade("");
+        if (plans.length > 0) {
+            grade = plans[0].getGrade();
+        }
+        ArrayList<HWPlan> planArrayList = new ArrayList(Arrays.asList(plans));
+        ArrayList<Integer> placedHours = new ArrayList<>();
+        for (HWPlan plan : plans) {
+            placedHours.add(plan.getHour());
+        }
+        Collections.sort(placedHours);
+        int lastHour = 14;
+        for (int hour : placedHours) {
+            if (hour > (lastHour + 1)) {
+                Integer[] breakHours = new Integer[hour - lastHour - 1];
+                for (int breakHour = lastHour + 1; breakHour < hour; breakHour++) {
+                    Log.d(TAG, breakHour + "_" + lastHour + "_" + hour);
+                    breakHours[hour - breakHour - 1] = breakHour;
+                }
+                Arrays.sort(breakHours);
+                HWPlan plan = new HWPlan(grade, hour - 1, day, "", "PAUSE", "", "", "", null, null, null, null);
+                plan.setHourString(CombineData.hoursString(breakHours, true));
+                planArrayList.add(placedHours.indexOf(hour), plan);
+            }
+            lastHour = hour;
+        }
+        return planArrayList.toArray(new HWPlan[planArrayList.size()]);
     }
 
     public static String[] findSubscribableSubjects(HWLesson[] lessons) {

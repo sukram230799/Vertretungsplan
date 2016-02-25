@@ -2,9 +2,13 @@ package wuest.markus.vertretungsplan;
 
 import android.content.Intent;
 import android.net.Uri;
+import android.nfc.NdefMessage;
+import android.nfc.NfcAdapter;
+import android.os.Parcelable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.widget.Toast;
 
 
 public class TimeTableImport extends AppCompatActivity {

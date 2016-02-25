@@ -18,4 +18,6 @@ public class VPWidgetService extends RemoteViewsService {
         Log.d(TAG, "-onGetViewFactory");
         return (new VPWidgetAdapter(this.getApplicationContext(), intent));
     }
+
+
 }

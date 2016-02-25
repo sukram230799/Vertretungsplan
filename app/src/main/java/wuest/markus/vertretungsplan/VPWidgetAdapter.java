@@ -76,12 +76,12 @@ public class VPWidgetAdapter implements RemoteViewsFactory {
             case 0: //Full Design
                 remoteView = new RemoteViews(
                         context.getPackageName(), R.layout.widget_full_row);
-                remoteView.setTextViewText(R.id.textDate, text[0]);
-                remoteView.setTextViewText(R.id.textHour, text[1]);
-                remoteView.setTextViewText(R.id.textSubject, text[2]);
-                remoteView.setTextViewText(R.id.textRoom, text[3]);
-                remoteView.setTextViewText(R.id.textInfo1, text[4]);
-                remoteView.setTextViewText(R.id.textInfo2, text[5]);
+                remoteView.setTextViewText(R.id.vpTextDate, text[0]);
+                remoteView.setTextViewText(R.id.vpTextHour, text[1]);
+                remoteView.setTextViewText(R.id.vpTextSubject, text[2]);
+                remoteView.setTextViewText(R.id.vpTextRoom, text[3]);
+                remoteView.setTextViewText(R.id.vpTextInfo1, text[4]);
+                remoteView.setTextViewText(R.id.vpTextInfo2, text[5]);
                 break;
             case 1: //Minimal Design
                 remoteView = new RemoteViews(
@@ -134,6 +134,7 @@ public class VPWidgetAdapter implements RemoteViewsFactory {
 
     @Override
     public void onDataSetChanged() {
+        this.populateListItem();
     }
 
     @Override

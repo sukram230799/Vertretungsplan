@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -19,6 +20,7 @@ import android.widget.Toast;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 /**
  * The configuration screen for the {@link VPWidget VPWidget} AppWidget.
@@ -88,6 +90,16 @@ public class VPWidgetConfigureActivity extends AppCompatActivity {
         SharedPreferences.Editor prefs = context.getSharedPreferences(PREFS_NAME, 0).edit();
         prefs.remove(PREF_PREFIX_KEY + appWidgetId);
         prefs.apply();
+    }
+
+    public static void updateAllWidget(Context context){
+        SharedPreferences prefs = context.getSharedPreferences(PREFS_NAME, 0);
+        Map<String, ?> allEntries = prefs.getAll();
+        for (Map.Entry<String, ?> entry : allEntries.entrySet()) {
+            int appWidgetId = Integer.parseInt(entry.getKey().split("_")[1]);
+            AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context.getApplicationContext());
+            VPWidget.updateAppWidget(context, appWidgetManager, appWidgetId);
+        }
     }
 
     @Override

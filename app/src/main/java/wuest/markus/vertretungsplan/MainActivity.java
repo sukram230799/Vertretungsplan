@@ -1,6 +1,7 @@
 package wuest.markus.vertretungsplan;
 
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.ClipData;
 import android.content.ClipboardManager;
@@ -9,9 +10,14 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.net.Uri;
+import android.nfc.NdefMessage;
+import android.nfc.NdefRecord;
+import android.nfc.NfcAdapter;
+import android.nfc.NfcEvent;
 import android.os.Build;
 import android.os.Handler;
 import android.os.Message;
+import android.os.Parcelable;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -19,17 +25,23 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.text.InputType;
+import android.text.format.Time;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.Calendar;
 import java.util.Date;
 
-public class MainActivity extends AppCompatActivity implements /*Navigation*/DrawerFragment.ItemSelectedListener, VPFragment.RefreshContentListener, TimeTableFragment.RefreshContentListener, TabbedTimeTableFragment.EditInterface, TimeTableFragment.EditInterface, PlanFragment.EditInterface, SubjectChooserDialog.OnReloadData, TabbedPlanFragment.EditInterface {
+public class MainActivity extends AppCompatActivity implements /*Navigation*/DrawerFragment.ItemSelectedListener,
+        VPFragment.RefreshContentListener, TimeTableFragment.RefreshContentListener,
+        TabbedTimeTableFragment.EditInterface, TimeTableFragment.EditInterface, PlanFragment.EditInterface,
+        SubjectChooserDialog.OnReloadData, TabbedPlanFragment.EditInterface, NfcAdapter.CreateNdefMessageCallback,
+        NfcAdapter.OnNdefPushCompleteCallback {
 
     Handler vpHandler = new Handler() {
         @Override
@@ -223,6 +235,10 @@ public class MainActivity extends AppCompatActivity implements /*Navigation*/Dra
     private int tableType; //Resembles the kind of Fragment for example TimeTableFragment;
     private boolean editTable;
 
+    NfcAdapter mNfcAdapter;
+
+    private boolean devMode = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         Log.d(TAG, "onCreate");
@@ -264,6 +280,16 @@ public class MainActivity extends AppCompatActivity implements /*Navigation*/Dra
             ConfigureDialog configureDialog = new ConfigureDialog();
             configureDialog.show(getSupportFragmentManager(), "fragment_configure_dialog");
         }
+
+        mNfcAdapter = NfcAdapter.getDefaultAdapter(this);
+        if (mNfcAdapter == null) {
+        } else {
+            // Register callback to set NDEF message
+            mNfcAdapter.setNdefPushMessageCallback(this, this);
+            // Register callback to listen for message-sent success
+            mNfcAdapter.setOnNdefPushCompleteCallback(this, this);
+        }
+        devMode = Preferences.readBooleanFromPreferences(this, getString(R.string.DEVELOPER_MODE), false);
     }
 
     public void SetUp() {
@@ -304,6 +330,9 @@ public class MainActivity extends AppCompatActivity implements /*Navigation*/Dra
     protected void onResume() {
         super.onResume();
         foreground = true;
+        if (NfcAdapter.ACTION_NDEF_DISCOVERED.equals(getIntent().getAction())) {
+            processIntent(getIntent());
+        }
     }
 
     @Override
@@ -431,7 +460,7 @@ public class MainActivity extends AppCompatActivity implements /*Navigation*/Dra
         } else if (id == R.id.changeGroupGrade) {
             ConfigureDialog configureDialog = new ConfigureDialog();
             configureDialog.show(getSupportFragmentManager(), "fragment_configure_dialog");
-        } else if (id == R.id.selectSubjects){
+        } else if (id == R.id.selectSubjects) {
             subjectChooser();
         }
 
@@ -488,7 +517,7 @@ public class MainActivity extends AppCompatActivity implements /*Navigation*/Dra
             if (resultCode == RESULT_OK) {
                 String contents = data.getStringExtra("SCAN_RESULT");
                 Toast.makeText(this, contents, Toast.LENGTH_SHORT).show();
-                HWLesson[] newLessons = TimeTableHelper.parseURL(contents, ";", "\\+");
+                HWLesson[] newLessons = TimeTableHelper.parseURL(contents, this);
                 //HWLesson[] oldLessons = new HWLesson[0];
                 for (HWLesson lesson : newLessons) {
                     dbHandler.addLesson(lesson);
@@ -655,9 +684,112 @@ public class MainActivity extends AppCompatActivity implements /*Navigation*/Dra
         loadVPFragment(getSupportFragmentManager(), position);
     }
 
-    private void subjectChooser(){
+    private void subjectChooser() {
         SubjectChooserDialog subjectChooserDialog = new SubjectChooserDialog();
         subjectChooserDialog.setOnReloadData(this);
         subjectChooserDialog.show(getSupportFragmentManager(), "fragment_subject_chooser_dialog");
+    }
+
+    @Override
+    public NdefMessage createNdefMessage(NfcEvent event) {
+        Time time = new Time();
+        time.setToNow();
+        String text = ("No SP");
+        try {
+            HWLesson[] hwLessons = dbHandler.getTimeTable(new HWGrade(Preferences.readStringFromPreferences(this, getString(R.string.SELECTED_GRADE), "")));
+            text = TimeTableHelper.getURLForShare(hwLessons, ";", "+");
+        } catch (DBError error) {
+            error.printStackTrace();
+        }
+        NdefMessage msg = new NdefMessage(NdefRecord.createMime(
+                "application/wuest.markus.vertretungsplan", text.getBytes())
+                /**
+                 * The Android Application Record (AAR) is commented out. When a device
+                 * receives a push with an AAR in it, the application specified in the AAR
+                 * is guaranteed to run. The AAR overrides the tag dispatch system.
+                 * You can add it back in to guarantee that this
+                 * activity starts when receiving a beamed message. For now, this code
+                 * uses the tag dispatch system.
+                 */
+                //,NdefRecord.createApplicationRecord("com.example.android.beam")
+        );
+        return msg;
+    }
+
+    private static final int MESSAGE_SENT = 1;
+
+    /**
+     * Implementation for the OnNdefPushCompleteCallback interface
+     */
+    @Override
+    public void onNdefPushComplete(NfcEvent arg0) {
+        // A handler is needed to send messages to the activity when this
+        // callback occurs, because it happens from a binder thread
+        mHandler.obtainMessage(MESSAGE_SENT).sendToTarget();
+    }
+
+    /**
+     * This handler receives a message from onNdefPushComplete
+     */
+    private final Handler mHandler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            switch (msg.what) {
+                case MESSAGE_SENT:
+                    Toast.makeText(getApplicationContext(), "Message sent!", Toast.LENGTH_LONG).show();
+                    break;
+            }
+        }
+    };
+
+
+    @Override
+    public void onNewIntent(Intent intent) {
+        // onResume gets called after this to handle the intent
+        setIntent(intent);
+    }
+
+    /**
+     * Parses the NDEF Message from the intent and prints to the TextView
+     */
+    void processIntent(Intent intent) {
+        Parcelable[] rawMsgs = intent.getParcelableArrayExtra(
+                NfcAdapter.EXTRA_NDEF_MESSAGES);
+        // only one message sent during the beam
+        NdefMessage msg = (NdefMessage) rawMsgs[0];
+        // record 0 contains the MIME type, record 1 is the AAR, if present
+        final String URL = new String(msg.getRecords()[0].getPayload());
+        if (devMode) {
+            Toast.makeText(this, URL, Toast.LENGTH_LONG).show();
+        }
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Stundenplan");
+        builder.setMessage("Alten Stundenplan löschen?");
+        builder.setCancelable(false);
+        builder.setNegativeButton("Behalten", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                HWLesson[] lessons = TimeTableHelper.parseURL(URL, mainActivity);
+                for (HWLesson lesson : lessons) {
+                    dbHandler.addLesson(lesson);
+                }
+                dialog.dismiss();
+            }
+        });
+        builder.setPositiveButton("Löschen", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                HWLesson[] lessons = TimeTableHelper.parseURL(URL, mainActivity);
+                if (lessons.length > 0) {
+                    dbHandler.removeTimeTable(lessons[0].getGrade());
+                }
+                for (HWLesson lesson : lessons) {
+                    dbHandler.addLesson(lesson);
+                }
+                dialog.dismiss();
+            }
+        });
+        builder.show();
+        //mInfoText.setText(new String(msg.getRecords()[0].getPayload()));
     }
 }

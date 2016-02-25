@@ -110,13 +110,13 @@ public class TableAdapter extends RecyclerView.Adapter<TableAdapter.TableViewHol
             itemView.setOnClickListener(this);
             itemView.setOnLongClickListener(this);
 
-            textHour = (TextView) itemView.findViewById(R.id.textHour);
-            textTeacher = (TextView) itemView.findViewById(R.id.textTeacher);
-            textSubject = (TextView) itemView.findViewById(R.id.textSubject);
-            textRoom = (TextView) itemView.findViewById(R.id.textRoom);
-            textRepeatType = (TextView) itemView.findViewById(R.id.textRepeatType);
+            textHour = (TextView) itemView.findViewById(R.id.spTextHour);
+            textTeacher = (TextView) itemView.findViewById(R.id.spTextTeacher);
+            textSubject = (TextView) itemView.findViewById(R.id.spTextSubject);
+            textRoom = (TextView) itemView.findViewById(R.id.spTextRoom);
+            textRepeatType = (TextView) itemView.findViewById(R.id.spTextRepeatType);
             checkBox = (CheckBox) itemView.findViewById(R.id.checkBox);
-            textBreak = (TextView) itemView.findViewById(R.id.textBreak);
+            textBreak = (TextView) itemView.findViewById(R.id.spTextBreak);
 
             checkBox.setVisibility(View.GONE);
         }

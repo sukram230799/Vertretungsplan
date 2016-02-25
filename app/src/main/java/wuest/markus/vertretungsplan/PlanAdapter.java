@@ -73,7 +73,7 @@ public class PlanAdapter extends RecyclerView.Adapter<PlanAdapter.PlanViewHolder
                 holder.imageViewQuestionMark.setVisibility(View.VISIBLE);
             }
             if (plan.getSpSubject().equals("PAUSE")) {
-                holder.spTextHour.setVisibility(View.GONE);
+                //holder.spTextHour.setVisibility(View.GONE); //Hour is shown always
                 holder.spTextTeacher.setVisibility(View.GONE);
                 holder.spTextSubject.setVisibility(View.GONE);
                 holder.spTextRoom.setVisibility(View.GONE);
@@ -81,9 +81,8 @@ public class PlanAdapter extends RecyclerView.Adapter<PlanAdapter.PlanViewHolder
 
                 holder.spTextBreak.setVisibility(View.VISIBLE);
             } else {
-                holder.spTextHour.setText(String.valueOf(plan.getHour()));
 
-                holder.spTextHour.setVisibility(View.VISIBLE);
+                //holder.spTextHour.setVisibility(View.VISIBLE);
                 holder.spTextTeacher.setVisibility(View.VISIBLE);
                 holder.spTextSubject.setVisibility(View.VISIBLE);
                 holder.spTextRoom.setVisibility(View.VISIBLE);
@@ -92,6 +91,7 @@ public class PlanAdapter extends RecyclerView.Adapter<PlanAdapter.PlanViewHolder
                 holder.spTextBreak.setVisibility(View.GONE);
             }
 
+            holder.spTextHour.setText(plan.getHourString());
             holder.spTextTeacher.setText(plan.getTeacher());
             holder.spTextTeacher.setTextColor(textColor);
             holder.spTextSubject.setText(plan.getSpSubject());
@@ -145,13 +145,13 @@ public class PlanAdapter extends RecyclerView.Adapter<PlanAdapter.PlanViewHolder
                     break;
             }
             holder.vpTextDate.setText(context.getString(R.string.datebuilder, Wochentag, dateFormat.format(plan.getDate())));
-            holder.vpTextHour.setText(String.valueOf(plan.getHour()));
+            holder.vpTextHour.setText(plan.getHourString());
             holder.vpTextSubject.setText(plan.getVpSubject());
             holder.vpTextRoom.setText(plan.getVpRoom());
             holder.vpTextInfo1.setText(plan.getInfo1());
             holder.vpTextInfo2.setText(plan.getInfo2());
             if (onlyVP) {
-                holder.spTextHour.setText(String.valueOf(plan.getHour()));
+                holder.spTextHour.setText(plan.getHourString());
                 holder.spTextSubject.setText(plan.getVpSubject());
                 holder.spTextRoom.setText(plan.getVpRoom());
                 holder.spTextTeacher.setText("VP!");

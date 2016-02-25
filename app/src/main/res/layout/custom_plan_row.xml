@@ -18,22 +18,13 @@
         android:layout_height="85dp"
         android:animateLayoutChanges="false">
 
-        <!--<TableLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:background="@color/planForeground"
-            android:stretchColumns="3">
-
-            <TableRow android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:minHeight="100dp">-->
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:background="@color/planForeground"
             android:orientation="vertical">
-
-            <RelativeLayout
+            <include layout="@layout/base_table_row" />
+            <!--<RelativeLayout
                 android:id="@+id/spLayout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -70,7 +61,7 @@
                     android:paddingLeft="15dp"
                     android:text="1"
                     android:textAppearance="?android:attr/textAppearanceMedium" />
-                <!-- Because of the checkbox: No need for paddingLeft -->
+                Because of the checkbox: No need for paddingLeft
 
                 <TextView
                     android:id="@+id/spTextTeacher"
@@ -135,9 +126,12 @@
                     android:textAppearance="?android:attr/textAppearanceMedium"
                     android:textColor="#8aFF0000" />
 
-            </RelativeLayout>
-
-            <RelativeLayout
+            </RelativeLayout>-->
+            <include layout="@layout/base_vp_row"
+                android:layout_below="@+id/spLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+            <!--<RelativeLayout
                 android:id="@+id/vpLayout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -275,7 +269,7 @@
                     android:textAppearance="?android:attr/textAppearanceMedium"
                     android:textColor="#8a000000" />
 
-            </RelativeLayout>
+            </RelativeLayout>-->
 
             <ImageView
                 android:id="@+id/imageView"
@@ -288,8 +282,6 @@
                 android:src="@drawable/ic_help_black_18dp"
                 android:visibility="visible" />
         </RelativeLayout>
-        <!--</TableRow>
-    </TableLayout>-->
     </android.support.v7.widget.CardView>
 
 </LinearLayout>

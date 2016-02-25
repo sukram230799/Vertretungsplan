@@ -54,12 +54,12 @@ public class VPWidgetAdapterPreview extends ArrayAdapter<VPData> {
                 TextView textInfo1;
                 TextView textInfo2;
 
-                textDate = (TextView) convertView.findViewById(R.id.textDate);
-                textHour = (TextView) convertView.findViewById(R.id.textHour);
-                textSubject = (TextView) convertView.findViewById(R.id.textSubject);
-                textRoom = (TextView) convertView.findViewById(R.id.textRoom);
-                textInfo1 = (TextView) convertView.findViewById(R.id.textInfo1);
-                textInfo2 = (TextView) convertView.findViewById(R.id.textInfo2);
+                textDate = (TextView) convertView.findViewById(R.id.vpTextDate);
+                textHour = (TextView) convertView.findViewById(R.id.vpTextHour);
+                textSubject = (TextView) convertView.findViewById(R.id.vpTextSubject);
+                textRoom = (TextView) convertView.findViewById(R.id.vpTextRoom);
+                textInfo1 = (TextView) convertView.findViewById(R.id.vpTextInfo1);
+                textInfo2 = (TextView) convertView.findViewById(R.id.vpTextInfo2);
 
                 textDate.setText(text[0]);
                 textHour.setText(text[1]);
@@ -76,12 +76,12 @@ public class VPWidgetAdapterPreview extends ArrayAdapter<VPData> {
                 textBrief.setText(VPWidgetTextProcess.brief(text));
                 break;
             default:
-                textDate = (TextView) convertView.findViewById(R.id.textDate);
-                textHour = (TextView) convertView.findViewById(R.id.textHour);
-                textSubject = (TextView) convertView.findViewById(R.id.textSubject);
-                textRoom = (TextView) convertView.findViewById(R.id.textRoom);
-                textInfo1 = (TextView) convertView.findViewById(R.id.textInfo1);
-                textInfo2 = (TextView) convertView.findViewById(R.id.textInfo2);
+                textDate = (TextView) convertView.findViewById(R.id.vpTextDate);
+                textHour = (TextView) convertView.findViewById(R.id.vpTextHour);
+                textSubject = (TextView) convertView.findViewById(R.id.vpTextSubject);
+                textRoom = (TextView) convertView.findViewById(R.id.vpTextRoom);
+                textInfo1 = (TextView) convertView.findViewById(R.id.vpTextInfo1);
+                textInfo2 = (TextView) convertView.findViewById(R.id.vpTextInfo2);
 
                 textDate.setText(text[0]);
                 textHour.setText(text[1]);

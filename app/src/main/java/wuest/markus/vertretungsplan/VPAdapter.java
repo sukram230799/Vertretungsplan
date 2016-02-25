@@ -111,12 +111,12 @@ public class VPAdapter extends RecyclerView.Adapter<VPAdapter.PlanViewHolder> {
             itemView.setLongClickable(true);
             itemView.setOnClickListener(this);
             itemView.setOnLongClickListener(this);
-            textDate = (TextView) itemView.findViewById(R.id.textDate);
-            textHour = (TextView) itemView.findViewById(R.id.textHour);
-            textSubject = (TextView) itemView.findViewById(R.id.textSubject);
-            textRoom = (TextView) itemView.findViewById(R.id.textRoom);
-            textInfo1 = (TextView) itemView.findViewById(R.id.textInfo1);
-            textInfo2 = (TextView) itemView.findViewById(R.id.textInfo2);
+            textDate = (TextView) itemView.findViewById(R.id.vpTextDate);
+            textHour = (TextView) itemView.findViewById(R.id.vpTextHour);
+            textSubject = (TextView) itemView.findViewById(R.id.vpTextSubject);
+            textRoom = (TextView) itemView.findViewById(R.id.vpTextRoom);
+            textInfo1 = (TextView) itemView.findViewById(R.id.vpTextInfo1);
+            textInfo2 = (TextView) itemView.findViewById(R.id.vpTextInfo2);
             Log.v(TAG, String.valueOf(textHour));
         }
 
