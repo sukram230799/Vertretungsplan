@@ -1,5 +1,6 @@
 package wuest.markus.vertretungsplan;
 
+import android.content.Context;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
@@ -13,14 +14,16 @@ public class TimeTablePagerAdapter extends FragmentPagerAdapter implements TimeT
 
     private HWGrade grade;
     private RefreshContentListener refreshListener;
+    private Context context;
 
-    public TimeTablePagerAdapter(FragmentManager fm, HWGrade grade) {
+    public TimeTablePagerAdapter(FragmentManager fm, HWGrade grade, Context context) {
         super(fm);
         this.grade = grade;
         fragments = new ArrayList<>();
         for (int i = 0; i < getCount(); i++) {
             fragments.add(TimeTableFragment.newInstance(grade, i + 2, false, false));
         }
+        this.context = context;
     }
 
     ArrayList<TimeTableFragment> fragments;
@@ -36,13 +39,6 @@ public class TimeTablePagerAdapter extends FragmentPagerAdapter implements TimeT
         timeTableFragment.setRefreshListener(this);
 
         return timeTableFragment;
-        //Fragment fragment = null;
-        //return TimeTableFragment.newInstance(grade, position + 2); //1 = Sunday;
-        /*
-        switch (position){
-            case 0: TimeTableFragment.newInstance(new HWGrade("TG11-2"), position + 2); //1 = Sunday;
-        }
-        return null;*/
     }
 
     @Override
@@ -52,7 +48,7 @@ public class TimeTablePagerAdapter extends FragmentPagerAdapter implements TimeT
 
     @Override
     public CharSequence getPageTitle(int position) {
-        return TimeTableHelper.getDayName(position + 2);
+        return TimeTableHelper.getDayName(position + 2, context);
     }
 
     /*public void setEdit(boolean showCheckBoxes) {

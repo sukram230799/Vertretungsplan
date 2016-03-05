@@ -514,22 +514,31 @@ public class TimeTableHelper {
         return new HWLesson[0];
     }
 
-    public static String getDayName(int day) {
+    public static String getDayName(int day, Context context) {
         switch (day) {
-            case 2:
-                return "Montag";
-            case 3:
-                return "Dienstag";
-            case 4:
-                return "Mittwoch";
-            case 5:
-                return "Donnerstag";
-            case 6:
-                return "Freitag";
-            case 7:
-                return "Samstag";
+            case Calendar.MONDAY:
+                return context.getString(R.string.dayMonday);
+
+            case Calendar.TUESDAY:
+                return context.getString(R.string.dayTuesday);
+
+            case Calendar.WEDNESDAY:
+                return context.getString(R.string.dayWednesday);
+
+            case Calendar.THURSDAY:
+                return context.getString(R.string.dayThursday);
+
+            case Calendar.FRIDAY:
+                return context.getString(R.string.dayFriday);
+
+            case Calendar.SATURDAY:
+                return context.getString(R.string.daySaturday);
+
+            case Calendar.SUNDAY:
+                return context.getString(R.string.daySunday);
+
             default:
-                return "Sonntag";
+                return context.getString(R.string.dayInvalid);
         }
     }
 

@@ -1,5 +1,6 @@
 package wuest.markus.vertretungsplan;
 
+import android.content.Context;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v4.app.Fragment;
@@ -22,8 +23,9 @@ public class PlanPagerAdapter extends FragmentPagerAdapter implements PlanFragme
     //ArrayList<HWTime> registeredDates;
     ArrayList<PlanFragment> fragments;
     HWGrade grade;
+    private Context context;
 
-    public PlanPagerAdapter(FragmentManager fm, HWGrade grade) {
+    public PlanPagerAdapter(FragmentManager fm, HWGrade grade, Context context) {
         super(fm);
         this.grade = grade;
         fragments = new ArrayList<>();
@@ -31,6 +33,7 @@ public class PlanPagerAdapter extends FragmentPagerAdapter implements PlanFragme
         for (int i = 0; i < getCount(); i++) {
             fragments.add(PlanFragment.newInstance(grade, i + 2, false));
         }
+        this.context = context;
     }
 
     @Override
@@ -57,7 +60,7 @@ public class PlanPagerAdapter extends FragmentPagerAdapter implements PlanFragme
     public CharSequence getPageTitle(int position) {
         /*Calendar calendar = new GregorianCalendar();
         calendar.setTime(registeredDates.get(position).toDate());*/
-        return TimeTableHelper.getDayName(position + 2);
+        return TimeTableHelper.getDayName(position + 2, context);
         //return TimeTableHelper.getDayName(calendar.get(Calendar.DAY_OF_WEEK));
     }
 

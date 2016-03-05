@@ -57,7 +57,7 @@ public class TabbedPlanFragment extends Fragment{
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {View view = inflater.inflate(R.layout.fragment_tabbed_time_table, container, false);
         pager = (ViewPager) view.findViewById(R.id.pager);
-        pagerAdapter = new PlanPagerAdapter(getChildFragmentManager(), grade);
+        pagerAdapter = new PlanPagerAdapter(getChildFragmentManager(), grade, getActivity());
         /*Calendar now = new GregorianCalendar();
         pagerAdapter.registerNewDate(new HWTime(now), false);
         pagerAdapter.registerNewDate(new HWTime(now.get(Calendar.HOUR_OF_DAY), now.get(Calendar.MINUTE), now.get(Calendar.DAY_OF_MONTH) + 1,

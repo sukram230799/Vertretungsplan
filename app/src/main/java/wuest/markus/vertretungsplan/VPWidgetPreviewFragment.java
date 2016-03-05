@@ -60,21 +60,35 @@ public class VPWidgetPreviewFragment extends Fragment {
                              Bundle savedInstanceState) {
         HWGrade grade = new HWGrade(Preferences.readStringFromPreferences(getContext(), getString(R.string.SELECTED_GRADE), "KLASSE"));
 
-        ArrayList<VPData> vpDataArrayList = new ArrayList<>(2);
         Integer[] hour0 = {0, 1};
         Integer[] hour1 = {2, 3};
         Integer[] hour2 = {4, 5};
         Integer[] hour3 = {6, 7};
-        vpDataArrayList.add(new VPData(grade, hour0, "FCKW", "A1337", "Entfall", "Keine Lust", new Date()));
-        vpDataArrayList.add(new VPData(grade, hour1, "CO", "A1337", "Entfall", "Keine Lust", new Date()));
-        vpDataArrayList.add(new VPData(grade, hour2, "N2O", "A1337", "Entfall", "Keine Lust", new Date()));
-        vpDataArrayList.add(new VPData(grade, hour3, "CH4", "A1337", "Entfall", "Keine Lust", new Date()));
-
-
 
         View layout = inflater.inflate(R.layout.vpwidget, container, false);
         ListView listView = (ListView) layout.findViewById(R.id.vpwidget);
-        VPWidgetAdapterPreview widgetAdapterPreview = new VPWidgetAdapterPreview(getContext(), vpDataArrayList, type);
+        VPWidgetAdapterPreview widgetAdapterPreview;
+        if (type <= 1) {
+            ArrayList<VPData> vpDataArrayList = new ArrayList<>(4);
+            vpDataArrayList.add(new VPData(grade, hour0, "FCKW", "A1337", "Entfall", "Keine Lust", new Date()));
+            vpDataArrayList.add(new VPData(grade, hour1, "CO", "A1337", "Entfall", "Keine Lust", new Date()));
+            vpDataArrayList.add(new VPData(grade, hour2, "N2O", "A1337", "Entfall", "Keine Lust", new Date()));
+            vpDataArrayList.add(new VPData(grade, hour3, "CH4", "A1337", "Entfall", "Keine Lust", new Date()));
+            widgetAdapterPreview = new VPWidgetAdapterPreview(getContext(), (ArrayList) vpDataArrayList, type);
+        } else if (type <= 2) {
+            ArrayList<HWLesson> hwLessonArrayList = new ArrayList<>(4);
+            hwLessonArrayList.add(new HWLesson(grade, hour0, 2, "TEA", "FCKW", "A314", "W"));
+            hwLessonArrayList.add(new HWLesson(grade, hour1, 2, "TEA", "CO", "A314", "W"));
+            hwLessonArrayList.add(new HWLesson(grade, hour2, 2, "TEA", "N2O", "A314", "W"));
+            hwLessonArrayList.add(new HWLesson(grade, hour3, 2, "TEA", "CH4", "A314", "W"));
+            widgetAdapterPreview = new VPWidgetAdapterPreview(getContext(), (ArrayList) hwLessonArrayList, type);
+        } else {
+            ArrayList<HWPlan> hwPlanArrayList = new ArrayList<>(4);
+            hwPlanArrayList.add(new HWPlan(grade, 1, 2, "TEA", "FCKW", "A314", "W", null, null, null, null, null));
+            hwPlanArrayList.add(new HWPlan(grade, 2, 2, "TEA", "CO", "A314", "W", "N2O", "---", "Entfall", "Keine Lust", new Date()));
+            hwPlanArrayList.add(new HWPlan(grade, 3, 2, null, null, null, null, "CH4", "---", "Entfall", "Keine Lust", new Date()));
+            widgetAdapterPreview = new VPWidgetAdapterPreview(getContext(), (ArrayList) hwPlanArrayList, type);
+        }
         listView.setAdapter(widgetAdapterPreview);
         // Inflate the layout for this fragment
         return layout;

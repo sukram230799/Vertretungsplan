@@ -70,16 +70,6 @@ public class TableAdapter extends RecyclerView.Adapter<TableAdapter.TableViewHol
         //holder.spTextRoom.setText(TimeTableHelper.getRepeatTypeName(plan.get(position).getRepeatType()));
         holder.textRepeatType.setText(table.get(position).getRepeatType());
 
-        if (table.get(position).changedRoom) {
-            holder.textRoom.setTextColor(Color.parseColor("#8aFF0000"));
-        } else {
-            holder.textRoom.setTextColor(Color.parseColor("#8a000000"));
-        }
-        if (table.get(position).changedSubject) {
-            holder.textSubject.setTextColor(Color.parseColor("#8aFF0000"));
-        } else {
-            holder.textSubject.setTextColor(Color.parseColor("#8a000000"));
-        }
     }
 
     @Override

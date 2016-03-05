@@ -145,7 +145,7 @@ public class TableEditor extends AppCompatActivity implements HourPickerDialog.N
         HWLesson[] hwLessons;
 
         try {
-            hwLessons = dbHandler.getTimeTable(new HWGrade("TG11-2"));
+            hwLessons = dbHandler.getTimeTable(new HWGrade(Preferences.readStringFromPreferences(this, getString(R.string.SELECTED_GRADE), "")));
             hwLessons = CombineData.combineHWLessons(hwLessons);
             HWLesson[] selectedLessons = TimeTableHelper.selectLessonsFromRepeatType(hwLessons, GregorianCalendar.getInstance().get(Calendar.WEEK_OF_YEAR), null, this);
             for (HWLesson lesson : selectedLessons) {
@@ -200,12 +200,6 @@ public class TableEditor extends AppCompatActivity implements HourPickerDialog.N
         ArrayAdapter<String> dayAdapter = new ArrayAdapter<>(this,
                 android.R.layout.simple_dropdown_item_1line, days);
         textDay.setAdapter(dayAdapter);
-
-        /*TimeTableFragment timeTableFragment = TimeTableFragment.newInstance(new HWGrade("TG11-2"));
-        timeTableFragment.setRefreshListener(this);
-        getSupportFragmentManager().beginTransaction()
-                .replace(R.id.container, timeTableFragment)
-                .commit();*/
 
         new Thread(new GetRepeatTypes(this, new Handler())).start();
     }
@@ -496,7 +490,7 @@ public class TableEditor extends AppCompatActivity implements HourPickerDialog.N
         textGrade.setText(Preferences.readStringFromPreferences(this, getString(R.string.SELECTED_GRADE), ""));
         if (lesson != null) {
             textTeacher.setText(lesson.getTeacher());
-            textDay.setText(TimeTableHelper.getDayName(lesson.getDay()));
+            textDay.setText(TimeTableHelper.getDayName(lesson.getDay(), this));
             startHour = lesson.getHours()[0];
             endHour = lesson.getHours()[lesson.getHours().length - 1];
             setHour(textHour);

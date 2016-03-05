@@ -10,9 +10,6 @@ public class HWLesson {
     private String room;
     private String repeatType;
 
-    public boolean changedSubject;
-    public boolean changedRoom;
-
     public HWLesson(HWGrade grade, Integer[] hours, int day, String teacher, String subject, String room, String repeatType) {
         this.grade = grade;
         this.hours = hours;

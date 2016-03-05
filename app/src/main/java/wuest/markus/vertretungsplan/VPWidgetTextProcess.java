@@ -9,38 +9,14 @@ import java.util.GregorianCalendar;
 public class VPWidgetTextProcess {
     public static final SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy");
 
-    public static String[] processData(Context context, VPData vpData) {
+    public static String[] processVPData(Context context, VPData vpData) {
         String Wochentag;
         Calendar c = new GregorianCalendar();
         c.setTime(vpData.getDate());
-        switch (c.get(Calendar.DAY_OF_WEEK)) {
-            case Calendar.MONDAY:
-                Wochentag = context.getString(R.string.dayMonday);
-                break;
-            case Calendar.TUESDAY:
-                Wochentag = context.getString(R.string.dayTuesday);
-                break;
-            case Calendar.WEDNESDAY:
-                Wochentag = context.getString(R.string.dayWednesday);
-                break;
-            case Calendar.THURSDAY:
-                Wochentag = context.getString(R.string.dayThursday);
-                break;
-            case Calendar.FRIDAY:
-                Wochentag = context.getString(R.string.dayFriday);
-                break;
-            case Calendar.SATURDAY:
-                Wochentag = context.getString(R.string.daySaturday);
-                break;
-            case Calendar.SUNDAY:
-                Wochentag = context.getString(R.string.daySunday);
-                break;
-            default:
-                Wochentag = context.getString(R.string.dayInvalid);
-                break;
-        }
 
-        return new String[] {
+        Wochentag = TimeTableHelper.getDayName(c.get(Calendar.DAY_OF_WEEK), context);
+
+        return new String[]{
                 context.getString(R.string.datebuilder, Wochentag, dateFormat.format(vpData.getDate())),
                 CombineData.hoursString(vpData.getHours(), false),
                 vpData.getSubject(),
@@ -51,7 +27,49 @@ public class VPWidgetTextProcess {
 
     }
 
-    public static String brief(String[] text){
+    public static String[] processSPData(Context context, HWLesson hwLesson) {
+        if (hwLesson.getSubject().equals("PAUSE")) {
+            return new String[]{
+                    CombineData.hoursString(hwLesson.getHours(), true),
+                    "PAUSE"
+            };
+        }
+        return new String[]{
+                CombineData.hoursString(hwLesson.getHours(), true),
+                hwLesson.getTeacher(),
+                hwLesson.getSubject(),
+                hwLesson.getRoom(),
+                hwLesson.getRepeatType()
+        };
+    }
+
+    public static String[] processPlan(Context context, HWPlan hwPlan) {
+        if (hwPlan.getSpSubject().equals("PAUSE")) {
+            return new String[]{
+                    hwPlan.getHourString(),
+                    "PAUSE"
+            };
+        } else if(hwPlan.getDate() == null) {
+            return new String[]{
+                    hwPlan.getHourString(),
+                    hwPlan.getTeacher(),
+                    hwPlan.getSpSubject(),
+                    hwPlan.getSpRoom(),
+                    hwPlan.getRepeatType(),
+                    hwPlan.getVpSubject(),
+                    hwPlan.getVpRoom(),
+                    hwPlan.getInfo1(),
+                    hwPlan.getInfo2(),
+                    dateFormat.format(hwPlan.getDate())
+            };
+        } else {
+            return new String[] {
+
+            };
+        }
+    }
+
+    public static String brief(String[] text) {
         return text[0] + " " + text[1] + " " + text[2] + " in " + text[3] + ": " + text[4] + " " + text[5];
     }
 }

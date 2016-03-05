@@ -6,15 +6,17 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.CheckBox;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.Objects;
 
-public class VPWidgetAdapterPreview extends ArrayAdapter<VPData> {
+public class VPWidgetAdapterPreview extends ArrayAdapter<Object> {
 
     int type;
 
-    public VPWidgetAdapterPreview(Context context, ArrayList<VPData> vpDataArrayList, int type) {
+    public VPWidgetAdapterPreview(Context context, ArrayList<Object> vpDataArrayList, int type) {
         super(context, 0, vpDataArrayList);
         this.type = type;
 
@@ -22,6 +24,21 @@ public class VPWidgetAdapterPreview extends ArrayAdapter<VPData> {
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
+
+        TextView spTextHour;
+        TextView spTextTeacher;
+        TextView spTextSubject;
+        TextView spTextRoom;
+        TextView spTextRepeatType;
+        CheckBox checkBox;
+        TextView spTextBreak;
+
+        TextView vpTextDate;
+        TextView vpTextHour;
+        TextView vpTextSubject;
+        TextView vpTextRoom;
+        TextView vpTextInfo1;
+        TextView vpTextInfo2;
         int design;
         switch (type) {
             case 0:
@@ -29,6 +46,12 @@ public class VPWidgetAdapterPreview extends ArrayAdapter<VPData> {
                 break;
             case 1:
                 design = R.layout.widget_minimal_row;
+                break;
+            case 2:
+                design = R.layout.widget_table_row;
+                break;
+            case 3:
+                design = R.layout.widget_plan_row;
                 break;
             default:
                 design = R.layout.widget_full_row;
@@ -38,35 +61,40 @@ public class VPWidgetAdapterPreview extends ArrayAdapter<VPData> {
             convertView = LayoutInflater.from(getContext()).inflate(design, parent, false);
         }
 
-        VPData vpData = getItem(position);
-        String[] text = VPWidgetTextProcess.processData(getContext(), vpData);
-
-        if (text.length < 6) {
-            text = new String[] {"Something", "went", "horribly", "wrong!", "We're", "sorry"};
+        String[] text = null;
+        VPData vpData = null;
+        HWLesson lesson = null;
+        HWPlan plan = null;
+        if(type <= 1) {
+            vpData = (VPData) getItem(position);
+            text = VPWidgetTextProcess.processVPData(getContext(), vpData);
+            if (text.length < 6) {
+                text = new String[] {"Something", "went", "horribly", "wrong!", "We're", "sorry"};
+            }
+        } else if(type <=2) {
+            lesson = (HWLesson) getItem(position);
+            text = VPWidgetTextProcess.processSPData(getContext(), lesson);
+        } else {
+            plan = (HWPlan) getItem(position);
+            text = VPWidgetTextProcess.processPlan(getContext(), plan);
         }
+
 
         switch (type) {
             case 0:
-                TextView textDate;
-                TextView textHour;
-                TextView textSubject;
-                TextView textRoom;
-                TextView textInfo1;
-                TextView textInfo2;
+                vpTextDate = (TextView) convertView.findViewById(R.id.vpTextDate);
+                vpTextHour = (TextView) convertView.findViewById(R.id.vpTextHour);
+                vpTextSubject = (TextView) convertView.findViewById(R.id.vpTextSubject);
+                vpTextRoom = (TextView) convertView.findViewById(R.id.vpTextRoom);
+                vpTextInfo1 = (TextView) convertView.findViewById(R.id.vpTextInfo1);
+                vpTextInfo2 = (TextView) convertView.findViewById(R.id.vpTextInfo2);
 
-                textDate = (TextView) convertView.findViewById(R.id.vpTextDate);
-                textHour = (TextView) convertView.findViewById(R.id.vpTextHour);
-                textSubject = (TextView) convertView.findViewById(R.id.vpTextSubject);
-                textRoom = (TextView) convertView.findViewById(R.id.vpTextRoom);
-                textInfo1 = (TextView) convertView.findViewById(R.id.vpTextInfo1);
-                textInfo2 = (TextView) convertView.findViewById(R.id.vpTextInfo2);
-
-                textDate.setText(text[0]);
-                textHour.setText(text[1]);
-                textSubject.setText(text[2]);
-                textRoom.setText(text[3]);
-                textInfo1.setText(text[4]);
-                textInfo2.setText(text[5]);
+                vpTextDate.setText(text[0]);
+                vpTextHour.setText(text[1]);
+                vpTextSubject.setText(text[2]);
+                vpTextRoom.setText(text[3]);
+                vpTextInfo1.setText(text[4]);
+                vpTextInfo2.setText(text[5]);
                 break;
             case 1:
                 TextView textBrief;
@@ -75,20 +103,88 @@ public class VPWidgetAdapterPreview extends ArrayAdapter<VPData> {
 
                 textBrief.setText(VPWidgetTextProcess.brief(text));
                 break;
-            default:
-                textDate = (TextView) convertView.findViewById(R.id.vpTextDate);
-                textHour = (TextView) convertView.findViewById(R.id.vpTextHour);
-                textSubject = (TextView) convertView.findViewById(R.id.vpTextSubject);
-                textRoom = (TextView) convertView.findViewById(R.id.vpTextRoom);
-                textInfo1 = (TextView) convertView.findViewById(R.id.vpTextInfo1);
-                textInfo2 = (TextView) convertView.findViewById(R.id.vpTextInfo2);
+            case 2:
 
-                textDate.setText(text[0]);
-                textHour.setText(text[1]);
-                textSubject.setText(text[2]);
-                textRoom.setText(text[3]);
-                textInfo1.setText(text[4]);
-                textInfo2.setText(text[5]);
+                spTextHour = (TextView) convertView.findViewById(R.id.spTextHour);
+                spTextTeacher = (TextView) convertView.findViewById(R.id.spTextTeacher);
+                spTextSubject = (TextView) convertView.findViewById(R.id.spTextSubject);
+                spTextRoom = (TextView) convertView.findViewById(R.id.spTextRoom);
+                spTextRepeatType = (TextView) convertView.findViewById(R.id.spTextRepeatType);
+                checkBox = (CheckBox) convertView.findViewById(R.id.checkBox);
+                spTextBreak = (TextView) convertView.findViewById(R.id.spTextBreak);
+
+                checkBox.setVisibility(View.GONE);
+                if(text[0].contains("\n")) {
+                    spTextHour.setGravity(View.TEXT_ALIGNMENT_CENTER);
+                } else {
+                    spTextHour.setGravity(View.TEXT_ALIGNMENT_TEXT_START);
+                }
+
+                if(text.length <= 2){
+                    spTextHour.setVisibility(View.GONE);
+                    spTextTeacher.setVisibility(View.GONE);
+                    spTextSubject.setVisibility(View.GONE);
+                    spTextRoom.setVisibility(View.GONE);
+                    spTextRepeatType.setVisibility(View.GONE);
+
+                    spTextBreak.setVisibility(View.VISIBLE);
+
+
+                    spTextHour.setText(text[0]);
+                    spTextBreak.setText(text[1]);
+                } else {
+                    spTextHour.setText(text[0]);
+
+                    spTextHour.setVisibility(View.VISIBLE);
+                    spTextTeacher.setVisibility(View.VISIBLE);
+                    spTextSubject.setVisibility(View.VISIBLE);
+                    spTextRoom.setVisibility(View.VISIBLE);
+                    spTextRepeatType.setVisibility(View.VISIBLE);
+
+                    spTextBreak.setVisibility(View.GONE);
+
+
+                    spTextTeacher.setText(text[1]);
+                    spTextSubject.setText(text[2]);
+                    spTextRoom.setText(text[3]);
+                    spTextRepeatType.setText(text[4]);
+
+                }
+                break;
+            case 3:
+                vpTextDate = (TextView) convertView.findViewById(R.id.vpTextDate);
+                vpTextHour = (TextView) convertView.findViewById(R.id.vpTextHour);
+                vpTextSubject = (TextView) convertView.findViewById(R.id.vpTextSubject);
+                vpTextRoom = (TextView) convertView.findViewById(R.id.vpTextRoom);
+                vpTextInfo1 = (TextView) convertView.findViewById(R.id.vpTextInfo1);
+                vpTextInfo2 = (TextView) convertView.findViewById(R.id.vpTextInfo2);
+
+
+                spTextHour = (TextView) convertView.findViewById(R.id.spTextHour);
+                spTextTeacher = (TextView) convertView.findViewById(R.id.spTextTeacher);
+                spTextSubject = (TextView) convertView.findViewById(R.id.spTextSubject);
+                spTextRoom = (TextView) convertView.findViewById(R.id.spTextRoom);
+                spTextRepeatType = (TextView) convertView.findViewById(R.id.spTextRepeatType);
+                checkBox = (CheckBox) convertView.findViewById(R.id.checkBox);
+                spTextBreak = (TextView) convertView.findViewById(R.id.spTextBreak);
+
+                if(text.length <= 2) {
+
+                }
+            default:
+                vpTextDate = (TextView) convertView.findViewById(R.id.vpTextDate);
+                vpTextHour = (TextView) convertView.findViewById(R.id.vpTextHour);
+                vpTextSubject = (TextView) convertView.findViewById(R.id.vpTextSubject);
+                vpTextRoom = (TextView) convertView.findViewById(R.id.vpTextRoom);
+                vpTextInfo1 = (TextView) convertView.findViewById(R.id.vpTextInfo1);
+                vpTextInfo2 = (TextView) convertView.findViewById(R.id.vpTextInfo2);
+
+                vpTextDate.setText(text[0]);
+                vpTextHour.setText(text[1]);
+                vpTextSubject.setText(text[2]);
+                vpTextRoom.setText(text[3]);
+                vpTextInfo1.setText(text[4]);
+                vpTextInfo2.setText(text[5]);
                 break;
         }
         return convertView;

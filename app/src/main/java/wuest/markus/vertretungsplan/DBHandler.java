@@ -466,6 +466,7 @@ public class DBHandler extends SQLiteOpenHelper {
     public void removeTimeTable(HWGrade grade){
         String query = "DELETE FROM " + TABLE_TIMETABLE + " WHERE " + COLUMN_GRADE + " = \"" + grade.getGradeName() + "\";";
         Log.d(TAG, query);
+        getWritableDatabase().execSQL(query);
     }
 
     public void dropTimeTable() {

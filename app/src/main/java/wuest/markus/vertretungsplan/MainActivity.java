@@ -18,6 +18,7 @@ import android.os.Build;
 import android.os.Handler;
 import android.os.Message;
 import android.os.Parcelable;
+import android.preference.Preference;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -333,6 +334,11 @@ public class MainActivity extends AppCompatActivity implements /*Navigation*/Dra
         if (NfcAdapter.ACTION_NDEF_DISCOVERED.equals(getIntent().getAction())) {
             processIntent(getIntent());
         }
+        boolean newSP = Preferences.readBooleanFromPreferences(this, getString(R.string.SP_CHANGED), false);
+        if (newSP) {
+            subjectChooser();
+            Preferences.saveBooleanToPreferences(this, getString(R.string.SP_CHANGED), false);
+        }
     }
 
     @Override
@@ -464,19 +470,6 @@ public class MainActivity extends AppCompatActivity implements /*Navigation*/Dra
             subjectChooser();
         }
 
-        /*else if (id == R.id.shareTimeTableCSV) {
-            try {
-                Intent sendIntent = new Intent();
-                sendIntent.setAction(Intent.ACTION_SEND);
-                sendIntent.putExtra(Intent.EXTRA_TITLE, "test.csv");
-                sendIntent.putExtra(Intent.EXTRA_TEXT, TimeTableHelper.getCSV(dbHandler.getTimeTable(new HWGrade("TG11-2")), ",", "\n"));
-                sendIntent.setType("text/csv");
-                startActivity(Intent.createChooser(sendIntent, "CSV"));
-            } catch (DBError error) {
-                error.printStackTrace();
-            }
-        }*/
-
         return super.onOptionsItemSelected(item);
     }
 
@@ -517,16 +510,17 @@ public class MainActivity extends AppCompatActivity implements /*Navigation*/Dra
             if (resultCode == RESULT_OK) {
                 String contents = data.getStringExtra("SCAN_RESULT");
                 Toast.makeText(this, contents, Toast.LENGTH_SHORT).show();
-                HWLesson[] newLessons = TimeTableHelper.parseURL(contents, this);
+                HWLesson[] lessons = TimeTableHelper.parseURL(contents, this);
                 //HWLesson[] oldLessons = new HWLesson[0];
-                for (HWLesson lesson : newLessons) {
-                    dbHandler.addLesson(lesson);
+                HWGrade grade = null;
+                if (lessons.length > 0) {
+                    grade = lessons[0].getGrade();
                 }
+                importSP(lessons, false);
             }
             if (resultCode == RESULT_CANCELED) {
                 //handle cancel
             }
-            subjectChooser();
         }
     }
 
@@ -762,6 +756,17 @@ public class MainActivity extends AppCompatActivity implements /*Navigation*/Dra
         if (devMode) {
             Toast.makeText(this, URL, Toast.LENGTH_LONG).show();
         }
+        HWLesson[] lessons = TimeTableHelper.parseURL(URL, mainActivity);
+        HWGrade grade = null;
+        if (lessons.length > 0) {
+            grade = lessons[0].getGrade();
+        }
+        importSP(lessons, true);
+        //mInfoText.setText(new String(msg.getRecords()[0].getPayload()));
+    }
+
+    void importSP(final HWLesson[] lessons, final boolean finish) {
+
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Stundenplan");
         builder.setMessage("Alten Stundenplan löschen?");
@@ -769,17 +774,21 @@ public class MainActivity extends AppCompatActivity implements /*Navigation*/Dra
         builder.setNegativeButton("Behalten", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                HWLesson[] lessons = TimeTableHelper.parseURL(URL, mainActivity);
                 for (HWLesson lesson : lessons) {
                     dbHandler.addLesson(lesson);
                 }
                 dialog.dismiss();
+                if (finish) {
+                    Preferences.saveBooleanToPreferences(mainActivity, getString(R.string.SP_CHANGED), true);
+                    finish();
+                } else {
+                    subjectChooser();
+                }
             }
         });
         builder.setPositiveButton("Löschen", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                HWLesson[] lessons = TimeTableHelper.parseURL(URL, mainActivity);
                 if (lessons.length > 0) {
                     dbHandler.removeTimeTable(lessons[0].getGrade());
                 }
@@ -787,9 +796,14 @@ public class MainActivity extends AppCompatActivity implements /*Navigation*/Dra
                     dbHandler.addLesson(lesson);
                 }
                 dialog.dismiss();
+                if (finish) {
+                    Preferences.saveBooleanToPreferences(mainActivity, getString(R.string.SP_CHANGED), true);
+                    finish();
+                } else {
+                    subjectChooser();
+                }
             }
         });
         builder.show();
-        //mInfoText.setText(new String(msg.getRecords()[0].getPayload()));
     }
 }
