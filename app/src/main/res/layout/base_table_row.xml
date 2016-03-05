@@ -7,8 +7,18 @@
     android:paddingTop="10dp"
     android:background="@color/planForeground">
 
-    <CheckBox
+    <!--<CheckBox
         android:id="@+id/checkBox"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_centerVertical="true"
+        android:layout_gravity="center_vertical"
+        android:checked="false"
+        android:visibility="visible" />-->
+    <FrameLayout
+        android:id="@+id/checkBoxContainer"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
@@ -24,8 +34,8 @@
         android:layout_height="wrap_content"
         android:layout_centerVertical="true"
         android:layout_gravity="center_vertical"
-        android:layout_toEndOf="@+id/checkBox"
-        android:layout_toRightOf="@+id/checkBox"
+        android:layout_toEndOf="@+id/checkBoxContainer"
+        android:layout_toRightOf="@+id/checkBoxContainer"
         android:gravity="center_vertical"
         android:paddingLeft="15dp"
         android:text="1"

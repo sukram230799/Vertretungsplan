@@ -10,6 +10,9 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 
 import java.util.ArrayList;
@@ -69,5 +72,21 @@ public class SelectLessonActivity extends AppCompatActivity {
         fragmentManager.beginTransaction()
                 .replace(R.id.container, timeTableFragment)
                 .commit();
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_select_lesson, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if(item.getItemId() == R.id.action_remove) {
+            new DBHandler(this, null, null, 0).removeLesson(timeTableFragment.getSelectedLesson());
+            finish();
+            return true;
+        }
+        return false;
     }
 }

@@ -291,6 +291,17 @@ public class MainActivity extends AppCompatActivity implements /*Navigation*/Dra
             mNfcAdapter.setOnNdefPushCompleteCallback(this, this);
         }
         devMode = Preferences.readBooleanFromPreferences(this, getString(R.string.DEVELOPER_MODE), false);
+
+        Intent intent = getIntent();
+        Uri data = intent.getData();
+        if(data != null) {
+            Log.d(TAG, data.getHost());
+            Log.d(TAG, data.getPath());
+            Log.d(TAG, data.getQuery());
+            String URL = "http://" + data.getHost() + data.getPath() + "?" + data.getQuery();
+            Log.d(TAG, URL);
+            importSP(TimeTableHelper.parseURL(URL, this), true);
+        }
     }
 
     public void SetUp() {

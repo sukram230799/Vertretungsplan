@@ -197,7 +197,6 @@ public class PlanAdapter extends RecyclerView.Adapter<PlanAdapter.PlanViewHolder
         TextView spTextSubject;
         TextView spTextRoom;
         TextView spTextRepeatType;
-        CheckBox spCheckBox;
         TextView spTextBreak;
         TextView vpTextDate;
         TextView vpTextHour;
@@ -227,10 +226,8 @@ public class PlanAdapter extends RecyclerView.Adapter<PlanAdapter.PlanViewHolder
             spTextSubject = (TextView) itemView.findViewById(R.id.spTextSubject);
             spTextRoom = (TextView) itemView.findViewById(R.id.spTextRoom);
             spTextRepeatType = (TextView) itemView.findViewById(R.id.spTextRepeatType);
-            spCheckBox = (CheckBox) itemView.findViewById(R.id.checkBox);
             spTextBreak = (TextView) itemView.findViewById(R.id.spTextBreak);
 
-            spCheckBox.setVisibility(View.GONE);
 
             vpLayout = (RelativeLayout) itemView.findViewById(R.id.vpLayout);
 

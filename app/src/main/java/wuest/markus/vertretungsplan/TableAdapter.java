@@ -90,7 +90,7 @@ public class TableAdapter extends RecyclerView.Adapter<TableAdapter.TableViewHol
         TextView textSubject;
         TextView textRoom;
         TextView textRepeatType;
-        CheckBox checkBox;
+        //CheckBox checkBox;
         TextView textBreak;
 
         public TableViewHolder(View itemView) {
@@ -105,10 +105,10 @@ public class TableAdapter extends RecyclerView.Adapter<TableAdapter.TableViewHol
             textSubject = (TextView) itemView.findViewById(R.id.spTextSubject);
             textRoom = (TextView) itemView.findViewById(R.id.spTextRoom);
             textRepeatType = (TextView) itemView.findViewById(R.id.spTextRepeatType);
-            checkBox = (CheckBox) itemView.findViewById(R.id.checkBox);
+            //checkBox = (CheckBox) itemView.findViewById(R.id.checkBox);
             textBreak = (TextView) itemView.findViewById(R.id.spTextBreak);
 
-            checkBox.setVisibility(View.GONE);
+            //checkBox.setVisibility(View.GONE);
         }
 
         boolean longpress;

@@ -72,16 +72,25 @@ public class TableEditAdapter extends RecyclerView.Adapter<TableEditAdapter.Tabl
         } else {
             selectedLesson = table.get(selectedLessons.get(0));
         }
-        if (selectedLesson != null && !(selectedLesson.getDay() == table.get(position).getDay() &&
-                selectedLesson.getTeacher().equals(table.get(position).getTeacher()) &&
-                selectedLesson.getSubject().equals(table.get(position).getSubject()) &&
-                selectedLesson.getRoom().equals(table.get(position).getRoom()) &&
-                selectedLesson.getRepeatType().equals(table.get(position).getRepeatType()))) {
-            holder.checkBox.setEnabled(false);
-        } else {
+        if (selectedLessons.contains(position)) {
+            holder.checkBox.setChecked(true);
             holder.checkBox.setEnabled(true);
+            holder.checkBox.setAlpha(1.0f);
+        } else {
+            holder.checkBox.setChecked(false);
+            if (selectedLesson != null && !(selectedLesson.getDay() == table.get(position).getDay() &&
+                    selectedLesson.getTeacher().equals(table.get(position).getTeacher()) &&
+                    selectedLesson.getSubject().equals(table.get(position).getSubject()) &&
+                    selectedLesson.getRoom().equals(table.get(position).getRoom()) &&
+                    selectedLesson.getRepeatType().equals(table.get(position).getRepeatType()))) {
+                holder.checkBox.setEnabled(false);
+                holder.checkBox.setAlpha(0.4f);
+            } else {
+                holder.checkBox.setEnabled(true);
+                holder.checkBox.setAlpha(1.0f);
+            }
         }
-
+        holder.checkBoxNumber.setText(String.valueOf(position));
         holder.textTeacher.setText(table.get(position).getTeacher());
         holder.textSubject.setText(table.get(position).getSubject());
         holder.textRoom.setText(table.get(position).getRoom());
@@ -91,16 +100,17 @@ public class TableEditAdapter extends RecyclerView.Adapter<TableEditAdapter.Tabl
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 Log.d(TAG, String.valueOf(isChecked));
+                int adapterPosition = Integer.parseInt(((TextView) ((View) buttonView.getParent()).findViewById(R.id.adapterPosition)).getText().toString());
                 HWLesson selectedLesson;
                 if (selectedLessons.isEmpty()) {
                     selectedLesson = null;
                 } else {
                     selectedLesson = table.get(selectedLessons.get(0));
                 }
-                if (isChecked) {
-                    selectedLessons.add(((Integer) position));
+                if (isChecked && buttonView.isShown()) {
+                    selectedLessons.add(((Integer) adapterPosition));
                     if (selectedLesson == null) {
-                        selectedLesson = table.get(position);
+                        selectedLesson = table.get(adapterPosition);
                         for (int i = 0; i < table.size(); i++) {
                             HWLesson lesson = table.get(i);
                             if (!(selectedLesson.getDay() == lesson.getDay() &&
@@ -112,10 +122,12 @@ public class TableEditAdapter extends RecyclerView.Adapter<TableEditAdapter.Tabl
                             }
                         }
                     }
-                } else {
-                    selectedLessons.remove(((Integer) position));
+                } else if (buttonView.isShown()) {
+                    selectedLessons.remove(((Integer) adapterPosition));
                     if (selectedLessons.isEmpty()) {
-                        notifyDataSetChanged();
+                        for (int i = 0; i < getItemCount(); i++) {
+                            notifyItemChanged(i);
+                        }
                     }
                 }
             }
@@ -143,6 +155,7 @@ public class TableEditAdapter extends RecyclerView.Adapter<TableEditAdapter.Tabl
         TextView textRepeatType;
         CheckBox checkBox;
         TextView textBreak;
+        TextView checkBoxNumber;
 
         public TableViewHolder(View itemView) {
             super(itemView);
@@ -156,7 +169,13 @@ public class TableEditAdapter extends RecyclerView.Adapter<TableEditAdapter.Tabl
             textSubject = (TextView) itemView.findViewById(R.id.spTextSubject);
             textRoom = (TextView) itemView.findViewById(R.id.spTextRoom);
             textRepeatType = (TextView) itemView.findViewById(R.id.spTextRepeatType);
-            checkBox = (CheckBox) itemView.findViewById(R.id.checkBox);
+            ViewGroup viewGroup = (ViewGroup) itemView.findViewById(R.id.checkBoxContainer);
+            checkBox = new CheckBox(context);
+            checkBoxNumber = new TextView(context);
+            checkBoxNumber.setId(R.id.adapterPosition);
+            checkBoxNumber.setVisibility(View.GONE);
+            viewGroup.addView(checkBox);
+            viewGroup.addView(checkBoxNumber);
             textBreak = (TextView) itemView.findViewById(R.id.spTextBreak);
         }
 

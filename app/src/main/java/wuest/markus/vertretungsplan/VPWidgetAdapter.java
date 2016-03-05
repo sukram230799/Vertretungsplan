@@ -44,12 +44,16 @@ public class VPWidgetAdapter implements RemoteViewsFactory {
         try {
             int type = VPWidgetConfigureActivity.loadGradePref(context, appWidgetId);
             int day = Calendar.getInstance().get(Calendar.DAY_OF_WEEK);
-            if(type <= 1) {
+            int week = Calendar.getInstance().get(Calendar.WEEK_OF_YEAR);
+            String[] subscribedSubjects = dbHandler.getSubscribedSubjects();
+            if (type <= 1) {
                 arrayList = new ArrayList<Object>(Arrays.asList((Object[]) CombineData.combineVP(dbHandler.getVP(grade))));
-            } else if(type <=2) {
-                arrayList = new ArrayList<Object>(Arrays.asList((Object[]) dbHandler.getTimeTable(grade, day)));
+            } else if (type <= 2) {
+                HWLesson[] lesson = TimeTableHelper.selectLessonsFromDayRepeatType(dbHandler.getTimeTable(grade, day), week, day, subscribedSubjects, context);
+                arrayList = new ArrayList<Object>(Arrays.asList((Object[]) lesson));
             } else {
-                arrayList = new ArrayList<>(Arrays.asList((Object[]) TimeTableHelper.combineVPSP(dbHandler.getTimeTable(grade, day),
+                HWLesson[] lesson = TimeTableHelper.selectLessonsFromDayRepeatType(dbHandler.getTimeTable(grade, day), week, day, subscribedSubjects, context);
+                arrayList = new ArrayList<>(Arrays.asList((Object[]) TimeTableHelper.combineVPSP(lesson,
                         dbHandler.getVP(grade), false, false)));
             }
         } catch (DBError dbError) {
@@ -86,13 +90,13 @@ public class VPWidgetAdapter implements RemoteViewsFactory {
         VPData vpData = null;
         HWLesson lesson = null;
         HWPlan plan = null;
-        if(type <= 1) {
+        if (type <= 1) {
             vpData = (VPData) arrayList.get(position);
             text = VPWidgetTextProcess.processVPData(context, vpData);
             if (text.length < 6) {
-                text = new String[] {"Something", "went", "horribly", "wrong!", "We're", "sorry"};
+                text = new String[]{"Something", "went", "horribly", "wrong!", "We're", "sorry"};
             }
-        } else if(type <=2) {
+        } else if (type <= 2) {
             Log.d(TAG, String.valueOf(arrayList.size()));
             lesson = (HWLesson) arrayList.get(position);
             text = VPWidgetTextProcess.processSPData(context, lesson);
@@ -127,7 +131,6 @@ public class VPWidgetAdapter implements RemoteViewsFactory {
             case 2:
                 remoteView = new RemoteViews(
                         context.getPackageName(), R.layout.widget_table_row);
-                remoteView.setViewVisibility(R.id.checkBox, View.GONE);
                 if (text.length <= 2) {
                     remoteView.setViewVisibility(R.id.spTextBreak, View.VISIBLE);
 

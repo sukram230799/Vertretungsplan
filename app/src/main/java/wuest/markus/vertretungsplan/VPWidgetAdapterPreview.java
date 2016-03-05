@@ -30,7 +30,6 @@ public class VPWidgetAdapterPreview extends ArrayAdapter<Object> {
         TextView spTextSubject;
         TextView spTextRoom;
         TextView spTextRepeatType;
-        CheckBox checkBox;
         TextView spTextBreak;
 
         TextView vpTextDate;
@@ -110,10 +109,8 @@ public class VPWidgetAdapterPreview extends ArrayAdapter<Object> {
                 spTextSubject = (TextView) convertView.findViewById(R.id.spTextSubject);
                 spTextRoom = (TextView) convertView.findViewById(R.id.spTextRoom);
                 spTextRepeatType = (TextView) convertView.findViewById(R.id.spTextRepeatType);
-                checkBox = (CheckBox) convertView.findViewById(R.id.checkBox);
                 spTextBreak = (TextView) convertView.findViewById(R.id.spTextBreak);
 
-                checkBox.setVisibility(View.GONE);
                 if(text[0].contains("\n")) {
                     spTextHour.setGravity(View.TEXT_ALIGNMENT_CENTER);
                 } else {
@@ -165,7 +162,6 @@ public class VPWidgetAdapterPreview extends ArrayAdapter<Object> {
                 spTextSubject = (TextView) convertView.findViewById(R.id.spTextSubject);
                 spTextRoom = (TextView) convertView.findViewById(R.id.spTextRoom);
                 spTextRepeatType = (TextView) convertView.findViewById(R.id.spTextRepeatType);
-                checkBox = (CheckBox) convertView.findViewById(R.id.checkBox);
                 spTextBreak = (TextView) convertView.findViewById(R.id.spTextBreak);
 
                 if(text.length <= 2) {

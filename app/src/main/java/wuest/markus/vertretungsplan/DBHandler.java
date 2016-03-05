@@ -449,6 +449,11 @@ public class DBHandler extends SQLiteOpenHelper {
 
     public void updateLesson(HWLesson oldLesson, HWLesson newLesson) {
         SQLiteDatabase database = getWritableDatabase();
+        removeLesson(oldLesson);
+        addLesson(newLesson);
+    }
+
+    public void removeLesson(HWLesson oldLesson){
         for (int hour : oldLesson.getHours()) {
             String query = "DELETE FROM " + TABLE_TIMETABLE + " WHERE " +
                     COLUMN_DAY + " = \"" + oldLesson.getDay() + "\" AND " +
@@ -458,9 +463,8 @@ public class DBHandler extends SQLiteOpenHelper {
                     COLUMN_ROOM + " = \"" + oldLesson.getRoom() + "\" AND " +
                     COLUMN_REPEATTYPE + " = \"" + oldLesson.getRepeatType() + "\";";
             Log.d(TAG, query);
-            database.execSQL(query);
+            getWritableDatabase().execSQL(query);
         }
-        addLesson(newLesson);
     }
 
     public void removeTimeTable(HWGrade grade){
