@@ -7,6 +7,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -20,6 +21,7 @@ import java.util.Objects;
  */
 public class PlanPagerAdapter extends FragmentPagerAdapter implements PlanFragment.RefreshContentListener {
 
+    private static final String TAG = "PlanPagerAdapter";
     //ArrayList<HWTime> registeredDates;
     ArrayList<PlanFragment> fragments;
     HWGrade grade;
@@ -31,7 +33,8 @@ public class PlanPagerAdapter extends FragmentPagerAdapter implements PlanFragme
         fragments = new ArrayList<>();
         //registeredDates = new ArrayList<>();
         for (int i = 0; i < getCount(); i++) {
-            fragments.add(PlanFragment.newInstance(grade, i + 2, false));
+            //fragments.add(PlanFragment.newInstance(grade, i + 2, false));
+            fragments.add(PlanFragment.newInstance(grade, getHWTimeFromWeekDay(i + 2), false));
         }
         this.context = context;
     }
@@ -42,7 +45,7 @@ public class PlanPagerAdapter extends FragmentPagerAdapter implements PlanFragme
         if (fragments.size() == getCount()) {
             planFragment = fragments.get(position);
         } else {
-            planFragment = PlanFragment.newInstance(grade, position + 2, false);
+            planFragment = PlanFragment.newInstance(grade, getHWTimeFromWeekDay(position + 2), false);
         }
         planFragment.setRefreshListener(this);
 
@@ -67,6 +70,17 @@ public class PlanPagerAdapter extends FragmentPagerAdapter implements PlanFragme
     @Override
     public void refreshedContent(SwipeRefreshLayout refreshLayout) {
         refreshLayout.setRefreshing(false);
+    }
+
+    private HWTime getHWTimeFromWeekDay(int weekDay) {
+        Calendar calendar = GregorianCalendar.getInstance();
+        int WEEKDAY = calendar.get(Calendar.DAY_OF_WEEK);
+        calendar.add(Calendar.DAY_OF_MONTH, - (WEEKDAY - weekDay));
+        int YEAR = calendar.get(Calendar.YEAR);
+        int MONTH = calendar.get(Calendar.MONTH);
+        int DAY = calendar.get(Calendar.DAY_OF_MONTH);
+        Log.d(TAG, "" + DAY + " " + WEEKDAY + " " + weekDay);
+        return new HWTime(0, 0, YEAR, MONTH, DAY);
     }
 /*
     public void registerNewDate(HWTime time, boolean background) {

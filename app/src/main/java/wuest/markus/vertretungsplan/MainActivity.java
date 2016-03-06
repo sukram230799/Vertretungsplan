@@ -579,7 +579,7 @@ public class MainActivity extends AppCompatActivity implements /*Navigation*/Dra
                             .commit();
                     break;
                 case 3:
-                    PlanFragment planFragment = PlanFragment.newInstance(grade, Calendar.getInstance().get(Calendar.DAY_OF_WEEK), true);
+                    PlanFragment planFragment = PlanFragment.newInstance(grade, new HWTime(Calendar.getInstance()), true);
                     planFragment.setEditInterface(this);
                     fragmentManager.beginTransaction()
                             .replace(R.id.container, planFragment)

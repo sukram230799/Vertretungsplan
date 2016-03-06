@@ -93,11 +93,11 @@ public class PlanFragment extends Fragment implements SwipeRefreshLayout.OnRefre
         return fragment;
     }
 
-    public static PlanFragment newInstance(HWGrade grade, int day, boolean showFAB) {
+    public static PlanFragment newInstance(HWGrade grade, /*int day,*/ boolean showFAB) {
         PlanFragment fragment = new PlanFragment();
         Bundle args = new Bundle();
         args.putString(GRADE, grade.getGradeName());
-        args.putInt(WEEK_DAY, day);
+        //args.putInt(WEEK_DAY, day);
         args.putBoolean(FAB, showFAB);
         fragment.setArguments(args);
         return fragment;
@@ -112,8 +112,8 @@ public class PlanFragment extends Fragment implements SwipeRefreshLayout.OnRefre
             weekDay = savedInstanceState.getInt(WEEK_DAY, -1);
             showFAB = savedInstanceState.getBoolean(FAB);
             Log.v(TAG, "savedInstanceState not null");
-            if(weekDay == -1){
-                time = new HWTime(0,0,savedInstanceState.getInt(YEAR), savedInstanceState.getInt(MONTH), savedInstanceState.getInt(DAY));
+            if (weekDay == -1) {
+                time = new HWTime(0, 0, savedInstanceState.getInt(YEAR), savedInstanceState.getInt(MONTH), savedInstanceState.getInt(DAY));
                 Calendar calendar = new GregorianCalendar();
                 calendar.setTime(time.toDate());
                 weekDay = calendar.get(Calendar.DAY_OF_WEEK);
@@ -122,8 +122,8 @@ public class PlanFragment extends Fragment implements SwipeRefreshLayout.OnRefre
             grade = new HWGrade(getArguments().getString(GRADE));
             weekDay = getArguments().getInt(WEEK_DAY, -1);
             showFAB = getArguments().getBoolean(FAB);
-            if(weekDay == -1){
-                time = new HWTime(0,0,getArguments().getInt(YEAR), getArguments().getInt(MONTH), getArguments().getInt(DAY));
+            if (weekDay == -1) {
+                time = new HWTime(0, 0, getArguments().getInt(YEAR), getArguments().getInt(MONTH), getArguments().getInt(DAY));
                 Calendar calendar = new GregorianCalendar();
                 calendar.setTime(time.toDate());
                 weekDay = calendar.get(Calendar.DAY_OF_WEEK);
@@ -141,8 +141,8 @@ public class PlanFragment extends Fragment implements SwipeRefreshLayout.OnRefre
             hwLessons = TimeTableHelper.selectLessonsFromRepeatType(hwLessons, week, subscribedSubjects, getActivity()); //No CombineData, because of better layout;
             //hwLessons = TimeTableHelper.fillGabs(hwLessons, week, weekDay, getActivity());
             try {
-                VPData[] vpData = dbHandler.getVP(grade);
-                vpData = TimeTableHelper.selectVPDataFromWeekDay(vpData, weekDay);
+                VPData[] vpData = dbHandler.getVP(grade, time);
+                //vpData = TimeTableHelper.selectVPDataFromWeekDay(vpData, weekDay);
                 plan = TimeTableHelper.combineVPSP(hwLessons, vpData, false, false);
                 plan = TimeTableHelper.fillPlanGabs(plan, weekDay);
             } catch (DBError e) {

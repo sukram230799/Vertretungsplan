@@ -253,14 +253,20 @@ public class DBHandler extends SQLiteOpenHelper {
         }
     }
 
-    public VPData[] getVP(HWGrade grade) throws DBError {
+    public VPData[] getVP(HWGrade grade) throws DBError{
+        return getVP(grade, null);
+    }
+
+    public VPData[] getVP(HWGrade grade, HWTime date) throws DBError {
         trimPlans();
         Log.d(TAG, "@getVP");
         ArrayList<VPData> vpDatas = new ArrayList<>();
         SQLiteDatabase db = getWritableDatabase();
         String query;
         //String query = "SELECT * FROM " + TABLE_VP + " WHERE " + COLUMN_DATE + ">= date(" + sdf.format(new Date()) + ");"; //Not used because of sorting with deleting of old entrys!
-        query = "SELECT * FROM " + TABLE_VP + " WHERE " + COLUMN_GRADE + "=\"" + grade.getGradeName() + "\" ORDER BY " + COLUMN_DATE + ", " + COLUMN_HOUR + " ASC";
+        query = "SELECT * FROM " + TABLE_VP + " WHERE " + COLUMN_GRADE + "=\"" + grade.getGradeName() + "\"";
+        if(date != null) query += " AND " + COLUMN_DATE + "=\"" + dbDateFormat.format(date.toDate()) + "\"";
+        query += " ORDER BY " + COLUMN_DATE + ", " + COLUMN_HOUR + " ASC";
         Cursor c = db.rawQuery(query, null);
         c.moveToFirst();
         Log.d(TAG, "$getVP@while");

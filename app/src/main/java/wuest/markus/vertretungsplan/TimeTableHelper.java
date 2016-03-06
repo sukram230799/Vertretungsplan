@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.regex.Pattern;
@@ -555,6 +556,16 @@ public class TimeTableHelper {
         return dataArrayList.toArray(new VPData[dataArrayList.size()]);
     }
 
+    public static VPData[] selectVPDataFromSubscribedSubjects(VPData[] vpDataArray, String[] subscribedSubjects) {
+        ArrayList<VPData> vpDataArrayList = new ArrayList<>();
+        for(VPData data : vpDataArray) {
+            if(isSubscribedSubject(data.getSubject(), subscribedSubjects)) {
+                vpDataArrayList.add(data);
+            }
+        }
+        return vpDataArrayList.toArray(new VPData[vpDataArrayList.size()]);
+    }
+
     //public static HWPlan[] combineVPSP(HWLesson[] sp, VPData[] vp, boolean combinedSP, boolean combinedVP) {
     //    return combineVPSP(sp, vp, combinedSP, combinedVP, -1);
     //}
@@ -623,6 +634,13 @@ public class TimeTableHelper {
                     null, null, null, vpData.getSubject(), vpData.getRoom(),
                     vpData.getInfo1(), vpData.getInfo2(), vpData.getDate()));
         }
+        Collections.sort(hwPlanArrayList, new Comparator<HWPlan>() {
+            @Override
+            public int compare(HWPlan plan1, HWPlan plan2) {
+
+                return ((Integer) plan1.getHour()).compareTo(plan2.getHour());
+            }
+        });
         return hwPlanArrayList.toArray(new HWPlan[hwPlanArrayList.size()]);
     }
 

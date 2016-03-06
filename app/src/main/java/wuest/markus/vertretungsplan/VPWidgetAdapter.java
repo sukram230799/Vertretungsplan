@@ -3,10 +3,13 @@ package wuest.markus.vertretungsplan;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.GregorianCalendar;
+import java.util.Objects;
 
 import android.appwidget.AppWidgetManager;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.opengl.Visibility;
 import android.util.Log;
 import android.view.View;
@@ -52,9 +55,20 @@ public class VPWidgetAdapter implements RemoteViewsFactory {
                 HWLesson[] lesson = TimeTableHelper.selectLessonsFromDayRepeatType(dbHandler.getTimeTable(grade, day), week, day, subscribedSubjects, context);
                 arrayList = new ArrayList<Object>(Arrays.asList((Object[]) lesson));
             } else {
-                HWLesson[] lesson = TimeTableHelper.selectLessonsFromDayRepeatType(dbHandler.getTimeTable(grade, day), week, day, subscribedSubjects, context);
-                arrayList = new ArrayList<>(Arrays.asList((Object[]) TimeTableHelper.combineVPSP(lesson,
-                        dbHandler.getVP(grade), false, false)));
+                HWLesson[] hwLessons = dbHandler.getTimeTable(grade, day /*Calendar.getInstance().get(Calendar.DAY_OF_WEEK)*/);
+                HWPlan[] plan;
+                hwLessons = TimeTableHelper.selectLessonsFromRepeatType(hwLessons, week, subscribedSubjects, context); //No CombineData, because of better layout;
+                //hwLessons = TimeTableHelper.fillGabs(hwLessons, week, weekDay, getActivity());
+                try {
+                    VPData[] vpData = dbHandler.getVP(grade, new HWTime(GregorianCalendar.getInstance()));
+                    //vpData = TimeTableHelper.selectVPDataFromWeekDay(vpData, day);
+                    plan = TimeTableHelper.combineVPSP(hwLessons, vpData, false, false);
+                    plan = TimeTableHelper.fillPlanGabs(plan, day);
+                } catch (DBError e) {
+                    e.printStackTrace();
+                    plan = TimeTableHelper.combineVPSP(hwLessons, new VPData[0], false, false);
+                }
+                arrayList = new ArrayList<Object>(Arrays.asList((Object[])plan));
             }
         } catch (DBError dbError) {
             dbError.printStackTrace();
@@ -85,6 +99,9 @@ public class VPWidgetAdapter implements RemoteViewsFactory {
         final RemoteViews remoteView;
 
         int type = VPWidgetConfigureActivity.loadGradePref(context, appWidgetId);
+
+        final int redColor = Color.parseColor("#8aFF0000");
+        final int textColor = Color.parseColor("#8a000000");
 
         String[] text = null;
         VPData vpData = null;
@@ -150,6 +167,74 @@ public class VPWidgetAdapter implements RemoteViewsFactory {
                     remoteView.setViewVisibility(R.id.spTextSubject, View.VISIBLE);
                     remoteView.setViewVisibility(R.id.spTextRoom, View.VISIBLE);
                     remoteView.setViewVisibility(R.id.spTextRepeatType, View.VISIBLE);
+
+                    remoteView.setTextViewText(R.id.spTextHour, text[0]);
+                    remoteView.setTextViewText(R.id.spTextTeacher, text[1]);
+                    remoteView.setTextViewText(R.id.spTextSubject, text[2]);
+                    remoteView.setTextViewText(R.id.spTextRoom, text[3]);
+                    remoteView.setTextViewText(R.id.spTextRepeatType, text[4]);
+                }
+                break;
+            case 3:
+                remoteView = new RemoteViews(
+                        context.getPackageName(), R.layout.widget_plan_row);
+                if(text.length <= 2){
+
+                    remoteView.setViewVisibility(R.id.spTextBreak, View.VISIBLE);
+
+                    remoteView.setViewVisibility(R.id.spTextHour, View.GONE);
+                    remoteView.setViewVisibility(R.id.spTextTeacher, View.GONE);
+                    remoteView.setViewVisibility(R.id.spTextSubject, View.GONE);
+                    remoteView.setViewVisibility(R.id.spTextRoom, View.GONE);
+                    remoteView.setViewVisibility(R.id.spTextRepeatType, View.GONE);
+
+                    remoteView.setTextViewText(R.id.spTextHour, text[0]);
+                    remoteView.setTextViewText(R.id.spTextBreak, text[1]);
+                } else if (text.length == 6){
+                    remoteView.setViewVisibility(R.id.spTextHour, View.VISIBLE);
+                    remoteView.setViewVisibility(R.id.spTextTeacher, View.VISIBLE);
+                    remoteView.setViewVisibility(R.id.spTextSubject, View.VISIBLE);
+                    remoteView.setViewVisibility(R.id.spTextRoom, View.VISIBLE);
+                    remoteView.setViewVisibility(R.id.spTextRepeatType, View.VISIBLE);
+
+                    remoteView.setViewVisibility(R.id.vpTextDate, View.VISIBLE);
+                    remoteView.setViewVisibility(R.id.vpTextSubject, View.VISIBLE);
+                    remoteView.setViewVisibility(R.id.vpTextRoom, View.VISIBLE);
+                    remoteView.setViewVisibility(R.id.vpTextInfo1, View.VISIBLE);
+                    remoteView.setViewVisibility(R.id.vpTextInfo2, View.VISIBLE);
+
+                    remoteView.setTextColor(R.id.spTextHour, redColor);
+                    remoteView.setTextColor(R.id.spTextTeacher, redColor);
+                    remoteView.setTextColor(R.id.spTextSubject, redColor);
+                    remoteView.setTextColor(R.id.spTextRoom, redColor);
+                    remoteView.setTextColor(R.id.spTextRepeatType, redColor);
+
+                    remoteView.setTextViewText(R.id.spTextHour, text[1]);
+                    remoteView.setTextViewText(R.id.spTextTeacher, "VP!");
+                    remoteView.setTextViewText(R.id.spTextSubject, text[2]);
+                    remoteView.setTextViewText(R.id.spTextRoom, text[3]);
+                    remoteView.setTextViewText(R.id.spTextRepeatType, "");
+
+                    remoteView.setTextViewText(R.id.vpTextDate, text[0]);
+                    remoteView.setTextViewText(R.id.vpTextHour, text[1]);
+                    remoteView.setTextViewText(R.id.vpTextSubject, text[2]);
+                    remoteView.setTextViewText(R.id.vpTextRoom, text[3]);
+                    remoteView.setTextViewText(R.id.vpTextInfo1, text[4]);
+                    remoteView.setTextViewText(R.id.vpTextInfo2, text[5]);
+                } else if(text.length == 5) {
+                    remoteView.setViewVisibility(R.id.spTextHour, View.VISIBLE);
+                    remoteView.setViewVisibility(R.id.spTextTeacher, View.VISIBLE);
+                    remoteView.setViewVisibility(R.id.spTextSubject, View.VISIBLE);
+                    remoteView.setViewVisibility(R.id.spTextRoom, View.VISIBLE);
+                    remoteView.setViewVisibility(R.id.spTextRepeatType, View.VISIBLE);
+
+                    remoteView.setViewVisibility(R.id.vpTextDate, View.GONE);
+                    remoteView.setViewVisibility(R.id.vpTextSubject, View.GONE);
+                    remoteView.setViewVisibility(R.id.vpTextRoom, View.GONE);
+                    remoteView.setViewVisibility(R.id.vpTextInfo1, View.GONE);
+                    remoteView.setViewVisibility(R.id.vpTextInfo2, View.GONE);
+
+                    remoteView.setViewVisibility(R.id.vpLayout, View.GONE);
 
                     remoteView.setTextViewText(R.id.spTextHour, text[0]);
                     remoteView.setTextViewText(R.id.spTextTeacher, text[1]);

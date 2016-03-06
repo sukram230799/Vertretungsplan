@@ -39,7 +39,8 @@
         android:gravity="center_vertical"
         android:paddingLeft="15dp"
         android:text="1"
-        android:textAppearance="?android:attr/textAppearanceMedium" />
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:textColor="#8a000000" />
     <!-- Because of the checkbox: No need for paddingLeft -->
 
     <TextView
@@ -52,7 +53,8 @@
         android:layout_toRightOf="@+id/spTextHour"
         android:gravity="center_vertical"
         android:text="BOB"
-        android:textAppearance="?android:attr/textAppearanceMedium" />
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:textColor="#8a000000" />
 
     <TextView
         android:id="@+id/spTextSubject"
@@ -64,7 +66,8 @@
         android:layout_toRightOf="@+id/spTextTeacher"
         android:gravity="center_vertical"
         android:text="CH"
-        android:textAppearance="?android:attr/textAppearanceMedium" />
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:textColor="#8a000000" />
 
     <TextView
         android:id="@+id/spTextRoom"
@@ -76,7 +79,8 @@
         android:layout_toStartOf="@+id/spTextRepeatType"
         android:gravity="center_vertical|right"
         android:text="A301"
-        android:textAppearance="?android:attr/textAppearanceMedium" />
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:textColor="#8a000000" />
 
     <TextView
         android:id="@+id/spTextRepeatType"
@@ -90,7 +94,8 @@
         android:paddingRight="25dp"
         android:password="false"
         android:text="G151"
-        android:textAppearance="?android:attr/textAppearanceMedium" />
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:textColor="#8a000000" />
 
 
     <TextView
@@ -102,7 +107,8 @@
         android:layout_gravity="center_vertical"
         android:gravity="center_vertical|right"
         android:text="PAUSE"
-        android:textAppearance="?android:attr/textAppearanceMedium" />
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:textColor="#8a000000" />
 
     <!--<ImageView
         android:id="@+id/imageView"

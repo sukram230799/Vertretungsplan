@@ -165,8 +165,18 @@ public class VPWidgetAdapterPreview extends ArrayAdapter<Object> {
                 spTextBreak = (TextView) convertView.findViewById(R.id.spTextBreak);
 
                 if(text.length <= 2) {
+                    spTextTeacher.setVisibility(View.GONE);
+                    spTextSubject.setVisibility(View.GONE);
+                    spTextRoom.setVisibility(View.GONE);
+                    spTextRepeatType.setVisibility(View.GONE);
+
+                    spTextBreak.setVisibility(View.VISIBLE);
+                    spTextHour.setText(text[0]);
+                    spTextBreak.setText(text[1]);
+                } else {
 
                 }
+                break;
             default:
                 vpTextDate = (TextView) convertView.findViewById(R.id.vpTextDate);
                 vpTextHour = (TextView) convertView.findViewById(R.id.vpTextHour);

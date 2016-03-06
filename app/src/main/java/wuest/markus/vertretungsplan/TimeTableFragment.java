@@ -115,12 +115,6 @@ public class TimeTableFragment extends Fragment implements SwipeRefreshLayout.On
                 String[] subscribedSubjects = dbHandler.getSubscribedSubjects();
                 hwLessons = TimeTableHelper.selectLessonsFromRepeatType(hwLessons, week, subscribedSubjects, getActivity()); //No CombineData, because of better layout;
             }
-            try {
-                VPData[] vpData = dbHandler.getVP(grade);
-                //hwLessons = TimeTableHelper.combineVPSP(hwLessons, vpData, false, false);
-            } catch (DBError e) {
-                e.printStackTrace();
-            }
             hwLessons = TimeTableHelper.fillGabs(hwLessons, week, day, getActivity(), editMode);  //When editMode == true then whole day should be filled;
             this.data = Arrays.asList(hwLessons);
             /*for (VPData data : vpData) {

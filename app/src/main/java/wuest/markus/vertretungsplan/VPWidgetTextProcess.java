@@ -3,6 +3,7 @@ package wuest.markus.vertretungsplan;
 import android.content.Context;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 
@@ -44,12 +45,74 @@ public class VPWidgetTextProcess {
     }
 
     public static String[] processPlan(Context context, HWPlan hwPlan) {
+        boolean onlyVP = (hwPlan.getSpRoom() == null);
+        boolean onlySP = (hwPlan.getVpRoom() == null);
+
+        String Wochentag = "";
+        if(!onlySP){
+            Calendar c = new GregorianCalendar();
+            c.setTime(hwPlan.getDate());
+            Wochentag = TimeTableHelper.getDayName(c.get(Calendar.DAY_OF_WEEK), context);
+        }
+
+        if (!onlyVP) {
+            if (hwPlan.getSpSubject().equals("PAUSE")) {
+                return new String[]{
+                        hwPlan.getHourString(),
+                        "PAUSE"
+                };
+            }
+            ArrayList<String> textToReturn = new ArrayList<>();
+            textToReturn.add(hwPlan.getHourString());
+            textToReturn.add(hwPlan.getTeacher());
+            textToReturn.add(hwPlan.getSpSubject());
+            textToReturn.add(hwPlan.getSpRoom());
+            textToReturn.add(hwPlan.getRepeatType());
+            if (onlySP) {
+                return textToReturn.toArray(new String[textToReturn.size()]);
+            }
+            textToReturn.add(hwPlan.getVpSubject());
+            textToReturn.add(hwPlan.getVpSubject());
+            textToReturn.add(hwPlan.getVpRoom());
+            textToReturn.add(hwPlan.getInfo1());
+            textToReturn.add(hwPlan.getInfo2());
+            textToReturn.add(dateFormat.format(hwPlan.getDate()));
+            return textToReturn.toArray(new String[textToReturn.size()]);
+        }
+        if (!onlySP) {
+            return new String[]{
+                    context.getString(R.string.datebuilder, Wochentag, dateFormat.format(hwPlan.getDate())),
+                    hwPlan.getHourString(),
+                    hwPlan.getVpSubject(),
+                    hwPlan.getVpRoom(),
+                    hwPlan.getInfo1(),
+                    hwPlan.getInfo2()
+            };
+        }
+
         if (hwPlan.getSpSubject().equals("PAUSE")) {
             return new String[]{
                     hwPlan.getHourString(),
                     "PAUSE"
             };
-        } else if(hwPlan.getDate() == null) {
+        } else if (hwPlan.getDate() == null) {
+            return new String[]{
+                    hwPlan.getHourString(),
+                    hwPlan.getTeacher(),
+                    hwPlan.getSpSubject(),
+                    hwPlan.getSpRoom(),
+                    hwPlan.getRepeatType(),
+            };
+        } else if (hwPlan.getSpSubject() == null) {
+            return new String[]{
+                    context.getString(R.string.datebuilder, Wochentag, dateFormat.format(hwPlan.getDate())),
+                    hwPlan.getHourString(),
+                    hwPlan.getVpSubject(),
+                    hwPlan.getVpRoom(),
+                    hwPlan.getInfo1(),
+                    hwPlan.getInfo2()
+            };
+        } else {
             return new String[]{
                     hwPlan.getHourString(),
                     hwPlan.getTeacher(),
@@ -61,10 +124,6 @@ public class VPWidgetTextProcess {
                     hwPlan.getInfo1(),
                     hwPlan.getInfo2(),
                     dateFormat.format(hwPlan.getDate())
-            };
-        } else {
-            return new String[] {
-
             };
         }
     }
