@@ -63,7 +63,7 @@ public class TabbedTimeTableFragment extends Fragment {
         pagerAdapter = new TimeTablePagerAdapter(getChildFragmentManager(), grade, getActivity());
         pagerTabStrip = (PagerTabStrip) view.findViewById(R.id.pager_tab_strip);
         pager.setAdapter(pagerAdapter);
-        pager.setCurrentItem(Calendar.getInstance().get(Calendar.DAY_OF_WEEK) - 2);
+        pager.setCurrentItem(2);
         //fab = (FloatingActionButton) view.findViewById(R.id.fab);
 
 

@@ -9,6 +9,7 @@ import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.util.Log;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -24,6 +25,7 @@ public class PlanPagerAdapter extends FragmentPagerAdapter implements PlanFragme
     private static final String TAG = "PlanPagerAdapter";
     //ArrayList<HWTime> registeredDates;
     ArrayList<PlanFragment> fragments;
+    ArrayList<HWTime> dates;
     HWGrade grade;
     private Context context;
 
@@ -31,11 +33,16 @@ public class PlanPagerAdapter extends FragmentPagerAdapter implements PlanFragme
         super(fm);
         this.grade = grade;
         fragments = new ArrayList<>();
+        dates = new ArrayList<>();
         //registeredDates = new ArrayList<>();
-        for (int i = 0; i < getCount(); i++) {
+        for (HWTime time : getHWTimes()) {
+            fragments.add(PlanFragment.newInstance(grade, time, false));
+            dates.add(time);
+        }
+        /*for (int i = 0; i < getCount(); i++) {
             //fragments.add(PlanFragment.newInstance(grade, i + 2, false));
             fragments.add(PlanFragment.newInstance(grade, getHWTimeFromWeekDay(i + 2), false));
-        }
+        }*/
         this.context = context;
     }
 
@@ -55,7 +62,7 @@ public class PlanPagerAdapter extends FragmentPagerAdapter implements PlanFragme
 
     @Override
     public int getCount() {
-        return 6;
+        return dates.size();
         //return registeredDates.size();
     }
 
@@ -63,8 +70,15 @@ public class PlanPagerAdapter extends FragmentPagerAdapter implements PlanFragme
     public CharSequence getPageTitle(int position) {
         /*Calendar calendar = new GregorianCalendar();
         calendar.setTime(registeredDates.get(position).toDate());*/
-        return TimeTableHelper.getDayName(position + 2, context);
-        //return TimeTableHelper.getDayName(calendar.get(Calendar.DAY_OF_WEEK));
+        //return TimeTableHelper.getDayName(position + 2, context);
+        if (position < dates.size()) {
+            Calendar calendar = new GregorianCalendar();
+            Log.d(TAG, DBHandler.dbDateFormat.format(dates.get(position).toDate()));
+            calendar.setTime(dates.get(position).toDate());
+            Log.d(TAG, DBHandler.dbDateFormat.format(calendar.getTime()));
+            return TimeTableHelper.getDayName(calendar.get(Calendar.DAY_OF_WEEK), context);
+        }
+        return "?!?";
     }
 
     @Override
@@ -75,12 +89,36 @@ public class PlanPagerAdapter extends FragmentPagerAdapter implements PlanFragme
     private HWTime getHWTimeFromWeekDay(int weekDay) {
         Calendar calendar = GregorianCalendar.getInstance();
         int WEEKDAY = calendar.get(Calendar.DAY_OF_WEEK);
-        calendar.add(Calendar.DAY_OF_MONTH, - (WEEKDAY - weekDay));
+        calendar.add(Calendar.DAY_OF_MONTH, -(WEEKDAY - weekDay));
         int YEAR = calendar.get(Calendar.YEAR);
         int MONTH = calendar.get(Calendar.MONTH);
         int DAY = calendar.get(Calendar.DAY_OF_MONTH);
         Log.d(TAG, "" + DAY + " " + WEEKDAY + " " + weekDay);
         return new HWTime(0, 0, YEAR, MONTH, DAY);
+    }
+
+    private HWTime[] getHWTimes() {
+        Calendar twoDaysAgo = GregorianCalendar.getInstance();
+        twoDaysAgo.add(Calendar.DATE, -2);
+        Log.d(TAG, DBHandler.dbDateFormat.format(twoDaysAgo.getTime()));
+        Calendar oneDayAgo = GregorianCalendar.getInstance();
+        oneDayAgo.add(Calendar.DATE, -1);
+        Log.d(TAG, DBHandler.dbDateFormat.format(oneDayAgo.getTime()));
+        Calendar today = GregorianCalendar.getInstance();
+        Log.d(TAG, DBHandler.dbDateFormat.format(today.getTime()));
+        Calendar plusOneDay = GregorianCalendar.getInstance();
+        plusOneDay.add(Calendar.DATE, 1);
+        Log.d(TAG, DBHandler.dbDateFormat.format(plusOneDay.getTime()));
+        Calendar plusTwoDays = GregorianCalendar.getInstance();
+        plusTwoDays.add(Calendar.DATE, 2);
+        Log.d(TAG, DBHandler.dbDateFormat.format(plusTwoDays.getTime()));
+        return new HWTime[]{
+                new HWTime(twoDaysAgo),
+                new HWTime(oneDayAgo),
+                new HWTime(today),
+                new HWTime(plusOneDay),
+                new HWTime(plusTwoDays)
+        };
     }
 /*
     public void registerNewDate(HWTime time, boolean background) {

@@ -64,7 +64,7 @@ public class TabbedPlanFragment extends Fragment{
                 now.get(Calendar.MONTH), now.get(Calendar.YEAR)), true);*/
         pagerTabStrip = (PagerTabStrip) view.findViewById(R.id.pager_tab_strip);
         pager.setAdapter(pagerAdapter);
-        pager.setCurrentItem(Calendar.getInstance().get(Calendar.DAY_OF_WEEK) - 2);
+        pager.setCurrentItem(2);
         //fab = (FloatingActionButton) view.findViewById(R.id.fab);
 
 

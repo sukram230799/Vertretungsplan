@@ -191,6 +191,8 @@ public class VPWidgetAdapter implements RemoteViewsFactory {
                     remoteView.setTextViewText(R.id.spTextHour, text[0]);
                     remoteView.setTextViewText(R.id.spTextBreak, text[1]);
                 } else if (text.length == 6){
+                    remoteView.setViewVisibility(R.id.spTextBreak, View.GONE);
+
                     remoteView.setViewVisibility(R.id.spTextHour, View.VISIBLE);
                     remoteView.setViewVisibility(R.id.spTextTeacher, View.VISIBLE);
                     remoteView.setViewVisibility(R.id.spTextSubject, View.VISIBLE);
@@ -228,11 +230,7 @@ public class VPWidgetAdapter implements RemoteViewsFactory {
                     remoteView.setViewVisibility(R.id.spTextRoom, View.VISIBLE);
                     remoteView.setViewVisibility(R.id.spTextRepeatType, View.VISIBLE);
 
-                    remoteView.setViewVisibility(R.id.vpTextDate, View.GONE);
-                    remoteView.setViewVisibility(R.id.vpTextSubject, View.GONE);
-                    remoteView.setViewVisibility(R.id.vpTextRoom, View.GONE);
-                    remoteView.setViewVisibility(R.id.vpTextInfo1, View.GONE);
-                    remoteView.setViewVisibility(R.id.vpTextInfo2, View.GONE);
+                    remoteView.setViewVisibility(R.id.spTextBreak, View.GONE);
 
                     remoteView.setViewVisibility(R.id.vpLayout, View.GONE);
 
