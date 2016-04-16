@@ -48,27 +48,44 @@ public class VPWidgetAdapter implements RemoteViewsFactory {
             int type = VPWidgetConfigureActivity.loadGradePref(context, appWidgetId);
             int day = Calendar.getInstance().get(Calendar.DAY_OF_WEEK);
             int week = Calendar.getInstance().get(Calendar.WEEK_OF_YEAR);
+            HWTime time = new HWTime(Calendar.getInstance());
             String[] subscribedSubjects = dbHandler.getSubscribedSubjects();
             if (type <= 1) {
-                arrayList = new ArrayList<Object>(Arrays.asList((Object[]) CombineData.combineVP(dbHandler.getVP(grade))));
+                arrayList = new ArrayList<>();
+                VPData[] data = dbHandler.getVP(grade);
+                for (VPData vpData : data) {
+                    boolean found = false;
+                    for (Object usedDataArray : arrayList) {
+                        for (VPData usedData : (VPData[]) usedDataArray) {
+                            if (usedData == vpData) {
+                                found = true;
+                                break;
+                            }
+                        }
+                    }
+                    if (!found) {
+                        arrayList.add(CombineData.getSimilarVP(vpData, data));
+                    }
+                }
             } else if (type <= 2) {
-                HWLesson[] lesson = TimeTableHelper.selectLessonsFromDayRepeatType(dbHandler.getTimeTable(grade, day), week, day, subscribedSubjects, context);
-                arrayList = new ArrayList<Object>(Arrays.asList((Object[]) lesson));
+                HWLesson[] lesson = TimeTableHelper.selectLessonsFromTime(dbHandler.getTimeTable(grade, day), time, subscribedSubjects, context);
+                arrayList = new ArrayList<>(Arrays.asList((Object[]) lesson));
             } else {
                 HWLesson[] hwLessons = dbHandler.getTimeTable(grade, day /*Calendar.getInstance().get(Calendar.DAY_OF_WEEK)*/);
                 HWPlan[] plan;
-                hwLessons = TimeTableHelper.selectLessonsFromRepeatType(hwLessons, week, subscribedSubjects, context); //No CombineData, because of better layout;
+                hwLessons = TimeTableHelper.selectLessonsFromTime(hwLessons, time, subscribedSubjects, context); //No CombineData, because of better layout;
                 //hwLessons = TimeTableHelper.fillGabs(hwLessons, week, weekDay, getActivity());
                 try {
                     VPData[] vpData = dbHandler.getVP(grade, new HWTime(GregorianCalendar.getInstance()));
                     //vpData = TimeTableHelper.selectVPDataFromWeekDay(vpData, day);
-                    plan = TimeTableHelper.combineVPSP(hwLessons, vpData, false, false);
-                    plan = TimeTableHelper.fillPlanGabs(plan, day);
+                    vpData = TimeTableHelper.selectVPDataFromSubscribedSubjects(vpData, subscribedSubjects);
+                    plan = PlanHelper.combineVPSP(hwLessons, vpData);
+                    plan = PlanHelper.fillPlanGabs(plan, day);
                 } catch (DBError e) {
                     e.printStackTrace();
-                    plan = TimeTableHelper.combineVPSP(hwLessons, new VPData[0], false, false);
+                    plan = PlanHelper.combineVPSP(hwLessons, new VPData[0]);
                 }
-                arrayList = new ArrayList<Object>(Arrays.asList((Object[])plan));
+                arrayList = new ArrayList<>(Arrays.asList((Object[]) plan));
             }
         } catch (DBError dbError) {
             dbError.printStackTrace();
@@ -103,13 +120,17 @@ public class VPWidgetAdapter implements RemoteViewsFactory {
         final int redColor = Color.parseColor("#8aFF0000");
         final int textColor = Color.parseColor("#8a000000");
 
-        String[] text = null;
-        VPData vpData = null;
-        HWLesson lesson = null;
-        HWPlan plan = null;
+        String[] text;
+        VPData vpData;
+        HWLesson lesson;
+        HWPlan plan;
         if (type <= 1) {
-            vpData = (VPData) arrayList.get(position);
-            text = VPWidgetTextProcess.processVPData(context, vpData);
+            vpData = ((VPData[]) arrayList.get(position))[0];
+            Integer[] hours = new Integer[((VPData[]) arrayList.get(position)).length];
+            for (int i = 0; i < hours.length; i++) {
+                hours[i] = ((VPData[]) arrayList.get(position))[i].getHour();
+            }
+            text = VPWidgetTextProcess.processVPData(context, vpData, hours);
             if (text.length < 6) {
                 text = new String[]{"Something", "went", "horribly", "wrong!", "We're", "sorry"};
             }
@@ -139,7 +160,7 @@ public class VPWidgetAdapter implements RemoteViewsFactory {
                         context.getPackageName(), R.layout.widget_minimal_row);
 
                         /*
-                        context.getString(R.string.datebuilder, Wochentag, dateFormat.format(vpDataArrayList.get(position).getDate())) + " " +
+                        context.getString(R.string.datebuilder, Wochentag, dateFormat.format(vpDataArrayList.get(position).getVpDate())) + " " +
                         CombineData.hoursString(vpDataArrayList.get(position).getHours()) + " " +
                         vpDataArrayList.get(position).getSubject() + " in: " +
                         vpDataArrayList.get(position).getRoom();*/
@@ -178,7 +199,7 @@ public class VPWidgetAdapter implements RemoteViewsFactory {
             case 3:
                 remoteView = new RemoteViews(
                         context.getPackageName(), R.layout.widget_plan_row);
-                if(text.length <= 2){
+                if (text.length <= 2) {
 
                     remoteView.setViewVisibility(R.id.spTextBreak, View.VISIBLE);
 
@@ -190,7 +211,7 @@ public class VPWidgetAdapter implements RemoteViewsFactory {
 
                     remoteView.setTextViewText(R.id.spTextHour, text[0]);
                     remoteView.setTextViewText(R.id.spTextBreak, text[1]);
-                } else if (text.length == 6){
+                } else if (text.length == 6) {
                     remoteView.setViewVisibility(R.id.spTextBreak, View.GONE);
 
                     remoteView.setViewVisibility(R.id.spTextHour, View.VISIBLE);
@@ -223,7 +244,7 @@ public class VPWidgetAdapter implements RemoteViewsFactory {
                     remoteView.setTextViewText(R.id.vpTextRoom, text[3]);
                     remoteView.setTextViewText(R.id.vpTextInfo1, text[4]);
                     remoteView.setTextViewText(R.id.vpTextInfo2, text[5]);
-                } else if(text.length == 5) {
+                } else if (text.length == 5) {
                     remoteView.setViewVisibility(R.id.spTextHour, View.VISIBLE);
                     remoteView.setViewVisibility(R.id.spTextTeacher, View.VISIBLE);
                     remoteView.setViewVisibility(R.id.spTextSubject, View.VISIBLE);
@@ -249,7 +270,7 @@ public class VPWidgetAdapter implements RemoteViewsFactory {
         }
         //remoteView.setTextViewText(R.id.spTextHour, "");
 /*
-        String text = context.getString(R.string.datebuilder, Wochentag, dateFormat.format(vpDataArrayList.get(position).getDate())) + " " +
+        String text = context.getString(R.string.datebuilder, Wochentag, dateFormat.format(vpDataArrayList.get(position).getVpDate())) + " " +
                 CombineData.hoursString(vpDataArrayList.get(position).getHours()) + " " +
                 vpDataArrayList.get(position).getSubject() + " in: " +
                 vpDataArrayList.get(position).getRoom();

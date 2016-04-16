@@ -17,158 +17,88 @@ import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Created by Markus on 16.02.2016.
- */
 public class PlanPagerAdapter extends FragmentPagerAdapter implements PlanFragment.RefreshContentListener {
 
     private static final String TAG = "PlanPagerAdapter";
-    //ArrayList<HWTime> registeredDates;
     ArrayList<PlanFragment> fragments;
     ArrayList<HWTime> dates;
+    Integer[] lessonDays;
     HWGrade grade;
+    private RefreshContentListener refreshListener;
     private Context context;
 
     public PlanPagerAdapter(FragmentManager fm, HWGrade grade, Context context) {
         super(fm);
         this.grade = grade;
         fragments = new ArrayList<>();
-        dates = new ArrayList<>();
-        //registeredDates = new ArrayList<>();
-        for (HWTime time : getHWTimes()) {
+        lessonDays = new DBHandler(context, null, null, 0).getDaysWithLessons(grade);
+        dates = new ArrayList<>(Arrays.asList(TimeTableHelper.getHWTimes(lessonDays)));
+        for (HWTime time : dates) {
             fragments.add(PlanFragment.newInstance(grade, time, false));
-            dates.add(time);
         }
-        /*for (int i = 0; i < getCount(); i++) {
-            //fragments.add(PlanFragment.newInstance(grade, i + 2, false));
-            fragments.add(PlanFragment.newInstance(grade, getHWTimeFromWeekDay(i + 2), false));
-        }*/
         this.context = context;
     }
 
     @Override
     public Fragment getItem(int position) {
-        PlanFragment planFragment;
-        if (fragments.size() == getCount()) {
-            planFragment = fragments.get(position);
-        } else {
-            planFragment = PlanFragment.newInstance(grade, getHWTimeFromWeekDay(position + 2), false);
+        while (position >= dates.size()) {
+            addNewDate();
         }
+        PlanFragment planFragment = fragments.get(position);
         planFragment.setRefreshListener(this);
 
         return planFragment;
-        //return fragments.get(position);
     }
 
     @Override
     public int getCount() {
+        if(dates.size() < 20) {
+            return dates.size() + 1;
+        }
         return dates.size();
-        //return registeredDates.size();
+    }
+
+    private void addNewDate() {
+        dates.add(
+                TimeTableHelper.getNextHWTime(dates.get(dates.size() - 1), lessonDays));
+        fragments.add(PlanFragment.newInstance(grade, dates.get(dates.size() - 1), false));
+        notifyDataSetChanged();
     }
 
     @Override
     public CharSequence getPageTitle(int position) {
-        /*Calendar calendar = new GregorianCalendar();
-        calendar.setTime(registeredDates.get(position).toDate());*/
-        //return TimeTableHelper.getDayName(position + 2, context);
-        if (position < dates.size()) {
-            Calendar calendar = new GregorianCalendar();
-            Log.d(TAG, DBHandler.dbDateFormat.format(dates.get(position).toDate()));
-            calendar.setTime(dates.get(position).toDate());
-            Log.d(TAG, DBHandler.dbDateFormat.format(calendar.getTime()));
-            return TimeTableHelper.getDayName(calendar.get(Calendar.DAY_OF_WEEK), context);
+        SimpleDateFormat sdf = new SimpleDateFormat("dd. MMM");
+        while (position >= dates.size()) {
+            addNewDate();
         }
-        return "?!?";
+        Calendar calendar = new GregorianCalendar();
+        Log.d(TAG, DBHandler.dbDateFormat.format(dates.get(position).toDate()));
+        calendar.setTime(dates.get(position).toDate());
+        Log.d(TAG, DBHandler.dbDateFormat.format(calendar.getTime()));
+        return TimeTableHelper.getDayName(calendar.get(Calendar.DAY_OF_WEEK), context) +
+                " " + sdf.format(dates.get(position).toDate());
     }
 
     @Override
     public void refreshedContent(SwipeRefreshLayout refreshLayout) {
-        refreshLayout.setRefreshing(false);
-    }
-
-    private HWTime getHWTimeFromWeekDay(int weekDay) {
-        Calendar calendar = GregorianCalendar.getInstance();
-        int WEEKDAY = calendar.get(Calendar.DAY_OF_WEEK);
-        calendar.add(Calendar.DAY_OF_MONTH, -(WEEKDAY - weekDay));
-        int YEAR = calendar.get(Calendar.YEAR);
-        int MONTH = calendar.get(Calendar.MONTH);
-        int DAY = calendar.get(Calendar.DAY_OF_MONTH);
-        Log.d(TAG, "" + DAY + " " + WEEKDAY + " " + weekDay);
-        return new HWTime(0, 0, YEAR, MONTH, DAY);
-    }
-
-    private HWTime[] getHWTimes() {
-        Calendar twoDaysAgo = GregorianCalendar.getInstance();
-        twoDaysAgo.add(Calendar.DATE, -2);
-        Log.d(TAG, DBHandler.dbDateFormat.format(twoDaysAgo.getTime()));
-        Calendar oneDayAgo = GregorianCalendar.getInstance();
-        oneDayAgo.add(Calendar.DATE, -1);
-        Log.d(TAG, DBHandler.dbDateFormat.format(oneDayAgo.getTime()));
-        Calendar today = GregorianCalendar.getInstance();
-        Log.d(TAG, DBHandler.dbDateFormat.format(today.getTime()));
-        Calendar plusOneDay = GregorianCalendar.getInstance();
-        plusOneDay.add(Calendar.DATE, 1);
-        Log.d(TAG, DBHandler.dbDateFormat.format(plusOneDay.getTime()));
-        Calendar plusTwoDays = GregorianCalendar.getInstance();
-        plusTwoDays.add(Calendar.DATE, 2);
-        Log.d(TAG, DBHandler.dbDateFormat.format(plusTwoDays.getTime()));
-        return new HWTime[]{
-                new HWTime(twoDaysAgo),
-                new HWTime(oneDayAgo),
-                new HWTime(today),
-                new HWTime(plusOneDay),
-                new HWTime(plusTwoDays)
-        };
-    }
-/*
-    public void registerNewDate(HWTime time, boolean background) {
-        if (!registeredDates.contains(time)) {
-            if (background) {
-                new Thread(new BackgroundNewDate(grade, time, handler)).start();
-            }
-            registeredDates.add(time);
-            fragments.add(PlanFragment.newInstance(grade, time, false));
-            this.notifyDataSetChanged();
+        if (refreshListener == null) {
+            refreshLayout.setRefreshing(false);
+        } else {
+            refreshListener.refreshedContent(refreshLayout);
         }
     }
 
-    private void newDate(HWTime time, PlanFragment fragment) {
-        int position = registeredDates.size();
-        registeredDates.add(position, time);
-        fragments.add(position, fragment);
-        this.notifyDataSetChanged();
+    public int getDay(int itemNumber) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(dates.get(itemNumber).toDate());
+        return calendar.get(Calendar.DAY_OF_WEEK);
     }
 
-    class BackgroundNewDate implements Runnable {
-
-        HWGrade grade;
-        HWTime time;
-        Handler handler;
-
-        public BackgroundNewDate(HWGrade grade, HWTime time, Handler handler) {
-            this.grade = grade;
-            this.time = time;
-            this.handler = handler;
-        }
-
-        @Override
-        public void run() {
-            Message message = new Message();
-            PlanFragment fragment = PlanFragment.newInstance(grade, time, false);
-            message.obj = new ArrayList<Object>(Arrays.asList(new Object[]{time, fragment}));
-            handler.sendMessage(message);
-        }
+    public void setRefreshListener(RefreshContentListener refreshListener) {
+        this.refreshListener = refreshListener;
     }
 
-    Handler handler = new Handler() {
-        @Override
-        public void handleMessage(Message msg) {
-            if (msg != null) {
-                if (msg.obj != null) {
-                    ArrayList list = (ArrayList) msg.obj;
-                    newDate((HWTime) list.get(0), (PlanFragment) list.get(1));
-                }
-            }
-        }
-    };*/
+    public interface RefreshContentListener {
+        void refreshedContent(SwipeRefreshLayout refreshLayout);
+    }
 }

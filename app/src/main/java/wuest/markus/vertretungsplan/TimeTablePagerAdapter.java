@@ -8,13 +8,18 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.util.Log;
 import android.view.ViewGroup;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 
 public class TimeTablePagerAdapter extends FragmentPagerAdapter implements TimeTableFragment.RefreshContentListener {
 
     private static final String TAG = "TimeTablePagerAdapter";
+    ArrayList<TimeTableFragment> fragments;
+    ArrayList<HWTime> dates;
+    Integer[] lessonDays;
     private HWGrade grade;
     private RefreshContentListener refreshListener;
     private Context context;
@@ -23,27 +28,21 @@ public class TimeTablePagerAdapter extends FragmentPagerAdapter implements TimeT
         super(fm);
         this.grade = grade;
         fragments = new ArrayList<>();
-        /*for(HWTime time : getHWTimes()) { //PRE WORK
-            fragments.add(TimeTableFragment.newInstance(grade, HWTime, false, false));
-            dates.add(time);
-        }*/
-        for (int i = 0; i < getCount(); i++) {
-            fragments.add(TimeTableFragment.newInstance(grade, i + 2, false, false));
+        lessonDays = new DBHandler(context, null, null, 0).getDaysWithLessons(grade);
+        dates = new ArrayList<>(Arrays.asList(TimeTableHelper.getHWTimes(lessonDays)));
+        for (HWTime time : dates) { //PRE WORK
+            fragments.add(TimeTableFragment.newInstance(grade, time, false));
         }
         this.context = context;
     }
 
-    ArrayList<TimeTableFragment> fragments;
-    ArrayList<HWTime> dates;
 
     @Override
     public Fragment getItem(int position) {
-        TimeTableFragment timeTableFragment;
-        if (fragments.size() == getCount()) {
-            timeTableFragment = fragments.get(position);
-        } else {
-            timeTableFragment = TimeTableFragment.newInstance(grade, position + 2, false, false);
+        while (position >= dates.size()) {
+            addNewDate();
         }
+        TimeTableFragment timeTableFragment = fragments.get(position);
         timeTableFragment.setRefreshListener(this);
 
         return timeTableFragment;
@@ -51,19 +50,30 @@ public class TimeTablePagerAdapter extends FragmentPagerAdapter implements TimeT
 
     @Override
     public int getCount() {
-        return 6;
+        if(dates.size() < 20) {
+            return dates.size() + 1;
+        }
+        return dates.size();
+    }
+
+    private void addNewDate() {
+        dates.add(
+                TimeTableHelper.getNextHWTime(dates.get(dates.size() - 1), lessonDays));
+        fragments.add(TimeTableFragment.newInstance(grade, dates.get(dates.size() - 1), false));
+        notifyDataSetChanged();
     }
 
     @Override
     public CharSequence getPageTitle(int position) {
-        return TimeTableHelper.getDayName(position + 2, context);
-    }
-
-    /*public void setEdit(boolean showCheckBoxes) {
-        for (TimeTableFragment fragment : fragments) {
-            fragment.setShowCheckBoxes(showCheckBoxes);
+        SimpleDateFormat sdf = new SimpleDateFormat("dd. MMM");
+        while (position >= dates.size()) {
+            addNewDate();
         }
-    }*/
+        Calendar c = Calendar.getInstance();
+        c.setTime(dates.get(position).toDate());
+        return TimeTableHelper.getDayName(c.get(Calendar.DAY_OF_WEEK), context) +
+                " " + sdf.format(dates.get(position).toDate());
+    }
 
     @Override
     public void refreshedContent(SwipeRefreshLayout refreshLayout) {
@@ -80,29 +90,5 @@ public class TimeTablePagerAdapter extends FragmentPagerAdapter implements TimeT
 
     public interface RefreshContentListener {
         void refreshedContent(SwipeRefreshLayout refreshLayout);
-    }
-
-    private HWTime[] getHWTimes() {
-        Calendar twoDaysAgo = GregorianCalendar.getInstance();
-        twoDaysAgo.add(Calendar.DATE, -2);
-        Log.d(TAG, DBHandler.dbDateFormat.format(twoDaysAgo.getTime()));
-        Calendar oneDayAgo = GregorianCalendar.getInstance();
-        oneDayAgo.add(Calendar.DATE, -1);
-        Log.d(TAG, DBHandler.dbDateFormat.format(oneDayAgo.getTime()));
-        Calendar today = GregorianCalendar.getInstance();
-        Log.d(TAG, DBHandler.dbDateFormat.format(today.getTime()));
-        Calendar plusOneDay = GregorianCalendar.getInstance();
-        plusOneDay.add(Calendar.DATE, 1);
-        Log.d(TAG, DBHandler.dbDateFormat.format(plusOneDay.getTime()));
-        Calendar plusTwoDays = GregorianCalendar.getInstance();
-        plusTwoDays.add(Calendar.DATE, 2);
-        Log.d(TAG, DBHandler.dbDateFormat.format(plusTwoDays.getTime()));
-        return new HWTime[]{
-                new HWTime(twoDaysAgo),
-                new HWTime(oneDayAgo),
-                new HWTime(today),
-                new HWTime(plusOneDay),
-                new HWTime(plusTwoDays)
-        };
     }
 }

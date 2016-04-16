@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.PagerTabStrip;
 import android.support.v4.view.ViewPager;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,7 +17,7 @@ import com.github.clans.fab.FloatingActionMenu;
 
 import java.util.Calendar;
 
-public class TabbedTimeTableFragment extends Fragment {
+public class TabbedTimeTableFragment extends Fragment implements TimeTablePagerAdapter.RefreshContentListener {
 
     private static HWGrade grade;
     private static final String GRADE = "grade";
@@ -33,6 +34,7 @@ public class TabbedTimeTableFragment extends Fragment {
     private FloatingActionButton newFAB;
 
     EditInterface editInterface;
+    private RefreshContentListener refreshListener;
 
     public TabbedTimeTableFragment() {
         // Required empty public constructor
@@ -61,6 +63,7 @@ public class TabbedTimeTableFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_tabbed_time_table, container, false);
         pager = (ViewPager) view.findViewById(R.id.pager);
         pagerAdapter = new TimeTablePagerAdapter(getChildFragmentManager(), grade, getActivity());
+        pagerAdapter.setRefreshListener(this);
         pagerTabStrip = (PagerTabStrip) view.findViewById(R.id.pager_tab_strip);
         pager.setAdapter(pagerAdapter);
         pager.setCurrentItem(2);
@@ -123,11 +126,28 @@ public class TabbedTimeTableFragment extends Fragment {
         this.editInterface = editInterface;
     }
 
+    @Override
+    public void refreshedContent(SwipeRefreshLayout refreshLayout) {
+        if (refreshListener == null) {
+            refreshLayout.setRefreshing(false);
+        } else {
+            refreshListener.refreshedContent(refreshLayout);
+        }
+    }
+
     public interface EditInterface {
         void onEditLesson(int day, HWGrade grade);
 
         void onAddLesson(int day, HWGrade grade);
 
         void onShareTimeTable();
+    }
+
+    public void setRefreshListener(RefreshContentListener refreshListener) {
+        this.refreshListener = refreshListener;
+    }
+
+    public interface RefreshContentListener {
+        void refreshedContent(SwipeRefreshLayout refreshLayout);
     }
 }

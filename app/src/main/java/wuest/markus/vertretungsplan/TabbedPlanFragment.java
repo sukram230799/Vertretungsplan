@@ -5,6 +5,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.PagerTabStrip;
 import android.support.v4.view.ViewPager;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,14 +13,7 @@ import android.view.ViewGroup;
 import com.github.clans.fab.FloatingActionButton;
 import com.github.clans.fab.FloatingActionMenu;
 
-import java.sql.Time;
-import java.util.Calendar;
-import java.util.GregorianCalendar;
-
-/**
- * Created by Markus on 16.02.2016.
- */
-public class TabbedPlanFragment extends Fragment{
+public class TabbedPlanFragment extends Fragment implements PlanPagerAdapter.RefreshContentListener{
 
     private static HWGrade grade;
     private static final String GRADE = "grade";
@@ -36,6 +30,7 @@ public class TabbedPlanFragment extends Fragment{
     private FloatingActionButton newFAB;
 
     EditInterface editInterface;
+    private RefreshContentListener refreshListener;
 
     public static TabbedPlanFragment newInstance(HWGrade grade) {
         TabbedPlanFragment fragment = new TabbedPlanFragment();
@@ -58,10 +53,7 @@ public class TabbedPlanFragment extends Fragment{
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {View view = inflater.inflate(R.layout.fragment_tabbed_time_table, container, false);
         pager = (ViewPager) view.findViewById(R.id.pager);
         pagerAdapter = new PlanPagerAdapter(getChildFragmentManager(), grade, getActivity());
-        /*Calendar now = new GregorianCalendar();
-        pagerAdapter.registerNewDate(new HWTime(now), false);
-        pagerAdapter.registerNewDate(new HWTime(now.get(Calendar.HOUR_OF_DAY), now.get(Calendar.MINUTE), now.get(Calendar.DAY_OF_MONTH) + 1,
-                now.get(Calendar.MONTH), now.get(Calendar.YEAR)), true);*/
+        pagerAdapter.setRefreshListener(this);
         pagerTabStrip = (PagerTabStrip) view.findViewById(R.id.pager_tab_strip);
         pager.setAdapter(pagerAdapter);
         pager.setCurrentItem(2);
@@ -81,7 +73,7 @@ public class TabbedPlanFragment extends Fragment{
             public void onClick(View v) {
                 fab.close(true);
                 //pagerAdapter.setEdit(showCheckBoxes);
-                editInterface.onEditLesson(pager.getCurrentItem() + 2, grade);
+                editInterface.onEditLesson(pagerAdapter.getDay(pager.getCurrentItem()), grade);
             }
         });
         newFAB.setClickable(true);
@@ -89,7 +81,7 @@ public class TabbedPlanFragment extends Fragment{
             @Override
             public void onClick(View v) {
                 fab.close(true);
-                editInterface.onAddLesson(pager.getCurrentItem() + 2, grade);
+                editInterface.onAddLesson(pagerAdapter.getDay(pager.getCurrentItem()), grade);
             }
         });
         shareFAB.setClickable(true);
@@ -108,11 +100,28 @@ public class TabbedPlanFragment extends Fragment{
         this.editInterface = editInterface;
     }
 
+    @Override
+    public void refreshedContent(SwipeRefreshLayout refreshLayout) {
+        if (refreshListener == null) {
+            refreshLayout.setRefreshing(false);
+        } else {
+            refreshListener.refreshedContent(refreshLayout);
+        }
+    }
+
     public interface EditInterface {
         void onEditLesson(int day, HWGrade grade);
 
         void onAddLesson(int day, HWGrade grade);
 
         void onShareTimeTable();
+    }
+
+    public void setRefreshListener(RefreshContentListener refreshListener) {
+        this.refreshListener = refreshListener;
+    }
+
+    public interface RefreshContentListener {
+        void refreshedContent(SwipeRefreshLayout refreshLayout);
     }
 }
