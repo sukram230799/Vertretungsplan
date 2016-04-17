@@ -12,9 +12,6 @@ import android.widget.ListView;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-/**
- * Created by Markus on 16.02.2016.
- */
 public class SubjectChooserDialog extends DialogFragment {
 
     private String[] subjects;

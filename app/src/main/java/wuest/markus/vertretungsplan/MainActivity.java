@@ -337,7 +337,7 @@ public class MainActivity extends AppCompatActivity implements /*Navigation*/Dra
     @Override
     protected void onResume() {
         super.onResume();
-        toolbar.setTitle(grade.getGradeName());
+        toolbar.setTitle("Klasse: " + grade.getGradeName());
         foreground = true;
         if (NfcAdapter.ACTION_NDEF_DISCOVERED.equals(getIntent().getAction())) {
             processIntent(getIntent());
@@ -645,44 +645,13 @@ public class MainActivity extends AppCompatActivity implements /*Navigation*/Dra
     @Override
     public void onShareTimeTable() {
         try {
-            encodeBarcode("TEXT_TYPE", TimeTableHelper.getURLForShare(dbHandler.getTimeTable(grade), grade, ";", "+"));
+            String URL = TimeTableHelper.getURLForShare(dbHandler.getTimeTable(grade), grade, ";", "+");
+            ShareDialog shareDialog = ShareDialog.newInstance(URL);
+            shareDialog.show(getFragmentManager(), "TAG");
         } catch (DBError error) {
             error.printStackTrace();
         }
 
-    }
-
-    private void encodeBarcode(CharSequence type, CharSequence data) {
-        try {
-            /*IntentIntegrator integrator = new IntentIntegrator(this);
-            integrator.autoWide();
-            integrator.addExtra("ENCODE_SHOW_CONTENTS", false);
-            integrator.shareText(data, type);*/
-            Intent intent = new Intent();
-            intent.setAction("com.google.zxing.client.android.ENCODE");
-
-            intent.putExtra("ENCODE_TYPE", type);
-            intent.putExtra("ENCODE_DATA", data);
-            intent.putExtra(Intent.EXTRA_TITLE, "Stundenplan");
-            //intent.putExtra(Intents.Encode.FORMAT, BarcodeFormat.CODABAR.toString());
-
-            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
-
-            intent.putExtra("ENCODE_SHOW_CONTENTS", false);
-            //attachMoreExtras(intent); Same as above!
-            startActivity(intent);
-            //startActivityForResult(intent, 230799);
-        } catch (Exception e) {
-            try {
-                Uri marketUri = Uri.parse("market://details?id=com.google.zxing.client.android");
-                Intent marketIntent = new Intent(Intent.ACTION_VIEW, marketUri);
-                startActivity(marketIntent);
-            } catch (Exception ex) {
-                ex.printStackTrace();
-            }
-
-        }
     }
 
     @Override
@@ -700,8 +669,9 @@ public class MainActivity extends AppCompatActivity implements /*Navigation*/Dra
     public NdefMessage createNdefMessage(NfcEvent event) {
         String text = ("No SP");
         try {
-            HWLesson[] hwLessons = dbHandler.getTimeTable(new HWGrade(Preferences.readStringFromPreferences(this, getString(R.string.SELECTED_GRADE), "")));
+            HWLesson[] hwLessons = dbHandler.getTimeTable(grade);
             text = TimeTableHelper.getURLForShare(hwLessons, grade, ";", "+");
+            if (devMode) Log.d(TAG, text);
         } catch (DBError error) {
             error.printStackTrace();
         }

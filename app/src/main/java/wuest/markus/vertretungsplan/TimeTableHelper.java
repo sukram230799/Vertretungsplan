@@ -390,34 +390,35 @@ public class TimeTableHelper {
 
     public static String getURLForShare(HWLesson[] hwLessons, HWGrade grade, String itemSeparator, String lineSeparator) {
         ArrayList<HWLesson[]> combinedData = new ArrayList<>();
-        for(HWLesson lesson : hwLessons){
+        for (HWLesson lesson : hwLessons) {
             boolean found = false;
-            for(HWLesson[] usedLessonArray : combinedData) {
-                for (HWLesson usedLesson: usedLessonArray){
-                    if(usedLesson == lesson){
+            for (HWLesson[] usedLessonArray : combinedData) {
+                for (HWLesson usedLesson : usedLessonArray) {
+                    if (usedLesson == lesson) {
                         found = true;
                         break;
                     }
                 }
             }
-            if(!found){
+            if (!found) {
                 combinedData.add(CombineData.getSimilarLessons(lesson, hwLessons));
             }
         }
         if (hwLessons.length > 0) {
             String URL = "http://vp-edit.ga/?grade=" + grade.getGradeName() + "&table=";
             for (HWLesson[] lessons : combinedData) {
-                    String hours = "";
-                    for (HWLesson lesson : lessons) {
-                        hours += lesson.getHour() + "_";
-                    }
-                    URL += lessons[0].getDay() + itemSeparator +
-                            hours + itemSeparator +
-                            lessons[0].getTeacher() + itemSeparator +
-                            lessons[0].getSubject() + itemSeparator +
-                            lessons[0].getRoom() + itemSeparator +
-                            lessons[0].getRepeatType() + lineSeparator;
-                    Log.d(TAG, hours);
+                Log.d(TAG, combinedData.toString());
+                String hours = "";
+                for (HWLesson lesson : lessons) {
+                    hours += lesson.getHour() + "_";
+                }
+                URL += lessons[0].getDay() + itemSeparator +
+                        hours + itemSeparator +
+                        lessons[0].getTeacher() + itemSeparator +
+                        lessons[0].getSubject() + itemSeparator +
+                        lessons[0].getRoom() + itemSeparator +
+                        lessons[0].getRepeatType() + lineSeparator;
+                Log.d(TAG, hours);
             }
             return URL;
             /*try {
@@ -626,7 +627,7 @@ public class TimeTableHelper {
                 }
             }
         }
-        return null;
+        return hwTime;
     }
 
     public static HWTime getPreviousHWTime(HWTime hwTime, Integer[] lessonDays) {
@@ -644,7 +645,7 @@ public class TimeTableHelper {
                 }
             }
         }
-        return null;
+        return hwTime;
     }
 
     public static String[] findSubscribableSubjects(HWLesson[] lessons) {
