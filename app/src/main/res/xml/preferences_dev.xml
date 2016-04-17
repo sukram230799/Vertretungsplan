@@ -5,6 +5,15 @@
         <wuest.markus.vertretungsplan.GradeListPreference
             android:key="@string/SELECTED_GRADE"
             android:title="@string/mygrade" />
+        <PreferenceScreen android:title="Layout">
+            <EditTextPreference
+                android:inputType="number"
+                android:numeric="integer"
+                android:key="@string/DAYS_BACK"
+                android:summary="Anzahl der Tage, die im Wochenplan zurück gegangen werden kann"
+                android:title="Max. vergangene Tage"
+                />
+        </PreferenceScreen>
     </PreferenceCategory>
     <PreferenceCategory android:title="Automatisch Laden">
         <CheckBoxPreference
@@ -26,7 +35,7 @@
             android:title="@string/notification"
             android:summary="@string/notification_inform"/>
     </PreferenceCategory>
-    <PreferenceScreen android:title="Farben">
+    <!--<PreferenceScreen android:title="Farben">
         <wuest.markus.colorpicker.ColorPreference
             android:key="dash_colorkey"
             android:title="Preference Title"
@@ -36,7 +45,7 @@
             android:positiveButtonText="@null"
             app:numColumns="5"
             app:itemLayout="@layout/dash_grid_item_color"/>
-    </PreferenceScreen>
+    </PreferenceScreen>-->
     <PreferenceCategory android:title="Erweitertes">
         <CheckBoxPreference
             android:defaultValue="true"

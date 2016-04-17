@@ -13,7 +13,7 @@ import android.nfc.NdefMessage;
 import android.nfc.NdefRecord;
 import android.nfc.NfcAdapter;
 import android.nfc.NfcEvent;
-import android.os.Build;
+import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.os.Parcelable;
@@ -21,10 +21,8 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.text.InputType;
-import android.text.format.Time;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -216,6 +214,7 @@ public class MainActivity extends AppCompatActivity implements /*Navigation*/Dra
 
     private ProgressDialog progressDialog;
     private SwipeRefreshLayout refreshLayout = null;
+    private HWGrade grade;
 
     public static final String TAG = "MainActivity";
     /* Not used because defined in strings.xml
@@ -291,7 +290,7 @@ public class MainActivity extends AppCompatActivity implements /*Navigation*/Dra
 
         Intent intent = getIntent();
         Uri data = intent.getData();
-        if(data != null) {
+        if (data != null) {
             Log.d(TAG, data.getHost());
             Log.d(TAG, data.getPath());
             Log.d(TAG, data.getQuery());
@@ -338,6 +337,7 @@ public class MainActivity extends AppCompatActivity implements /*Navigation*/Dra
     @Override
     protected void onResume() {
         super.onResume();
+        toolbar.setTitle(grade.getGradeName());
         foreground = true;
         if (NfcAdapter.ACTION_NDEF_DISCOVERED.equals(getIntent().getAction())) {
             processIntent(getIntent());
@@ -358,11 +358,7 @@ public class MainActivity extends AppCompatActivity implements /*Navigation*/Dra
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
-            if (Build.VERSION.SDK_INT > Build.VERSION_CODES.HONEYCOMB) {
-                startActivity(new Intent(this, Settings.class));
-            } else {
-                startActivity(new Intent(this, SettingsActivity.class));
-            }
+            startActivity(new Intent(this, Settings.class));
             return true;
         } else if (id == R.id.about) {
             startActivity(new Intent(this, About.class));
@@ -543,7 +539,6 @@ public class MainActivity extends AppCompatActivity implements /*Navigation*/Dra
             isVP = false;
         }*/
         /*if (isVP) {*/
-        HWGrade grade;
 
         try {
             grade = dbHandler.getGrade(position);

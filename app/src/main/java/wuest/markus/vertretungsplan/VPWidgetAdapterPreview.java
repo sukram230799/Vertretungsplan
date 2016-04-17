@@ -24,6 +24,8 @@ public class VPWidgetAdapterPreview extends ArrayAdapter<Object> {
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
+        View vpLayout;
+        View spLayout;
 
         TextView spTextHour;
         TextView spTextTeacher;
@@ -153,6 +155,7 @@ public class VPWidgetAdapterPreview extends ArrayAdapter<Object> {
                 }
                 break;
             case 3:
+                vpLayout = convertView.findViewById(R.id.vpLayout);
                 vpTextDate = (TextView) convertView.findViewById(R.id.vpTextDate);
                 vpTextHour = (TextView) convertView.findViewById(R.id.vpTextHour);
                 vpTextSubject = (TextView) convertView.findViewById(R.id.vpTextSubject);
@@ -160,7 +163,7 @@ public class VPWidgetAdapterPreview extends ArrayAdapter<Object> {
                 vpTextInfo1 = (TextView) convertView.findViewById(R.id.vpTextInfo1);
                 vpTextInfo2 = (TextView) convertView.findViewById(R.id.vpTextInfo2);
 
-
+                spLayout = convertView.findViewById(R.id.spLayout);
                 spTextHour = (TextView) convertView.findViewById(R.id.spTextHour);
                 spTextTeacher = (TextView) convertView.findViewById(R.id.spTextTeacher);
                 spTextSubject = (TextView) convertView.findViewById(R.id.spTextSubject);
@@ -177,8 +180,50 @@ public class VPWidgetAdapterPreview extends ArrayAdapter<Object> {
                     spTextBreak.setVisibility(View.VISIBLE);
                     spTextHour.setText(text[0]);
                     spTextBreak.setText(text[1]);
-                } else {
+                } else  if(text.length == 6){
+                    spTextBreak.setVisibility(View.GONE);
 
+                    spTextHour.setVisibility(View.VISIBLE);
+                    spTextTeacher.setVisibility(View.VISIBLE);
+                    spTextSubject.setVisibility(View.VISIBLE);
+                    spTextRoom.setVisibility(View.VISIBLE);
+                    spTextRepeatType.setVisibility(View.VISIBLE);
+
+                    vpTextDate.setVisibility(View.VISIBLE);
+                    vpTextHour.setVisibility(View.VISIBLE);
+                    vpTextSubject.setVisibility(View.VISIBLE);
+                    vpTextRoom.setVisibility(View.VISIBLE);
+                    vpTextInfo1.setVisibility(View.VISIBLE);
+                    vpTextInfo2.setVisibility(View.VISIBLE);
+
+                    spTextHour.setText(text[1]);
+                    spTextTeacher.setText("VP!");
+                    spTextSubject.setText(text[2]);
+                    spTextRoom.setText(text[3]);
+                    spTextRepeatType.setText("");
+
+                    vpTextDate.setText(text[0]);
+                    vpTextHour.setText(text[1]);
+                    vpTextSubject.setText(text[2]);
+                    vpTextRoom.setText(text[3]);
+                    vpTextInfo1.setText(text[4]);
+                    vpTextInfo2.setText(text[5]);
+                } else if(text.length == 5) {
+                    spTextBreak.setVisibility(View.GONE);
+
+                    spTextHour.setVisibility(View.VISIBLE);
+                    spTextTeacher.setVisibility(View.VISIBLE);
+                    spTextSubject.setVisibility(View.VISIBLE);
+                    spTextRoom.setVisibility(View.VISIBLE);
+                    spTextRepeatType.setVisibility(View.VISIBLE);
+
+                    vpLayout.setVisibility(View.GONE);
+
+                    spTextHour.setText(text[0]);
+                    spTextTeacher.setText(text[1]);
+                    spTextSubject.setText(text[2]);
+                    spTextRoom.setText(text[3]);
+                    spTextRepeatType.setText(text[4]);
                 }
                 break;
             default:
