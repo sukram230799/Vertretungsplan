@@ -23,9 +23,10 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
-            android:padding="@dimen/abc_select_dialog_padding_start_material"
             android:text="Zum Teilen müssen nur die beiden Geräte mit der Rückseite gegeneinander gehalten werden. Nach der Vibration muss der Teilende mit einem Klick auf den Bildschirm die Übertragung bestätigen."
-            android:textAppearance="?android:attr/textAppearanceMedium" />
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:paddingLeft="@dimen/abc_select_dialog_padding_start_material"
+            android:paddingRight="@dimen/abc_select_dialog_padding_start_material" />
 
         <ImageView
             android:id="@+id/imageView2"

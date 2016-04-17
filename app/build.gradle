@@ -8,8 +8,8 @@ android {
         applicationId "wuest.markus.vertretungsplan"
         minSdkVersion 16
         targetSdkVersion 23
-        versionCode 16
-        versionName "1.0.5.alpha9"
+        versionCode 18
+        versionName "1.1.0.alpha11"
     }
     buildTypes {
         release {

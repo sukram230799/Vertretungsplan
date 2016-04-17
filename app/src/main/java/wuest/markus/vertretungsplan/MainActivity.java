@@ -37,7 +37,8 @@ public class MainActivity extends AppCompatActivity implements /*Navigation*/Dra
         VPFragment.RefreshContentListener, TimeTableFragment.RefreshContentListener,
         TabbedTimeTableFragment.EditInterface, TimeTableFragment.EditInterface, PlanFragment.EditInterface,
         SubjectChooserDialog.OnReloadData, TabbedPlanFragment.EditInterface, NfcAdapter.CreateNdefMessageCallback,
-        NfcAdapter.OnNdefPushCompleteCallback, TabbedPlanFragment.RefreshContentListener, TabbedTimeTableFragment.RefreshContentListener {
+        NfcAdapter.OnNdefPushCompleteCallback, TabbedPlanFragment.RefreshContentListener, TabbedTimeTableFragment.RefreshContentListener,
+        ShareDialog.QRRead {
 
     Handler vpHandler = new Handler() {
         @Override
@@ -417,24 +418,7 @@ public class MainActivity extends AppCompatActivity implements /*Navigation*/Dra
                 error.printStackTrace();
             }
         } else if (id == R.id.getQR) {
-            try {
-
-                Intent intent = new Intent("com.google.zxing.client.android.SCAN");
-                intent.putExtra("SCAN_MODE", "QR_CODE_MODE"); // "PRODUCT_MODE for bar codes
-
-                startActivityForResult(intent, 0);
-
-            } catch (Exception e) {
-
-                Uri marketUri = Uri.parse("market://details?id=com.google.zxing.client.android");
-                Intent marketIntent = new Intent(Intent.ACTION_VIEW, marketUri);
-                try {
-                    startActivity(marketIntent);
-                } catch (Exception ex) {
-                    ex.printStackTrace();
-                }
-
-            }
+            readQR();
         } else if (id == R.id.addTimeTableCSV) {
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
             builder.setTitle("CSV Import");
@@ -475,6 +459,26 @@ public class MainActivity extends AppCompatActivity implements /*Navigation*/Dra
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void readQR() {
+        try {
+            Intent intent = new Intent("com.google.zxing.client.android.SCAN");
+            intent.putExtra("SCAN_MODE", "QR_CODE_MODE"); // "PRODUCT_MODE for bar codes
+
+            startActivityForResult(intent, 0);
+
+        } catch (Exception e) {
+
+            Uri marketUri = Uri.parse("market://details?id=com.google.zxing.client.android");
+            Intent marketIntent = new Intent(Intent.ACTION_VIEW, marketUri);
+            try {
+                startActivity(marketIntent);
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+        }
     }
 
     private int position = -1;
@@ -647,6 +651,7 @@ public class MainActivity extends AppCompatActivity implements /*Navigation*/Dra
         try {
             String URL = TimeTableHelper.getURLForShare(dbHandler.getTimeTable(grade), grade, ";", "+");
             ShareDialog shareDialog = ShareDialog.newInstance(URL);
+            shareDialog.setQrRead(this);
             shareDialog.show(getFragmentManager(), "TAG");
         } catch (DBError error) {
             error.printStackTrace();

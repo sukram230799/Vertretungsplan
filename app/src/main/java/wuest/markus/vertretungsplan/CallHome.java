@@ -76,6 +76,9 @@ public class CallHome implements Runnable {
                             Log.d(TAG, remoteversion[i]);
                             int rv = Integer.parseInt(remoteversion[i]);
                             Log.d(TAG, String.valueOf(rv));
+                            if(lv > rv){
+                                break;
+                            }
                             if (lv < rv) {
                                 update = true;
                                 Bundle bundle = new Bundle();

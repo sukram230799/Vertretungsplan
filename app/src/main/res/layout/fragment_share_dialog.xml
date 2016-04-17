@@ -10,9 +10,11 @@
         android:orientation="vertical">
 
         <LinearLayout
+            android:id="@+id/linearLayoutNFC"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:layout_gravity="center_horizontal">
+            android:layout_gravity="center_horizontal"
+            android:orientation="horizontal">
 
             <TextView
                 android:id="@+id/textView"
@@ -23,11 +25,11 @@
                 android:textAppearance="?android:attr/textAppearanceLarge" />
 
             <ImageView
+                android:id="@+id/imageViewNFCHelp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:id="@+id/imageViewNFCHelp"
-                android:src="@drawable/ic_help_black_18dp"
-                android:paddingStart="5dp" />
+                android:paddingStart="5dp"
+                android:src="@drawable/ic_help_black_18dp" />
         </LinearLayout>
 
         <ImageButton
@@ -45,12 +47,27 @@
             android:text="QR"
             android:textAppearance="?android:attr/textAppearanceLarge" />
 
-        <ImageButton
-            android:id="@+id/imageButtonQR"
+        <LinearLayout
+            android:id="@+id/linearLayoutQR"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:layout_gravity="center_horizontal"
-            android:src="@drawable/ic_qrcode_black_36dp" />
+            android:orientation="horizontal">
+
+            <ImageButton
+                android:id="@+id/imageButtonQR"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:src="@drawable/ic_qrcode_black_36dp" />
+
+            <ImageButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/imageButtonQRScan"
+                android:src="@drawable/ic_qrcode_scan_black_36dp" />
+
+        </LinearLayout>
 
         <TextView
             android:id="@+id/textView4"

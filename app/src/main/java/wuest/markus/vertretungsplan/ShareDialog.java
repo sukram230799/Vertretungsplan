@@ -12,6 +12,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -19,6 +20,8 @@ public class ShareDialog extends DialogFragment {
 
     private static final String URL = "URL";
     private String link = "";
+
+    private QRRead qrRead;
 
     public static ShareDialog newInstance(String link) {
 
@@ -41,8 +44,8 @@ public class ShareDialog extends DialogFragment {
 
         View view = getActivity().getLayoutInflater().inflate(R.layout.fragment_share_dialog, null);
 
-        ImageView imageViewNFCHelp = (ImageView) view.findViewById(R.id.imageViewNFCHelp);
-        imageViewNFCHelp.setOnClickListener(new View.OnClickListener() {
+        LinearLayout linearLayoutNFC = (LinearLayout) view.findViewById(R.id.linearLayoutNFC);
+        linearLayoutNFC.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 HelpDialog helpDialog = HelpDialog.newInstance(1);
@@ -59,6 +62,7 @@ public class ShareDialog extends DialogFragment {
                 } else {
                     startActivity(new Intent(android.provider.Settings.ACTION_WIRELESS_SETTINGS));
                 }
+                dismiss();
             }
         });
 
@@ -67,6 +71,20 @@ public class ShareDialog extends DialogFragment {
             @Override
             public void onClick(View v) {
                 encodeBarcode("TEXT_TYPE", link);
+                dismiss();
+            }
+        });
+
+        ImageButton imageButtonQRScan = (ImageButton) view.findViewById(R.id.imageButtonQRScan);
+        imageButtonQRScan.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (qrRead != null) {
+                    qrRead.readQR();
+                } else {
+                    Toast.makeText(getActivity(), "QR Lesen ist momentan nicht möglich.", Toast.LENGTH_LONG).show();
+                }
+                dismiss();
             }
         });
 
@@ -76,9 +94,10 @@ public class ShareDialog extends DialogFragment {
             public void onClick(View v) {
                 Intent sendIntent = new Intent();
                 sendIntent.setAction(Intent.ACTION_SEND);
-                sendIntent.putExtra(Intent.EXTRA_TEXT, "Stundenplan:\n" + link);
+                sendIntent.putExtra(Intent.EXTRA_TEXT, "Stundenplan:\n\n" + link);
                 sendIntent.setType("text/plain");
-                startActivity(sendIntent);
+                startActivity(Intent.createChooser(sendIntent, "Stundenplan versenden"));
+                dismiss();
             }
         });
 
@@ -104,6 +123,7 @@ public class ShareDialog extends DialogFragment {
                     Toast.makeText(getActivity(), "WhatsApp not Installed", Toast.LENGTH_SHORT)
                             .show();
                 }
+                dismiss();
             }
         });
 
@@ -154,5 +174,13 @@ public class ShareDialog extends DialogFragment {
             }
 
         }
+    }
+
+    public void setQrRead(QRRead qrRead) {
+        this.qrRead = qrRead;
+    }
+
+    public interface QRRead {
+        void readQR();
     }
 }
