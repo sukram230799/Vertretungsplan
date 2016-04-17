@@ -26,13 +26,17 @@ public class PlanPagerAdapter extends FragmentPagerAdapter implements PlanFragme
     HWGrade grade;
     private RefreshContentListener refreshListener;
     private Context context;
+    private int pastDays;
+    private int futureDays;
 
-    public PlanPagerAdapter(FragmentManager fm, HWGrade grade, Context context) {
+    public PlanPagerAdapter(FragmentManager fm, HWGrade grade, Context context, int pastDays, int futureDays) {
         super(fm);
         this.grade = grade;
         fragments = new ArrayList<>();
+        this.pastDays = pastDays;
+        this.futureDays = futureDays;
         lessonDays = new DBHandler(context, null, null, 0).getDaysWithLessons(grade);
-        dates = new ArrayList<>(Arrays.asList(TimeTableHelper.getHWTimes(lessonDays)));
+        dates = new ArrayList<>(Arrays.asList(TimeTableHelper.getHWTimes(lessonDays, pastDays, futureDays)));
         for (HWTime time : dates) {
             fragments.add(PlanFragment.newInstance(grade, time, false));
         }
@@ -42,7 +46,7 @@ public class PlanPagerAdapter extends FragmentPagerAdapter implements PlanFragme
     @Override
     public Fragment getItem(int position) {
         while (position >= dates.size()) {
-            addNewDate();
+            addFutureDate();
         }
         PlanFragment planFragment = fragments.get(position);
         planFragment.setRefreshListener(this);
@@ -58,18 +62,23 @@ public class PlanPagerAdapter extends FragmentPagerAdapter implements PlanFragme
         return dates.size();
     }
 
-    private void addNewDate() {
-        dates.add(
-                TimeTableHelper.getNextHWTime(dates.get(dates.size() - 1), lessonDays));
+    private void addFutureDate() {
+        dates.add(TimeTableHelper.getNextHWTime(dates.get(dates.size() - 1), lessonDays));
         fragments.add(PlanFragment.newInstance(grade, dates.get(dates.size() - 1), false));
         notifyDataSetChanged();
     }
+
+    /*private void addPastDate() {
+        dates.add(0, TimeTableHelper.getNextHWTime(dates.get(dates.size() - 1), lessonDays));
+        fragments.add(PlanFragment.newInstance(grade, dates.get(dates.size() - 1), false));
+        notifyDataSetChanged();
+    }*/
 
     @Override
     public CharSequence getPageTitle(int position) {
         SimpleDateFormat sdf = new SimpleDateFormat("dd. MMM");
         while (position >= dates.size()) {
-            addNewDate();
+            addFutureDate();
         }
         Calendar calendar = new GregorianCalendar();
         Log.d(TAG, DBHandler.dbDateFormat.format(dates.get(position).toDate()));
@@ -86,6 +95,10 @@ public class PlanPagerAdapter extends FragmentPagerAdapter implements PlanFragme
         } else {
             refreshListener.refreshedContent(refreshLayout);
         }
+    }
+
+    private int getCenterDay(){
+        return pastDays;
     }
 
     public int getDay(int itemNumber) {

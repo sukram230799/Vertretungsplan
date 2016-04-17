@@ -76,7 +76,8 @@
     <string name="LINE_SEP">wuest.markus.vertretungsplan.lineSep</string>
     <string name="ITEM_SEP">wuest.markus.vertretungsplan.itemSep</string>
     <string name="SP_CHANGED">wuest.markus.vertretungsplan.spChanged</string><!--boolean-->
-    <string name="DAYS_BACK">wuest.markus.vertretungsplan.daysBack</string>
+    <string name="PAST_DAYS">wuest.markus.vertretungsplan.pastDays</string>
+    <string name="FUTURE_DAYS">wuest.markus.vertretungsplan.futureDays</string>
 
     <string name="QUARTER_LAST_UPDATE">wuest.markus.vertretungsplan.qDate</string>
     <string name="Q1_S">wuest.markus.vertretungsplan.q1s</string>

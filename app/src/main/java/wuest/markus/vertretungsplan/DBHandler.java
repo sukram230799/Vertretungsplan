@@ -529,7 +529,7 @@ public class DBHandler extends SQLiteOpenHelper {
 
     public int getIdFromLesson(HWLesson lesson) {
         SQLiteDatabase db = getWritableDatabase();
-        String query = "SELECT 1 FROM " + TABLE_TIMETABLE + " WHERE " +
+        String query = "SELECT * FROM " + TABLE_TIMETABLE + " WHERE " +
                 COLUMN_DAY + " = \"" + lesson.getDay() + "\" AND " +
                 COLUMN_HOUR + " = \"" + lesson.getHour() + "\" AND " +
                 COLUMN_TEACHER + " = \"" + lesson.getTeacher() + "\" AND " +
@@ -541,6 +541,8 @@ public class DBHandler extends SQLiteOpenHelper {
         Cursor c = db.rawQuery(query, null);
         c.moveToFirst();
         Log.d(TAG, "" + c.getCount());
+        Log.d(TAG, "" + c.getColumnIndex(COLUMN_ID));
+        Log.d(TAG, "" + c.getCount());
         if (!c.isAfterLast()) {
             return c.getInt(c.getColumnIndex(COLUMN_ID));
         }
@@ -550,7 +552,7 @@ public class DBHandler extends SQLiteOpenHelper {
 
     public HWLesson getLessonFromId(int id) {
         SQLiteDatabase db = getWritableDatabase();
-        String query = "SELECT 1  FROM " + TABLE_TIMETABLE + " WHERE " +
+        String query = "SELECT * FROM " + TABLE_TIMETABLE + " WHERE " +
                 COLUMN_ID + " = \"" + id + "\";";
         ArrayList<HWLesson> lessons = parseHours(db.rawQuery(query, null), null);
         if (lessons.isEmpty()) return null;

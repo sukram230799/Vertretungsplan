@@ -645,7 +645,7 @@ public class MainActivity extends AppCompatActivity implements /*Navigation*/Dra
     @Override
     public void onShareTimeTable() {
         try {
-            encodeBarcode("TEXT_TYPE", TimeTableHelper.getURLForShare(dbHandler.getTimeTable(new HWGrade(Preferences.readStringFromPreferences(this, getString(R.string.SELECTED_GRADE), "TG11-2"))), ";", "+"));
+            encodeBarcode("TEXT_TYPE", TimeTableHelper.getURLForShare(dbHandler.getTimeTable(grade), grade, ";", "+"));
         } catch (DBError error) {
             error.printStackTrace();
         }
@@ -701,7 +701,7 @@ public class MainActivity extends AppCompatActivity implements /*Navigation*/Dra
         String text = ("No SP");
         try {
             HWLesson[] hwLessons = dbHandler.getTimeTable(new HWGrade(Preferences.readStringFromPreferences(this, getString(R.string.SELECTED_GRADE), "")));
-            text = TimeTableHelper.getURLForShare(hwLessons, ";", "+");
+            text = TimeTableHelper.getURLForShare(hwLessons, grade, ";", "+");
         } catch (DBError error) {
             error.printStackTrace();
         }

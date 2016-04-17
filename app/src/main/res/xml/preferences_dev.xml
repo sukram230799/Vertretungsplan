@@ -9,9 +9,16 @@
             <EditTextPreference
                 android:inputType="number"
                 android:numeric="integer"
-                android:key="@string/DAYS_BACK"
-                android:summary="Anzahl der Tage, die im Wochenplan zurück gegangen werden kann"
-                android:title="Max. vergangene Tage"
+                android:key="@string/PAST_DAYS"
+                android:summary="Anzahl der Tage, die im Wochenplan automatisch geladen werden"
+                android:title="Geldaene vergangene Tage"
+                />
+            <EditTextPreference
+                android:inputType="number"
+                android:numeric="integer"
+                android:key="@string/FUTURE_DAYS"
+                android:summary="Anzahl der Tage, die im Wochenplan automatisch geladen werden"
+                android:title="Geladene zukünftige Tage"
                 />
         </PreferenceScreen>
     </PreferenceCategory>

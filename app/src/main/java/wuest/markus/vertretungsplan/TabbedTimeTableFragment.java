@@ -57,16 +57,21 @@ public class TabbedTimeTableFragment extends Fragment implements TimeTablePagerA
         }
     }
 
+    int pastDays;
+    int futureDays;
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_tabbed_time_table, container, false);
         pager = (ViewPager) view.findViewById(R.id.pager);
-        pagerAdapter = new TimeTablePagerAdapter(getChildFragmentManager(), grade, getActivity());
+        pastDays = Integer.parseInt(Preferences.readStringFromPreferences(getActivity(), getString(R.string.PAST_DAYS), "3"));
+        futureDays = Integer.parseInt(Preferences.readStringFromPreferences(getActivity(), getString(R.string.FUTURE_DAYS), "3"));
+        pagerAdapter = new TimeTablePagerAdapter(getChildFragmentManager(), grade, getActivity(), pastDays, futureDays);
         pagerAdapter.setRefreshListener(this);
         pagerTabStrip = (PagerTabStrip) view.findViewById(R.id.pager_tab_strip);
         pager.setAdapter(pagerAdapter);
-        pager.setCurrentItem(2);
+        pager.setCurrentItem(pastDays);
         //fab = (FloatingActionButton) view.findViewById(R.id.fab);
 
 

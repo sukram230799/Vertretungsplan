@@ -25,6 +25,21 @@ public class CombineData {
         return dataArrayList.toArray(new VPData[dataArrayList.size()]);
     }
 
+    public static HWLesson[] getSimilarLessons(HWLesson compare, HWLesson[] rest) {
+        ArrayList<HWLesson> lessonArrayList = new ArrayList<>();
+        for (HWLesson hwLesson : rest) {
+            if (hwLesson.getDay() == compare.getDay() &&
+                    hwLesson.getGrade().getGradeName().equals(compare.getGrade().getGradeName()) &&
+                    hwLesson.getTeacher().equals(compare.getTeacher()) &&
+                    hwLesson.getSubject().equals(compare.getSubject()) &&
+                    hwLesson.getRoom().equals(compare.getRoom()) &&
+                    hwLesson.getRepeatType().equals(compare.getRepeatType())) {
+                lessonArrayList.add(hwLesson);
+            }
+        }
+        return lessonArrayList.toArray(new HWLesson[lessonArrayList.size()]);
+    }
+
     public static Integer[] getSimilarHours(VPData compare, VPData[] rest) {
         ArrayList<Integer> hoursArrayList = new ArrayList<>();
         for (VPData data : rest) {

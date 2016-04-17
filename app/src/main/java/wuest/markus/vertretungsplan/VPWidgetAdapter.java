@@ -46,9 +46,14 @@ public class VPWidgetAdapter implements RemoteViewsFactory {
         HWGrade grade = new HWGrade(Preferences.readStringFromPreferences(context, context.getString(R.string.SELECTED_GRADE), ""));
         try {
             int type = VPWidgetConfigureActivity.loadGradePref(context, appWidgetId);
-            int day = Calendar.getInstance().get(Calendar.DAY_OF_WEEK);
-            int week = Calendar.getInstance().get(Calendar.WEEK_OF_YEAR);
-            HWTime time = new HWTime(Calendar.getInstance());
+            Integer[] lessonDays = dbHandler.getDaysWithLessons(grade);
+            Calendar c = Calendar.getInstance();
+            c.add(Calendar.DATE, -1);
+            HWTime time = new HWTime(c);
+            time = TimeTableHelper.getNextHWTime(time, lessonDays);
+            c.setTime(time.toDate());
+            int day = c.get(Calendar.DAY_OF_WEEK);
+            int week = c.get(Calendar.WEEK_OF_YEAR);
             String[] subscribedSubjects = dbHandler.getSubscribedSubjects();
             if (type <= 1) {
                 arrayList = new ArrayList<>();

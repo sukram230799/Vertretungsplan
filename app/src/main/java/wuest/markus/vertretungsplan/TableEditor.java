@@ -245,7 +245,7 @@ public class TableEditor extends AppCompatActivity implements HourPickerDialog.N
                     }
                 } else {
                     for(int hour = startHour; hour <= endHour; hour++){
-                        dbHandler.removeLessons((Integer[]) ids.toArray());
+                        dbHandler.removeLessons(ids.toArray(new Integer[ids.size()]));
                         dbHandler.addLesson(new HWLesson(-1, new HWGrade(textGrade.getText().toString().trim()),
                                 hour,
                                 day,
