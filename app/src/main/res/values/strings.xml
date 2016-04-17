@@ -28,7 +28,7 @@
     <string name="datebuilder">%1$s, den %2$s</string>
     <string name="fillwith_builder">Bitte %1$s eingeben.</string>
 
-    <string name="teacher">Lehrer</string>
+    <string name="spTeacher">Lehrer</string>
     <string name="grade">Klasse</string>
     <string name="day">Tag</string>
     <string name="hour">Stunde</string>
@@ -87,7 +87,7 @@
     <string name="Q4_S">wuest.markus.vertretungsplan.q4s</string>
     <string name="Q4_E">wuest.markus.vertretungsplan.q4e</string>
 
-    <string name="update_avaliable">update_avaliable</string>
+    <string name="update_available">update_available</string>
 
     <string name="notification">Benachrichtigung</string>
     <string name="developermode">Entwickler Modus</string>

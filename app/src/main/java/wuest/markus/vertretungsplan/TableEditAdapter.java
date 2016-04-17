@@ -52,7 +52,7 @@ public class TableEditAdapter extends RecyclerView.Adapter<TableEditAdapter.Tabl
 
             holder.textBreak.setVisibility(View.VISIBLE);
         } else {
-            holder.textHour.setText(CombineData.hoursString(table.get(position).getHours(), true));
+            holder.textHour.setText(String.valueOf(table.get(position).getHour()));
 
             holder.textHour.setVisibility(View.VISIBLE);
             holder.textTeacher.setVisibility(View.VISIBLE);
@@ -94,7 +94,7 @@ public class TableEditAdapter extends RecyclerView.Adapter<TableEditAdapter.Tabl
         holder.textTeacher.setText(table.get(position).getTeacher());
         holder.textSubject.setText(table.get(position).getSubject());
         holder.textRoom.setText(table.get(position).getRoom());
-        //holder.spTextRoom.setText(TimeTableHelper.getRepeatTypeName(plan.get(position).getRepeatType()));
+        //holder.spTextRoom.setText(TimeTableHelper.getRepeatTypeName(plan.get(position).getSpRepeatType()));
         holder.textRepeatType.setText(table.get(position).getRepeatType());
         holder.checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
@@ -195,29 +195,27 @@ public class TableEditAdapter extends RecyclerView.Adapter<TableEditAdapter.Tabl
         }
     }
 
-    public HWLesson getSelectedLesson() {
+    public Integer[] getSelectedLessonIds() {
         if (selectedLessons.isEmpty()) {
-            return null;
+            return new Integer[0];
         } else {
             /*for (HWLesson lesson : plan) {
                 for (int hour : lesson.getHours()) {
                     for (int chour : selectedLessons) {
                         if (hour == chour) {
                             return new HWLesson(lesson.getGrade(), selectedLessons.toArray(new Integer[selectedLessons.size()]),
-                                    lesson.getDay(), lesson.getTeacher(), lesson.getSubject(), lesson.getRoom(), lesson.getRepeatType());
+                                    lesson.getDay(), lesson.getSpTeacher(), lesson.getSubject(), lesson.getRoom(), lesson.getSpRepeatType());
                         }
                     }
                 }
             }*/
-            ArrayList<Integer> hours = new ArrayList<>();
+            DBHandler dbHandler = new DBHandler(context, null, null, 0);
+            ArrayList<Integer> ids = new ArrayList<>();
             for (int pos : selectedLessons) {
-                for (int hour : table.get(pos).getHours()) {
-                    hours.add(((Integer) hour));
-                }
+                ids.add(((Integer) dbHandler.getIdFromLesson(table.get(pos))));
             }
             HWLesson lesson = table.get(selectedLessons.get(0));
-            return new HWLesson(lesson.getGrade(), hours.toArray(new Integer[hours.size()]),
-                    lesson.getDay(), lesson.getTeacher(), lesson.getSubject(), lesson.getRoom(), lesson.getRepeatType());
+            return ids.toArray(new Integer[ids.size()]);
             //return null;
         }
     }

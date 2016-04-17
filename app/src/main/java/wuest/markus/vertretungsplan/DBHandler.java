@@ -17,7 +17,7 @@ public class DBHandler extends SQLiteOpenHelper {
 
     private static final int DATABASE_VERSION = 4;
     private static final String DATABASE_NAME = "Vertretungsplan.db";
-    private static Context context;
+    private Context context;
 
     public static final String TABLE_GRADES = "grades";
     public static final String COLUMN_ID = "_id";
@@ -253,7 +253,7 @@ public class DBHandler extends SQLiteOpenHelper {
         }
     }
 
-    public VPData[] getVP(HWGrade grade) throws DBError{
+    public VPData[] getVP(HWGrade grade) throws DBError {
         return getVP(grade, null);
     }
 
@@ -265,7 +265,8 @@ public class DBHandler extends SQLiteOpenHelper {
         String query;
         //String query = "SELECT * FROM " + TABLE_VP + " WHERE " + COLUMN_DATE + ">= date(" + sdf.format(new Date()) + ");"; //Not used because of sorting with deleting of old entrys!
         query = "SELECT * FROM " + TABLE_VP + " WHERE " + COLUMN_GRADE + "=\"" + grade.getGradeName() + "\"";
-        if(date != null) query += " AND " + COLUMN_DATE + "=\"" + dbDateFormat.format(date.toDate()) + "\"";
+        if (date != null)
+            query += " AND " + COLUMN_DATE + "=\"" + dbDateFormat.format(date.toDate()) + "\"";
         query += " ORDER BY " + COLUMN_DATE + ", " + COLUMN_HOUR + " ASC";
         Cursor c = db.rawQuery(query, null);
         c.moveToFirst();
@@ -281,8 +282,10 @@ public class DBHandler extends SQLiteOpenHelper {
                 Log.d(TAG, "2");
                 try {
                     Log.d(TAG, "3");
-                    vpDatas.add(new VPData(grade,
-                            new Integer[]{c.getInt(c.getColumnIndex(COLUMN_HOUR))},
+                    vpDatas.add(new VPData(
+                            c.getInt(c.getColumnIndex(COLUMN_ID)),
+                            grade,
+                            c.getInt(c.getColumnIndex(COLUMN_HOUR)),
                             c.getString(c.getColumnIndex(COLUMN_SUBJECT)),
                             c.getString(c.getColumnIndex(COLUMN_ROOM)),
                             c.getString(c.getColumnIndex(COLUMN_INFO1)),
@@ -314,18 +317,16 @@ public class DBHandler extends SQLiteOpenHelper {
         ContentValues values = new ContentValues();
         Log.d(TAG, "$addDayPlan:before for");
         for (VPData data : vpDatas) {
-            for (Integer hour : data.getHours()) {
-                Log.d(TAG, "$addDayPlan:for");
-                values.put(COLUMN_DATE, dbDateFormat.format(data.getDate()));
-                values.put(COLUMN_GRADE, data.getGrade().getGradeName());
-                values.put(COLUMN_HOUR, hour);
-                values.put(COLUMN_SUBJECT, data.getSubject());
-                values.put(COLUMN_ROOM, data.getRoom());
-                values.put(COLUMN_INFO1, data.getInfo1());
-                values.put(COLUMN_INFO2, data.getInfo2());
-                db.insert(TABLE_VP, null, values);
-                values = new ContentValues();
-            }
+            Log.d(TAG, "$addDayPlan:for");
+            values.put(COLUMN_DATE, dbDateFormat.format(data.getDate()));
+            values.put(COLUMN_GRADE, data.getGrade().getGradeName());
+            values.put(COLUMN_HOUR, data.getHour());
+            values.put(COLUMN_SUBJECT, data.getSubject());
+            values.put(COLUMN_ROOM, data.getRoom());
+            values.put(COLUMN_INFO1, data.getInfo1());
+            values.put(COLUMN_INFO2, data.getInfo2());
+            db.insert(TABLE_VP, null, values);
+            values = new ContentValues();
         }
         Log.d(TAG, "-addDayPlan");
     }
@@ -369,19 +370,17 @@ public class DBHandler extends SQLiteOpenHelper {
 
     public void addLesson(HWLesson hwLesson) {
         Log.d(TAG, "@addLesson()");
-        for (int hour : hwLesson.getHours()) {
-            ContentValues values = new ContentValues();
-            values.put(COLUMN_GRADE, hwLesson.getGrade().getGradeName());
-            values.put(COLUMN_HOUR, hour);
-            values.put(COLUMN_DAY, hwLesson.getDay());
-            values.put(COLUMN_TEACHER, hwLesson.getTeacher());
-            values.put(COLUMN_SUBJECT, hwLesson.getSubject());
-            values.put(COLUMN_ROOM, hwLesson.getRoom());
-            values.put(COLUMN_REPEATTYPE, hwLesson.getRepeatType());
+        ContentValues values = new ContentValues();
+        values.put(COLUMN_GRADE, hwLesson.getGrade().getGradeName());
+        values.put(COLUMN_HOUR, hwLesson.getHour());
+        values.put(COLUMN_DAY, hwLesson.getDay());
+        values.put(COLUMN_TEACHER, hwLesson.getTeacher());
+        values.put(COLUMN_SUBJECT, hwLesson.getSubject());
+        values.put(COLUMN_ROOM, hwLesson.getRoom());
+        values.put(COLUMN_REPEATTYPE, hwLesson.getRepeatType());
 
-            SQLiteDatabase db = getWritableDatabase();
-            db.insert(TABLE_TIMETABLE, null, values);
-        }
+        SQLiteDatabase db = getWritableDatabase();
+        db.insert(TABLE_TIMETABLE, null, values);
 
         Log.d(TAG, "-addLesson()");
     }
@@ -436,8 +435,11 @@ public class DBHandler extends SQLiteOpenHelper {
                     c.getString(c.getColumnIndex(COLUMN_REPEATTYPE)) != null
                     ) {
                 Log.d(TAG, "2");
-                hwLessons.add(new HWLesson(grade,
-                        new Integer[]{c.getInt(c.getColumnIndex(COLUMN_HOUR))},
+                if (grade == null) grade = new HWGrade(c.getString(c.getColumnIndex(COLUMN_GRADE)));
+                hwLessons.add(new HWLesson(
+                        c.getInt(c.getColumnIndex(COLUMN_ID)),
+                        grade,
+                        c.getInt(c.getColumnIndex(COLUMN_HOUR)),
                         c.getInt(c.getColumnIndex(COLUMN_DAY)),
                         c.getString(c.getColumnIndex(COLUMN_TEACHER)),
                         c.getString(c.getColumnIndex(COLUMN_SUBJECT)),
@@ -459,21 +461,49 @@ public class DBHandler extends SQLiteOpenHelper {
         addLesson(newLesson);
     }
 
-    public void removeLesson(HWLesson oldLesson){
-        for (int hour : oldLesson.getHours()) {
-            String query = "DELETE FROM " + TABLE_TIMETABLE + " WHERE " +
-                    COLUMN_DAY + " = \"" + oldLesson.getDay() + "\" AND " +
-                    COLUMN_HOUR + " = \"" + hour + "\" AND " +
-                    COLUMN_TEACHER + " = \"" + oldLesson.getTeacher() + "\" AND " +
-                    COLUMN_SUBJECT + " = \"" + oldLesson.getSubject() + "\" AND " +
-                    COLUMN_ROOM + " = \"" + oldLesson.getRoom() + "\" AND " +
-                    COLUMN_REPEATTYPE + " = \"" + oldLesson.getRepeatType() + "\";";
-            Log.d(TAG, query);
-            getWritableDatabase().execSQL(query);
+    public Integer[] getDaysWithLessons(HWGrade grade) {
+        ArrayList<Integer> days = new ArrayList<>();
+        SQLiteDatabase db = getWritableDatabase();
+        for (int i = 1; i <= 7; i++) {
+            String query = "SELECT 1 FROM " + TABLE_TIMETABLE + " WHERE " + COLUMN_GRADE + "=\"" + grade.getGradeName() + "\" AND " + COLUMN_DAY + "=\"" + i + "\";";
+            Cursor c = db.rawQuery(query, null);
+            c.moveToFirst();
+            if (!c.isAfterLast()) {
+                days.add(i);
+                Log.d(TAG, String.valueOf(i));
+            }
+            Log.d(TAG, String.valueOf(i));
+            c.close();
+        }
+        return days.toArray(new Integer[days.size()]);
+    }
+
+    public void removeLesson(HWLesson oldLesson) {
+        String query = "DELETE FROM " + TABLE_TIMETABLE + " WHERE " +
+                COLUMN_DAY + " = \"" + oldLesson.getDay() + "\" AND " +
+                COLUMN_HOUR + " = \"" + oldLesson.getHour() + "\" AND " +
+                COLUMN_TEACHER + " = \"" + oldLesson.getTeacher() + "\" AND " +
+                COLUMN_SUBJECT + " = \"" + oldLesson.getSubject() + "\" AND " +
+                COLUMN_ROOM + " = \"" + oldLesson.getRoom() + "\" AND " +
+                COLUMN_REPEATTYPE + " = \"" + oldLesson.getRepeatType() + "\";";
+        Log.d(TAG, query);
+        getWritableDatabase().execSQL(query);
+    }
+
+    public void removeLesson(int id) {
+        String query = "DELETE FROM " + TABLE_TIMETABLE + " WHERE " +
+                COLUMN_ID + " = \"" + id + "\";";
+        Log.d(TAG, query);
+        getWritableDatabase().execSQL(query);
+    }
+
+    public void removeLessons(Integer[] ids) {
+        for (int id : ids) {
+            removeLesson(id);
         }
     }
 
-    public void removeTimeTable(HWGrade grade){
+    public void removeTimeTable(HWGrade grade) {
         String query = "DELETE FROM " + TABLE_TIMETABLE + " WHERE " + COLUMN_GRADE + " = \"" + grade.getGradeName() + "\";";
         Log.d(TAG, query);
         getWritableDatabase().execSQL(query);
@@ -495,6 +525,36 @@ public class DBHandler extends SQLiteOpenHelper {
                 ");";
         Log.d(TAG, "@onCreate: " + query);
         db.execSQL(query);
+    }
+
+    public int getIdFromLesson(HWLesson lesson) {
+        SQLiteDatabase db = getWritableDatabase();
+        String query = "SELECT 1 FROM " + TABLE_TIMETABLE + " WHERE " +
+                COLUMN_DAY + " = \"" + lesson.getDay() + "\" AND " +
+                COLUMN_HOUR + " = \"" + lesson.getHour() + "\" AND " +
+                COLUMN_TEACHER + " = \"" + lesson.getTeacher() + "\" AND " +
+                COLUMN_SUBJECT + " = \"" + lesson.getSubject() + "\" AND " +
+                COLUMN_ROOM + " = \"" + lesson.getRoom() + "\" AND " +
+                COLUMN_REPEATTYPE + " = \"" + lesson.getRepeatType() + "\";";
+
+
+        Cursor c = db.rawQuery(query, null);
+        c.moveToFirst();
+        Log.d(TAG, "" + c.getCount());
+        if (!c.isAfterLast()) {
+            return c.getInt(c.getColumnIndex(COLUMN_ID));
+        }
+        c.close();
+        return -1;
+    }
+
+    public HWLesson getLessonFromId(int id) {
+        SQLiteDatabase db = getWritableDatabase();
+        String query = "SELECT 1  FROM " + TABLE_TIMETABLE + " WHERE " +
+                COLUMN_ID + " = \"" + id + "\";";
+        ArrayList<HWLesson> lessons = parseHours(db.rawQuery(query, null), null);
+        if (lessons.isEmpty()) return null;
+        return lessons.get(0);
     }
 
     public void setSubscribedSubjects(String[] subjects) {
@@ -525,6 +585,7 @@ public class DBHandler extends SQLiteOpenHelper {
             }
             c.moveToNext();
         }
+        c.close();
         return subscribedSubjects.toArray(new String[subscribedSubjects.size()]);
     }
 }

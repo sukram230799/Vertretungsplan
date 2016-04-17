@@ -6,7 +6,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -80,7 +79,7 @@ public class CallHome implements Runnable {
                             if (lv < rv) {
                                 update = true;
                                 Bundle bundle = new Bundle();
-                                bundle.putBoolean(context.getString(R.string.update_avaliable), update);
+                                bundle.putBoolean(context.getString(R.string.update_available), update);
                                 msg.setData(bundle);
                                 break;
                             }

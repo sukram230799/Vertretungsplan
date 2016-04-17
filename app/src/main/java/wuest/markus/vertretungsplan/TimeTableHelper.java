@@ -3,15 +3,12 @@ package wuest.markus.vertretungsplan;
 import android.content.Context;
 import android.util.Log;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.regex.Pattern;
@@ -24,7 +21,24 @@ public class TimeTableHelper {
     public static final String format = "dd.MM.yyyy HH:mm,z";
     public static final SimpleDateFormat sdf = new SimpleDateFormat(format);
 
-    public static HWLesson[] selectLessonsFromDayRepeatType(HWLesson[] hwLessons, int week, int day, String[] subscribedSubjects, Context context) {
+    public static HWLesson[] selectLessonsFromTime(HWLesson[] hwLessons, HWTime time, String[] subscribedSubjects, Context context) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(time.toDate());
+        int weekDay = calendar.get(Calendar.DAY_OF_WEEK);
+        int week = calendar.get(Calendar.WEEK_OF_YEAR);
+        ArrayList<HWLesson> hwLessonArrayList = new ArrayList<>(hwLessons.length);
+        for (HWLesson lesson : hwLessons) {
+            if (lesson.getAssignedTime() != null && lesson.getAssignedTime().toDate().equals(time.toDate())) {
+                hwLessonArrayList.add(lesson);
+            } else if (lesson.getDay() == weekDay && isRepeatType(lesson.getRepeatType(), week, context) && isSubscribedSubject(lesson.getSubject(), subscribedSubjects)) {
+                lesson.setAssignedTime(time);
+                hwLessonArrayList.add(lesson);
+            }
+        }
+        return hwLessonArrayList.toArray(new HWLesson[hwLessonArrayList.size()]);
+    }
+
+    /*public static HWLesson[] selectLessonsFromDayRepeatType(HWLesson[] hwLessons, int week, int day, String[] subscribedSubjects, Context context) {
         ArrayList<HWLesson> hwLessonArrayList = new ArrayList<>(hwLessons.length);
         for (HWLesson lesson : hwLessons) {
             if (lesson.getDay() == day) {
@@ -42,7 +56,7 @@ public class TimeTableHelper {
             }
         }
         return hwLessonArrayList.toArray(new HWLesson[hwLessonArrayList.size()]);
-    }
+    }*/
 
     private static boolean isSubscribedSubject(String subject, String[] subscribedSubjects) {
         if (subscribedSubjects == null) {
@@ -308,13 +322,11 @@ public class TimeTableHelper {
         int highestHour = 0;
         for (HWLesson lesson : lessons) {
             if (lesson.getDay() == day) {
-                for (int hour : lesson.getHours()) {
-                    if (lowestHour > hour) {
-                        lowestHour = hour;
-                    }
-                    if (highestHour < hour) {
-                        highestHour = hour;
-                    }
+                if (lowestHour > lesson.getHour()) {
+                    lowestHour = lesson.getHour();
+                }
+                if (highestHour < lesson.getHour()) {
+                    highestHour = lesson.getHour();
                 }
             }
         }
@@ -367,7 +379,7 @@ public class TimeTableHelper {
         for (HWLesson lesson : hwLessons) {
             CSV += lesson.getGrade().getGradeName() + itemSeparator +
                     lesson.getDay() + itemSeparator +
-                    lesson.getHours()[0] + itemSeparator +
+                    lesson.getHour() + itemSeparator +
                     lesson.getTeacher() + itemSeparator +
                     lesson.getSubject() + itemSeparator +
                     lesson.getRoom() + itemSeparator +
@@ -377,21 +389,24 @@ public class TimeTableHelper {
     }
 
     public static String getURLForShare(HWLesson[] hwLessons, String itemSeparator, String lineSeparator) {
-        HWLesson[] combinedLessons = CombineData.combineHWLessons(hwLessons);
+        ArrayList<HWLesson> usedLessons = new ArrayList<>(hwLessons.length);
         if (hwLessons.length > 0) {
             String URL = "http://vp-edit.ga/?grade=" + hwLessons[0].getGrade().getGradeName() + "&table=";
-            for (HWLesson lesson : combinedLessons) {
-                String hours = "";
-                for (int hour : lesson.getHours()) {
-                    hours += hour + "_";
+            for (HWLesson lesson : hwLessons) {
+                if (!usedLessons.contains(lesson)) {
+                    String hours = "";
+                    Integer[] hoursArray = CombineData.getSimilarHours(lesson, hwLessons);
+                    for (int hour : hoursArray) {
+                        hours += hour + "_";
+                        URL += lesson.getDay() + itemSeparator +
+                                hours + itemSeparator +
+                                lesson.getTeacher() + itemSeparator +
+                                lesson.getSubject() + itemSeparator +
+                                lesson.getRoom() + itemSeparator +
+                                lesson.getRepeatType() + lineSeparator;
+                        Log.d(TAG, CombineData.hoursString(hoursArray, false));
+                    }
                 }
-                URL += lesson.getDay() + itemSeparator +
-                        hours + itemSeparator +
-                        lesson.getTeacher() + itemSeparator +
-                        lesson.getSubject() + itemSeparator +
-                        lesson.getRoom() + itemSeparator +
-                        lesson.getRepeatType() + lineSeparator;
-                Log.d(TAG, CombineData.hoursString(lesson.getHours(), false));
             }
             return URL;
             /*try {
@@ -418,11 +433,9 @@ public class TimeTableHelper {
         for (int i = 1; i < lessonStrings.length; i++) {
             String[] lessonInfo = lessonStrings[i].split(Pattern.quote(itemSeparator));
             Log.d(TAG, lessonStrings[i]);
-            Integer[] hours = {Integer.parseInt(lessonInfo[2])};
-            lessons.add(new HWLesson(new HWGrade(lessonInfo[0]),
-                    hours,
+            lessons.add(new HWLesson(-1, new HWGrade(lessonInfo[0]),
+                    Integer.parseInt(lessonInfo[2]),
                     Integer.parseInt(lessonInfo[1]),
-
                     lessonInfo[3],
                     lessonInfo[4],
                     lessonInfo[5],
@@ -453,14 +466,13 @@ public class TimeTableHelper {
                     String[] lessonInfo = lesson.split(itemSeparator);
                     ArrayList<Integer> hours = new ArrayList<>();
                     for (String hour : lessonInfo[1].split("_")) {
-                        hours.add(Integer.parseInt(hour));
+                        hwLessons.add(new HWLesson(-1, grade, Integer.parseInt(hour),
+                                Integer.parseInt(lessonInfo[0]),
+                                lessonInfo[2],
+                                lessonInfo[3],
+                                lessonInfo[4],
+                                lessonInfo[5]));
                     }
-                    hwLessons.add(new HWLesson(grade, hours.toArray(new Integer[hours.size()]),
-                            Integer.parseInt(lessonInfo[0]),
-                            lessonInfo[2],
-                            lessonInfo[3],
-                            lessonInfo[4],
-                            lessonInfo[5]));
                 }
                 return hwLessons.toArray(new HWLesson[hwLessons.size()]);
             }
@@ -492,9 +504,7 @@ public class TimeTableHelper {
             Log.d(TAG, String.valueOf(hours[1]));
             ArrayList<Integer> placedHours = new ArrayList<>((hours[1] - hours[0] + 1));
             for (HWLesson lesson : lessons) {
-                for (int hour : lesson.getHours()) {
-                    placedHours.add(hour);
-                }
+                placedHours.add(lesson.getHour());
             }
             Collections.sort(placedHours);
             int lastHour = 12;
@@ -506,7 +516,9 @@ public class TimeTableHelper {
                         breakHours[hour - breakHour - 1] = breakHour;
                     }
                     Arrays.sort(breakHours);
-                    lessonArrayList.add(placedHours.indexOf(hour), new HWLesson(grade, breakHours, day, "", "PAUSE", "", ""));
+                    for (int currentHour : breakHours) {
+                        lessonArrayList.add(placedHours.indexOf(hour), new HWLesson(-1, grade, currentHour, day, "", "PAUSE", "", ""));
+                    }
                 }
                 lastHour = hour;
             }
@@ -558,119 +570,70 @@ public class TimeTableHelper {
 
     public static VPData[] selectVPDataFromSubscribedSubjects(VPData[] vpDataArray, String[] subscribedSubjects) {
         ArrayList<VPData> vpDataArrayList = new ArrayList<>();
-        for(VPData data : vpDataArray) {
-            if(isSubscribedSubject(data.getSubject(), subscribedSubjects)) {
+        for (VPData data : vpDataArray) {
+            if (isSubscribedSubject(data.getSubject(), subscribedSubjects)) {
                 vpDataArrayList.add(data);
             }
         }
         return vpDataArrayList.toArray(new VPData[vpDataArrayList.size()]);
     }
 
-    //public static HWPlan[] combineVPSP(HWLesson[] sp, VPData[] vp, boolean combinedSP, boolean combinedVP) {
-    //    return combineVPSP(sp, vp, combinedSP, combinedVP, -1);
-    //}
-
-    /**
-     * @param sp         "HWLesson[] pre selected"
-     * @param vp         "VPData[] pre selected"
-     * @param combinedSP "true if Hours are combined"
-     * @param combinedVP "true if Hours are combined"
-     * @return "Combined SP and VP"
-     */
-    public static HWPlan[] combineVPSP(HWLesson[] sp, VPData[] vp, boolean combinedSP, boolean combinedVP) {
-        ArrayList<HWPlan> hwPlanArrayList = new ArrayList<>();
-        ArrayList<VPData> vpArrayList;
-        ArrayList<HWLesson> spArrayList;
-        if (combinedVP) {
-            vpArrayList = new ArrayList<>();
-            for (VPData data : vp) {
-                for (int hour : data.getHours()) {
-                    vpArrayList.add(new VPData(data.getGrade(), new Integer[]{hour}, data.getSubject(), data.getRoom(),
-                            data.getInfo1(), data.getInfo2(), data.getDate()));
-                }
-            }
-        } else {
-            vpArrayList = new ArrayList<>(Arrays.asList(vp));
+    public static HWTime[] getHWTimes(Integer[] lessonDays) {
+        ArrayList<HWTime> times = new ArrayList<>();
+        Calendar yesterday = Calendar.getInstance();
+        yesterday.add(Calendar.DATE, -1);
+        HWTime referenceTime = getNextHWTime(new HWTime(yesterday), lessonDays);
+        times.add(referenceTime);
+        for(int i = 0; i < 2; i++){
+            times.add(0, getPreviousHWTime(times.get(0), lessonDays));
         }
-        if (combinedSP) {
-            spArrayList = new ArrayList<>();
-            for (HWLesson lesson : sp) {
-                for (int hour : lesson.getHours()) {
-                    spArrayList.add(new HWLesson(lesson.getGrade(), new Integer[]{hour}, lesson.getDay(), lesson.getTeacher(),
-                            lesson.getSubject(), lesson.getRoom(), lesson.getRepeatType()));
-                }
-            }
-        } else {
-            spArrayList = new ArrayList<>(Arrays.asList(sp));
+        for(int i = 0; i < 3; i++) {
+            times.add(getNextHWTime(times.get(times.size() - 1), lessonDays));
         }
-        for (int i = 0; i < spArrayList.size(); i++) {
-            HWLesson lesson = spArrayList.get(i);
-            boolean add = false;
-            for (VPData vpData : vpArrayList) {
-                Calendar calendar = new GregorianCalendar();
-                calendar.setTime(vpData.getDate());
-                int day = calendar.get(Calendar.DAY_OF_WEEK);
-                if (lesson.getDay() == day &&
-                        Arrays.equals(lesson.getHours(), vpData.getHours())) {
-                    hwPlanArrayList.add(new HWPlan(lesson.getGrade(), lesson.getHours()[0], lesson.getDay(), lesson.getTeacher(),
-                            lesson.getSubject(), lesson.getRoom(), lesson.getRepeatType(), vpData.getSubject(), vpData.getRoom(),
-                            vpData.getInfo1(), vpData.getInfo2(), vpData.getDate()));
-                    vpArrayList.remove(vpData);
-                    add = true;
-                    break; //No double add!
-                }
-            }
-            if (!add) { //No double add!
-                hwPlanArrayList.add(new HWPlan(lesson.getGrade(), lesson.getHours()[0], lesson.getDay(), lesson.getTeacher(),
-                        lesson.getSubject(), lesson.getRoom(), lesson.getRepeatType(), null, null,
-                        null, null, null));
-            }
+        Calendar c = Calendar.getInstance();
+        Log.d(TAG, "Test" + times.size());
+        for(HWTime time : times){
+            c.setTime(time.toDate());
+            Log.d(TAG, "" + c.get(Calendar.DAY_OF_WEEK));
         }
-        for (VPData vpData : vpArrayList) {
-            Calendar calendar = new GregorianCalendar();
-            calendar.setTime(vpData.getDate());
-            int day = calendar.get(Calendar.DAY_OF_WEEK);
-            hwPlanArrayList.add(new HWPlan(vpData.getGrade(), vpData.getHours()[0], day, null,
-                    null, null, null, vpData.getSubject(), vpData.getRoom(),
-                    vpData.getInfo1(), vpData.getInfo2(), vpData.getDate()));
-        }
-        Collections.sort(hwPlanArrayList, new Comparator<HWPlan>() {
-            @Override
-            public int compare(HWPlan plan1, HWPlan plan2) {
-
-                return ((Integer) plan1.getHour()).compareTo(plan2.getHour());
-            }
-        });
-        return hwPlanArrayList.toArray(new HWPlan[hwPlanArrayList.size()]);
+        return times.toArray(new HWTime[times.size()]);
     }
 
-    public static HWPlan[] fillPlanGabs(HWPlan[] plans, int day) {
-        HWGrade grade = new HWGrade("");
-        if (plans.length > 0) {
-            grade = plans[0].getGrade();
-        }
-        ArrayList<HWPlan> planArrayList = new ArrayList(Arrays.asList(plans));
-        ArrayList<Integer> placedHours = new ArrayList<>();
-        for (HWPlan plan : plans) {
-            placedHours.add(plan.getHour());
-        }
-        Collections.sort(placedHours);
-        int lastHour = 14;
-        for (int hour : placedHours) {
-            if (hour > (lastHour + 1)) {
-                Integer[] breakHours = new Integer[hour - lastHour - 1];
-                for (int breakHour = lastHour + 1; breakHour < hour; breakHour++) {
-                    Log.d(TAG, breakHour + "_" + lastHour + "_" + hour);
-                    breakHours[hour - breakHour - 1] = breakHour;
+    public static HWTime getNextHWTime(HWTime hwTime, Integer[] lessonDays) {
+        Calendar oldCalendar = Calendar.getInstance();
+        oldCalendar.setTime(hwTime.toDate());
+        int weekDay = oldCalendar.get(Calendar.DAY_OF_WEEK);
+        for (int daysToAdd = 1; daysToAdd < 7; daysToAdd++) {
+            for (int lessonDay : lessonDays) {
+                if(weekDay + daysToAdd >= 7){
+                    weekDay -= 7;
                 }
-                Arrays.sort(breakHours);
-                HWPlan plan = new HWPlan(grade, hour - 1, day, "", "PAUSE", "", "", "", null, null, null, null);
-                plan.setHourString(CombineData.hoursString(breakHours, true));
-                planArrayList.add(placedHours.indexOf(hour), plan);
+                if (lessonDay == weekDay + daysToAdd) {
+                    oldCalendar.add(Calendar.DATE, daysToAdd);
+                    Log.d(TAG, weekDay + " " + daysToAdd);
+                    return new HWTime(oldCalendar);
+                }
             }
-            lastHour = hour;
         }
-        return planArrayList.toArray(new HWPlan[planArrayList.size()]);
+        return null;
+    }
+
+    public static HWTime getPreviousHWTime(HWTime hwTime, Integer[] lessonDays) {
+        Calendar oldCalendar = Calendar.getInstance();
+        oldCalendar.setTime(hwTime.toDate());
+        int weekDay = oldCalendar.get(Calendar.DAY_OF_WEEK);
+        for (int daysToAdd = 1; daysToAdd < 7; daysToAdd++) {
+            for (int lessonDay : lessonDays) {
+                if(weekDay - daysToAdd <= 0){
+                    weekDay += 7;
+                }
+                if (lessonDay == weekDay - daysToAdd) {
+                    oldCalendar.add(Calendar.DATE, -daysToAdd);
+                    return new HWTime(oldCalendar);
+                }
+            }
+        }
+        return null;
     }
 
     public static String[] findSubscribableSubjects(HWLesson[] lessons) {

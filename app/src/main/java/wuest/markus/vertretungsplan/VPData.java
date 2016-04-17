@@ -12,11 +12,12 @@ public class VPData {
     private String info1;
     private String info2;
     private Date date;
-    private Integer[] hours;
+    private int hour;
 
-    public VPData(HWGrade grade, Integer[] hours, String subject, String room, String info1, String info2, Date date) {
+    public VPData(int id, HWGrade grade, int hour, String subject, String room, String info1, String info2, Date date) {
+        this.id = id;
         this.grade = grade;
-        this.hours = hours;
+        this.hour = hour;
         this.subject = subject;
         this.room = room;
         this.info1 = info1;
@@ -48,8 +49,8 @@ public class VPData {
         this.info2 = info2;
     }
 
-    public void setHours(Integer[] hours) {
-        this.hours = hours;
+    public void setHour(int hour) {
+        this.hour = hour;
     }
 
     public int getId() {
@@ -84,7 +85,7 @@ public class VPData {
         return info2;
     }
 
-    public Integer[] getHours() {
-        return hours;
+    public int getHour() {
+        return hour;
     }
 }

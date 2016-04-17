@@ -20,30 +20,51 @@ public class HWPlan {
     }
 
     private int day;
-    private String teacher;
+
+    public int getSpId() {
+        return spId;
+    }
+
+    public void setSpId(int spId) {
+        this.spId = spId;
+    }
+
+    public int getVpId() {
+        return vpId;
+    }
+
+    public void setVpId(int vpId) {
+        this.vpId = vpId;
+    }
+
+    private int spId;
+    private String spTeacher;
     private String spSubject;
     private String spRoom;
-    private String repeatType;
+    private String spRepeatType;
 
+    private int vpId;
     private String vpSubject;
     private String vpRoom;
-    private String info1;
-    private String info2;
-    private Date date;
+    private String vpInfo1;
+    private String vpInfo2;
+    private Date vpDate;
 
-    public HWPlan(HWGrade grade, int hour, int day, String teacher, String spSubject, String spRoom, String repeatType, String vpSubject, String vpRoom, String info1, String info2, Date date) {
+    public HWPlan(HWGrade grade, int hour, int day, int spId, String spTeacher, String spSubject, String spRoom, String spRepeatType, int vpId, String vpSubject, String vpRoom, String vpInfo1, String vpInfo2, Date vpDate) {
         this.grade = grade;
         this.hour = hour;
         this.day = day;
-        this.teacher = teacher;
+        this.spId = spId;
+        this.spTeacher = spTeacher;
         this.spSubject = spSubject;
         this.spRoom = spRoom;
-        this.repeatType = repeatType;
+        this.spRepeatType = spRepeatType;
+        this.vpId = vpId;
         this.vpSubject = vpSubject;
         this.vpRoom = vpRoom;
-        this.info1 = info1;
-        this.info2 = info2;
-        this.date = date;
+        this.vpInfo1 = vpInfo1;
+        this.vpInfo2 = vpInfo2;
+        this.vpDate = vpDate;
     }
 
     public HWGrade getGrade() {
@@ -70,12 +91,12 @@ public class HWPlan {
         this.day = day;
     }
 
-    public String getTeacher() {
-        return teacher;
+    public String getSpTeacher() {
+        return spTeacher;
     }
 
-    public void setTeacher(String teacher) {
-        this.teacher = teacher;
+    public void setSpTeacher(String spTeacher) {
+        this.spTeacher = spTeacher;
     }
 
     public String getSpSubject() {
@@ -94,12 +115,12 @@ public class HWPlan {
         this.spRoom = spRoom;
     }
 
-    public String getRepeatType() {
-        return repeatType;
+    public String getSpRepeatType() {
+        return spRepeatType;
     }
 
-    public void setRepeatType(String repeatType) {
-        this.repeatType = repeatType;
+    public void setSpRepeatType(String spRepeatType) {
+        this.spRepeatType = spRepeatType;
     }
 
     public String getVpSubject() {
@@ -118,27 +139,27 @@ public class HWPlan {
         this.vpRoom = vpRoom;
     }
 
-    public String getInfo1() {
-        return info1;
+    public String getVpInfo1() {
+        return vpInfo1;
     }
 
-    public void setInfo1(String info1) {
-        this.info1 = info1;
+    public void setVpInfo1(String vpInfo1) {
+        this.vpInfo1 = vpInfo1;
     }
 
-    public String getInfo2() {
-        return info2;
+    public String getVpInfo2() {
+        return vpInfo2;
     }
 
-    public void setInfo2(String info2) {
-        this.info2 = info2;
+    public void setVpInfo2(String vpInfo2) {
+        this.vpInfo2 = vpInfo2;
     }
 
-    public Date getDate() {
-        return date;
+    public Date getVpDate() {
+        return vpDate;
     }
 
-    public void setDate(Date date) {
-        this.date = date;
+    public void setVpDate(Date vpDate) {
+        this.vpDate = vpDate;
     }
 }

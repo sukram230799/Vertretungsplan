@@ -1,18 +1,42 @@
 package wuest.markus.vertretungsplan;
 
+import java.util.Date;
+
 public class HWLesson {
 
+    private int id;
     private HWGrade grade;
-    private Integer[] hours;
+    //private Integer[] hours;
+    private int hour;
     private int day;
     private String teacher;
     private String subject;
     private String room;
     private String repeatType;
 
-    public HWLesson(HWGrade grade, Integer[] hours, int day, String teacher, String subject, String room, String repeatType) {
+    public HWTime getAssignedTime() {
+        return assignedTime;
+    }
+
+    public void setAssignedTime(HWTime assignedTime) {
+        this.assignedTime = assignedTime;
+    }
+
+    private HWTime assignedTime;
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public HWLesson(int id, HWGrade grade, int hour, int day, String teacher, String subject, String room, String repeatType) {
+        this.id = id;
+
         this.grade = grade;
-        this.hours = hours;
+        this.hour = hour;
         this.day = day;
         this.teacher = teacher;
         this.subject = subject;
@@ -28,12 +52,12 @@ public class HWLesson {
         this.grade = grade;
     }
 
-    public Integer[] getHours() {
-        return hours;
+    public int getHour() {
+        return hour;
     }
 
-    public void setHours(Integer[] hours) {
-        this.hours = hours;
+    public void setHour(int hour) {
+        this.hour = hour;
     }
 
     public int getDay() {

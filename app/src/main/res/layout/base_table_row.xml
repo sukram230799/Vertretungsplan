@@ -52,7 +52,7 @@
         android:layout_toEndOf="@+id/spTextHour"
         android:layout_toRightOf="@+id/spTextHour"
         android:gravity="center_vertical"
-        android:text="BOB"
+        android:text="XYZ"
         android:textAppearance="?android:attr/textAppearanceMedium"
         android:textColor="#8a000000" />
 
@@ -65,7 +65,7 @@
         android:layout_toEndOf="@+id/spTextTeacher"
         android:layout_toRightOf="@+id/spTextTeacher"
         android:gravity="center_vertical"
-        android:text="CH"
+        android:text="FACH"
         android:textAppearance="?android:attr/textAppearanceMedium"
         android:textColor="#8a000000" />
 
@@ -78,7 +78,7 @@
         android:layout_toLeftOf="@+id/spTextRepeatType"
         android:layout_toStartOf="@+id/spTextRepeatType"
         android:gravity="center_vertical|right"
-        android:text="A301"
+        android:text="A007"
         android:textAppearance="?android:attr/textAppearanceMedium"
         android:textColor="#8a000000" />
 
@@ -92,7 +92,6 @@
         android:layout_gravity="center_vertical"
         android:gravity="center_vertical|right"
         android:paddingRight="25dp"
-        android:password="false"
         android:text="G151"
         android:textAppearance="?android:attr/textAppearanceMedium"
         android:textColor="#8a000000" />

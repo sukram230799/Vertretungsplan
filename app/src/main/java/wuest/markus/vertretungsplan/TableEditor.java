@@ -18,7 +18,6 @@ import android.widget.AutoCompleteTextView;
 
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.GregorianCalendar;
 
 public class TableEditor extends AppCompatActivity implements HourPickerDialog.NumberDialogInterface {
 
@@ -27,13 +26,7 @@ public class TableEditor extends AppCompatActivity implements HourPickerDialog.N
     public final static String TAG = "TableEditor";
 
     public static final String GRADE = "grade";
-    public static final String DAY = "day";
-    public static final String HOURS = "hours";
-    public static final String TEACHER = "teacher";
-    public static final String SUBJECT = "subject";
-    public static final String ROOM = "room";
-    public static final String REPEATTYPE = "repeatType";
-
+    public static final String IDS = "ids";
 
     private AutoCompleteTextView textTeacher;
     private AutoCompleteTextView textDay;
@@ -62,6 +55,7 @@ public class TableEditor extends AppCompatActivity implements HourPickerDialog.N
 
     private HWLesson lesson = null;
     private int day = 0;
+    ArrayList<Integer> ids;
 
 
     /*public TableEditor(HWLesson lesson) {
@@ -75,17 +69,13 @@ public class TableEditor extends AppCompatActivity implements HourPickerDialog.N
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         Bundle bundle = getIntent().getExtras();
+        dbHandler = new DBHandler(this, null, null, 0);
         if (bundle != null) {
             try {
-                lesson = new HWLesson(new HWGrade(bundle.getString(GRADE)),
-                        bundle.getIntegerArrayList(HOURS).toArray(new Integer[bundle.getIntegerArrayList(HOURS).size()]),
-                        bundle.getInt(DAY),
-                        bundle.getString(TEACHER),
-                        bundle.getString(SUBJECT),
-                        bundle.getString(ROOM),
-                        bundle.getString(REPEATTYPE));
-                startHour = lesson.getHours()[0];
-                endHour = lesson.getHours()[lesson.getHours().length - 1];
+                ids = bundle.getIntegerArrayList(IDS);
+                lesson = dbHandler.getLessonFromId(ids.get(0));
+                startHour = lesson.getHour();
+                endHour = dbHandler.getLessonFromId(ids.get(ids.size() - 1)).getHour();
             } catch (java.lang.NullPointerException e) {
                 e.printStackTrace();
             }
@@ -136,7 +126,6 @@ public class TableEditor extends AppCompatActivity implements HourPickerDialog.N
             }
         });
 
-        dbHandler = new DBHandler(this, null, null, 0);
 
         ArrayList<String> teachers = new ArrayList<>(20);
         ArrayList<String> subjects = new ArrayList<>(30);
@@ -146,13 +135,13 @@ public class TableEditor extends AppCompatActivity implements HourPickerDialog.N
 
         try {
             hwLessons = dbHandler.getTimeTable(new HWGrade(Preferences.readStringFromPreferences(this, getString(R.string.SELECTED_GRADE), "")));
-            hwLessons = CombineData.combineHWLessons(hwLessons);
+            /*hwLessons = CombineData.combineHWLessons(hwLessons);
             HWLesson[] selectedLessons = TimeTableHelper.selectLessonsFromRepeatType(hwLessons, GregorianCalendar.getInstance().get(Calendar.WEEK_OF_YEAR), null, this);
             for (HWLesson lesson : selectedLessons) {
-                if (lesson.getDay() == day && lesson.getHours()[0] >= startHour && lesson.getHours()[0] <= endHour) {
+                if (lesson.getDay() == day && lesson.getHour() >= startHour && lesson.getHour() <= endHour) {
                     //TODO investigate why this function is used.
                 }
-            }
+            }*/
             for (HWLesson lesson : hwLessons) {
                 if (!teachers.contains(lesson.getTeacher())) {
                     teachers.add(lesson.getTeacher());
@@ -221,13 +210,6 @@ public class TableEditor extends AppCompatActivity implements HourPickerDialog.N
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == R.id.action_save) {
 
-            ArrayList<Integer> hours = new ArrayList<>(endHour - startHour + 1);
-
-            for (int counter = startHour; counter <= endHour; counter++) {
-                hours.add(counter);
-                Log.d(TAG, "" + counter);
-            }
-
             /*if (textGrade.getText().toString().trim().length() <= 0) {
                 //textGrade.getBackground().setColorFilter(Color.RED, PorterDuff.Mode.SRC_ATOP);
                 textLayoutGrade.setError("Bitte Klasse eingeben.");
@@ -252,22 +234,26 @@ public class TableEditor extends AppCompatActivity implements HourPickerDialog.N
                     textRoom.getText().toString().trim().length() > 0 &&
                     textRepeatType.getText().toString().trim().length() > 0) {
                 if (lesson == null) {
-                    dbHandler.addLesson(new HWLesson(new HWGrade(textGrade.getText().toString().trim()),
-                            hours.toArray(new Integer[hours.size()]),
-                            day,
-                            textTeacher.getText().toString().trim(),
-                            textSubject.getText().toString().trim(),
-                            textRoom.getText().toString().trim(),
-                            textRepeatType.getText().toString().trim()));
+                    for(int hour = startHour; hour <= endHour; hour++){
+                        dbHandler.addLesson(new HWLesson(-1, new HWGrade(textGrade.getText().toString().trim()),
+                                hour,
+                                day,
+                                textTeacher.getText().toString().trim(),
+                                textSubject.getText().toString().trim(),
+                                textRoom.getText().toString().trim(),
+                                textRepeatType.getText().toString().trim()));
+                    }
                 } else {
-                    dbHandler.updateLesson(lesson, new HWLesson(new HWGrade(textGrade.getText().toString().trim()),
-                                    hours.toArray(new Integer[hours.size()]),
-                                    day,
-                                    textTeacher.getText().toString().trim(),
-                                    textSubject.getText().toString().trim(),
-                                    textRoom.getText().toString().trim(),
-                                    textRepeatType.getText().toString().trim())
-                    );
+                    for(int hour = startHour; hour <= endHour; hour++){
+                        dbHandler.removeLessons((Integer[]) ids.toArray());
+                        dbHandler.addLesson(new HWLesson(-1, new HWGrade(textGrade.getText().toString().trim()),
+                                hour,
+                                day,
+                                textTeacher.getText().toString().trim(),
+                                textSubject.getText().toString().trim(),
+                                textRoom.getText().toString().trim(),
+                                textRepeatType.getText().toString().trim()));
+                    }
                 }
                 finish();
             }
@@ -491,8 +477,6 @@ public class TableEditor extends AppCompatActivity implements HourPickerDialog.N
         if (lesson != null) {
             textTeacher.setText(lesson.getTeacher());
             textDay.setText(TimeTableHelper.getDayName(lesson.getDay(), this));
-            startHour = lesson.getHours()[0];
-            endHour = lesson.getHours()[lesson.getHours().length - 1];
             setHour(textHour);
             textGrade.setText(lesson.getGrade().getGradeName());
             textSubject.setText(lesson.getSubject());

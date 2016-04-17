@@ -134,7 +134,7 @@ public class GetVP implements Runnable {
         if (stringArrayList.size() < 2) {
             stringArrayList.add("");
         }
-        return new VPData(grade, new Integer[]{hour},
+        return new VPData(-1, grade, hour,
                 element.select("td.spalte2").html(),
                 element.select("td.spalte3").html(),
                 stringArrayList.get(0),

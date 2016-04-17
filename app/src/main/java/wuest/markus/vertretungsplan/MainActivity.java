@@ -1,7 +1,6 @@
 package wuest.markus.vertretungsplan;
 
 import android.app.AlertDialog;
-import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.ClipData;
 import android.content.ClipboardManager;
@@ -18,7 +17,6 @@ import android.os.Build;
 import android.os.Handler;
 import android.os.Message;
 import android.os.Parcelable;
-import android.preference.Preference;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -32,7 +30,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.Calendar;
@@ -42,7 +39,7 @@ public class MainActivity extends AppCompatActivity implements /*Navigation*/Dra
         VPFragment.RefreshContentListener, TimeTableFragment.RefreshContentListener,
         TabbedTimeTableFragment.EditInterface, TimeTableFragment.EditInterface, PlanFragment.EditInterface,
         SubjectChooserDialog.OnReloadData, TabbedPlanFragment.EditInterface, NfcAdapter.CreateNdefMessageCallback,
-        NfcAdapter.OnNdefPushCompleteCallback {
+        NfcAdapter.OnNdefPushCompleteCallback, TabbedPlanFragment.RefreshContentListener, TabbedTimeTableFragment.RefreshContentListener {
 
     Handler vpHandler = new Handler() {
         @Override
@@ -187,7 +184,7 @@ public class MainActivity extends AppCompatActivity implements /*Navigation*/Dra
             if (msg != null) {
                 final Context context = (Context) msg.obj;
                 final Bundle bundle = msg.getData();
-                if (bundle.getBoolean(getString(R.string.update_avaliable), false)) {
+                if (bundle.getBoolean(getString(R.string.update_available), false)) {
                     AlertDialog.Builder builder = new AlertDialog.Builder(context);
                     builder.setTitle("Update");
                     builder.setCancelable(false);
@@ -383,16 +380,16 @@ public class MainActivity extends AppCompatActivity implements /*Navigation*/Dra
                 dbError.printStackTrace();
                 hwGrade = new HWGrade("TG11-2");
             }
-            Integer[] hour0 = {1, 2};
-            Integer[] hour1 = {3, 4};
-            Integer[] hour2 = {5, 6};
-            Integer[] hour3 = {8, 9};
-            Integer[] hour4 = {10, 11};
-            VPData[] vpData = {new VPData(hwGrade, hour0, "F", "A1337", "Freisetzung", "", new Date()),
-                    new VPData(hwGrade, hour1, "A", "A1337", "Freisetzung", "", new Date()),
-                    new VPData(hwGrade, hour2, "K", "A1337", "Freisetzung", "", new Date()),
-                    new VPData(hwGrade, hour3, "E", "A1337", "Freisetzung", "", new Date()),
-                    new VPData(hwGrade, hour4, "!", "A1337", "Freisetzung", "", new Date())};
+            VPData[] vpData = {new VPData(-1, hwGrade, 1, "F", "A1337", "Freisetzung", "", new Date()),
+                    new VPData(-1, hwGrade, 2, "F", "A1337", "Freisetzung", "", new Date()),
+                    new VPData(-1, hwGrade, 3, "A", "A1337", "Freisetzung", "", new Date()),
+                    new VPData(-1, hwGrade, 4, "A", "A1337", "Freisetzung", "", new Date()),
+                    new VPData(-1, hwGrade, 5, "K", "A1337", "Freisetzung", "", new Date()),
+                    new VPData(-1, hwGrade, 6, "K", "A1337", "Freisetzung", "", new Date()),
+                    new VPData(-1, hwGrade, 8, "E", "A1337", "Freisetzung", "", new Date()),
+                    new VPData(-1, hwGrade, 9, "E", "A1337", "Freisetzung", "", new Date()),
+                    new VPData(-1, hwGrade, 10, "!", "A1337", "Freisetzung", "", new Date()),
+                    new VPData(-1, hwGrade, 11, "!", "A1337", "Freisetzung", "", new Date())};
             dbHandler.addPlan(vpData);
             loadVPFragment(getSupportFragmentManager(), position);
         } else if (id == R.id.showid) {
@@ -555,6 +552,7 @@ public class MainActivity extends AppCompatActivity implements /*Navigation*/Dra
 
             shown = false;
             Log.d(TAG, "TableType: " + tableType);
+            Calendar calendar;
             switch (tableType) {
                 case 0:
                     VPFragment vpFragment = VPFragment.newInstance(grade);
@@ -564,7 +562,10 @@ public class MainActivity extends AppCompatActivity implements /*Navigation*/Dra
                             .commit();
                     break;
                 case 1:
-                    TimeTableFragment timeTableFragment = TimeTableFragment.newInstance(grade, Calendar.getInstance().get(Calendar.DAY_OF_WEEK), true, false);
+                    calendar = Calendar.getInstance();
+                    calendar.add(Calendar.DATE, -1);
+                    TimeTableFragment timeTableFragment = TimeTableFragment.newInstance(grade,
+                            TimeTableHelper.getNextHWTime(new HWTime(calendar), dbHandler.getDaysWithLessons(grade)), true);
                     timeTableFragment.setRefreshListener(this);
                     timeTableFragment.setEditInterface(this);
                     fragmentManager.beginTransaction()
@@ -574,12 +575,16 @@ public class MainActivity extends AppCompatActivity implements /*Navigation*/Dra
                 case 2:
                     TabbedTimeTableFragment tabbedTimeTableFragment = TabbedTimeTableFragment.newInstance(grade);
                     tabbedTimeTableFragment.setEditInterface(this);
+                    tabbedTimeTableFragment.setRefreshListener(this);
                     fragmentManager.beginTransaction()
                             .replace(R.id.container, tabbedTimeTableFragment)
                             .commit();
                     break;
                 case 3:
-                    PlanFragment planFragment = PlanFragment.newInstance(grade, new HWTime(Calendar.getInstance()), true);
+                    calendar = Calendar.getInstance();
+                    calendar.add(Calendar.DATE, -1);
+                    PlanFragment planFragment = PlanFragment.newInstance(grade,
+                            TimeTableHelper.getNextHWTime(new HWTime(calendar), dbHandler.getDaysWithLessons(grade)), true);
                     planFragment.setEditInterface(this);
                     fragmentManager.beginTransaction()
                             .replace(R.id.container, planFragment)
@@ -588,6 +593,7 @@ public class MainActivity extends AppCompatActivity implements /*Navigation*/Dra
                 case 4:
                     TabbedPlanFragment tabbedPlanFragment = TabbedPlanFragment.newInstance(grade);
                     tabbedPlanFragment.setEditInterface(this);
+                    tabbedPlanFragment.setRefreshListener(this);
                     fragmentManager.beginTransaction()
                             .replace(R.id.container, tabbedPlanFragment)
                             .commit();
@@ -697,8 +703,6 @@ public class MainActivity extends AppCompatActivity implements /*Navigation*/Dra
 
     @Override
     public NdefMessage createNdefMessage(NfcEvent event) {
-        Time time = new Time();
-        time.setToNow();
         String text = ("No SP");
         try {
             HWLesson[] hwLessons = dbHandler.getTimeTable(new HWGrade(Preferences.readStringFromPreferences(this, getString(R.string.SELECTED_GRADE), "")));

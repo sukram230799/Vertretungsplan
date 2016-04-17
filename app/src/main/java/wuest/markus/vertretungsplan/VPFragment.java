@@ -57,7 +57,7 @@ public class VPFragment extends Fragment implements VPAdapter.ClickListener, Swi
         DBHandler dbHandler = new DBHandler(getContext(), null, null, 1);
         try {
             VPData[] vpData = dbHandler.getVP(grade);
-            vpData = CombineData.combineVP(vpData);
+            //vpData = CombineData.combineVP(vpData);
             this.data = Arrays.asList(vpData);
             /*for (VPData data : vpData) {
                 this.data.add(data);

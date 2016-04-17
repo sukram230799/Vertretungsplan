@@ -100,7 +100,7 @@
                     android:id="@+id/input_teacher"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="@string/teacher"
+                    android:hint="@string/spTeacher"
                     android:imeOptions="actionNext"
                     android:inputType="textCapCharacters"
                     android:nextFocusDown="@+id/input_subject"

@@ -37,11 +37,11 @@ public class TimeTableService extends Service {
                 HWLesson[] lessonsBefore = null;
                 String[] subscribedSubjects = dbHandler.getSubscribedSubjects();
                 try {
-                    lessonsBefore = TimeTableHelper.selectLessonsFromRepeatType(dbHandler.getTimeTableLesson(grade, day, nextHour - 1), week, subscribedSubjects, context);
+                    lessonsBefore = TimeTableHelper.selectLessonsFromTime(dbHandler.getTimeTableLesson(grade, day, nextHour - 1), time, subscribedSubjects, context);
                 } catch (DBError error) {
                     error.printStackTrace();
                 }
-                HWLesson[] lessons = TimeTableHelper.selectLessonsFromRepeatType(dbHandler.getTimeTableLesson(grade, day, nextHour), week, subscribedSubjects, context);
+                HWLesson[] lessons = TimeTableHelper.selectLessonsFromTime(dbHandler.getTimeTableLesson(grade, day, nextHour), time, subscribedSubjects, context);
                 if (lessons.length > 0 && (lessonsBefore == null || lessonsBefore.length > 0 &&
                         (!lessonsBefore[0].getTeacher().equals(lessons[0].getTeacher()) ||
                                 !lessonsBefore[0].getSubject().equals(lessons[0].getSubject()) ||

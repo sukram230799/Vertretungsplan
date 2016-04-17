@@ -109,25 +109,19 @@ public class PlanFragment extends Fragment implements SwipeRefreshLayout.OnRefre
         Log.v(TAG, "oC");
         if (savedInstanceState != null) {
             grade = new HWGrade(savedInstanceState.getString(GRADE));
-            weekDay = savedInstanceState.getInt(WEEK_DAY, -1);
             showFAB = savedInstanceState.getBoolean(FAB);
             Log.v(TAG, "savedInstanceState not null");
-            if (weekDay == -1) {
-                time = new HWTime(0, 0, savedInstanceState.getInt(YEAR), savedInstanceState.getInt(MONTH), savedInstanceState.getInt(DAY));
-                Calendar calendar = new GregorianCalendar();
-                calendar.setTime(time.toDate());
-                weekDay = calendar.get(Calendar.DAY_OF_WEEK);
-            }
+            time = new HWTime(0, 0, savedInstanceState.getInt(YEAR), savedInstanceState.getInt(MONTH), savedInstanceState.getInt(DAY));
+            Calendar calendar = new GregorianCalendar();
+            calendar.setTime(time.toDate());
+            weekDay = calendar.get(Calendar.DAY_OF_WEEK);
         } else {
             grade = new HWGrade(getArguments().getString(GRADE));
-            weekDay = getArguments().getInt(WEEK_DAY, -1);
             showFAB = getArguments().getBoolean(FAB);
-            if (weekDay == -1) {
-                time = new HWTime(0, 0, getArguments().getInt(YEAR), getArguments().getInt(MONTH), getArguments().getInt(DAY));
-                Calendar calendar = new GregorianCalendar();
-                calendar.setTime(time.toDate());
-                weekDay = calendar.get(Calendar.DAY_OF_WEEK);
-            }
+            time = new HWTime(0, 0, getArguments().getInt(YEAR), getArguments().getInt(MONTH), getArguments().getInt(DAY));
+            Calendar calendar = new GregorianCalendar();
+            calendar.setTime(time.toDate());
+            weekDay = calendar.get(Calendar.DAY_OF_WEEK);
         }
         Log.v(TAG, "section_number: " + grade.getGradeName());
         //if (position < 0) position = 0;
@@ -137,17 +131,17 @@ public class PlanFragment extends Fragment implements SwipeRefreshLayout.OnRefre
             HWLesson[] hwLessons = dbHandler.getTimeTable(grade, weekDay /*Calendar.getInstance().get(Calendar.DAY_OF_WEEK)*/);
             HWPlan[] plan;
             String[] subscribedSubjects = dbHandler.getSubscribedSubjects();
-            int week = GregorianCalendar.getInstance().get(Calendar.WEEK_OF_YEAR);
-            hwLessons = TimeTableHelper.selectLessonsFromRepeatType(hwLessons, week, subscribedSubjects, getActivity()); //No CombineData, because of better layout;
+            hwLessons = TimeTableHelper.selectLessonsFromTime(hwLessons, time, subscribedSubjects, getActivity()); //No CombineData, because of better layout;
             //hwLessons = TimeTableHelper.fillGabs(hwLessons, week, weekDay, getActivity());
             try {
                 VPData[] vpData = dbHandler.getVP(grade, time);
                 //vpData = TimeTableHelper.selectVPDataFromWeekDay(vpData, weekDay);
-                plan = TimeTableHelper.combineVPSP(hwLessons, vpData, false, false);
-                plan = TimeTableHelper.fillPlanGabs(plan, weekDay);
+                vpData = TimeTableHelper.selectVPDataFromSubscribedSubjects(vpData, subscribedSubjects);
+                plan = PlanHelper.combineVPSP(hwLessons, vpData);
+                plan = PlanHelper.fillPlanGabs(plan, weekDay);
             } catch (DBError e) {
                 e.printStackTrace();
-                plan = TimeTableHelper.combineVPSP(hwLessons, new VPData[0], false, false);
+                plan = PlanHelper.combineVPSP(hwLessons, new VPData[0]);
             }
             this.data = Arrays.asList(plan);
         } catch (DBError dbError) {

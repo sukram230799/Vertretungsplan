@@ -53,7 +53,7 @@ public class TableAdapter extends RecyclerView.Adapter<TableAdapter.TableViewHol
 
             holder.textBreak.setVisibility(View.VISIBLE);
         } else {
-            holder.textHour.setText(CombineData.hoursString(table.get(position).getHours(), true));
+            holder.textHour.setText(/*CombineData.hoursString(*/String.valueOf(table.get(position).getHour())/*s*//*, true)*/);
 
             holder.textHour.setVisibility(View.VISIBLE);
             holder.textTeacher.setVisibility(View.VISIBLE);
@@ -67,7 +67,7 @@ public class TableAdapter extends RecyclerView.Adapter<TableAdapter.TableViewHol
         holder.textTeacher.setText(table.get(position).getTeacher());
         holder.textSubject.setText(table.get(position).getSubject());
         holder.textRoom.setText(table.get(position).getRoom());
-        //holder.spTextRoom.setText(TimeTableHelper.getRepeatTypeName(plan.get(position).getRepeatType()));
+        //holder.spTextRoom.setText(TimeTableHelper.getRepeatTypeName(plan.get(position).getSpRepeatType()));
         holder.textRepeatType.setText(table.get(position).getRepeatType());
 
     }

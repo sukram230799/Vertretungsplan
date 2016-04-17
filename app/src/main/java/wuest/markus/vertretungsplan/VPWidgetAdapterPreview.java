@@ -60,17 +60,21 @@ public class VPWidgetAdapterPreview extends ArrayAdapter<Object> {
             convertView = LayoutInflater.from(getContext()).inflate(design, parent, false);
         }
 
-        String[] text = null;
-        VPData vpData = null;
-        HWLesson lesson = null;
-        HWPlan plan = null;
-        if(type <= 1) {
-            vpData = (VPData) getItem(position);
-            text = VPWidgetTextProcess.processVPData(getContext(), vpData);
-            if (text.length < 6) {
-                text = new String[] {"Something", "went", "horribly", "wrong!", "We're", "sorry"};
+        String[] text;
+        VPData vpData;
+        HWLesson lesson;
+        HWPlan plan;
+        if (type <= 1) {
+            vpData = ((VPData[]) getItem(position))[0];
+            Integer[] hours = new Integer[((VPData[]) getItem(position)).length];
+            for (int i = 0; i < hours.length; i++) {
+                hours[i] = ((VPData[]) getItem(position))[i].getHour();
             }
-        } else if(type <=2) {
+            text = VPWidgetTextProcess.processVPData(getContext(), vpData, hours);
+            if (text.length < 6) {
+                text = new String[]{"Something", "went", "horribly", "wrong!", "We're", "sorry"};
+            }
+        } else if (type <= 2) {
             lesson = (HWLesson) getItem(position);
             text = VPWidgetTextProcess.processSPData(getContext(), lesson);
         } else {
@@ -111,13 +115,13 @@ public class VPWidgetAdapterPreview extends ArrayAdapter<Object> {
                 spTextRepeatType = (TextView) convertView.findViewById(R.id.spTextRepeatType);
                 spTextBreak = (TextView) convertView.findViewById(R.id.spTextBreak);
 
-                if(text[0].contains("\n")) {
+                if (text[0].contains("\n")) {
                     spTextHour.setGravity(View.TEXT_ALIGNMENT_CENTER);
                 } else {
                     spTextHour.setGravity(View.TEXT_ALIGNMENT_TEXT_START);
                 }
 
-                if(text.length <= 2){
+                if (text.length <= 2) {
                     spTextHour.setVisibility(View.GONE);
                     spTextTeacher.setVisibility(View.GONE);
                     spTextSubject.setVisibility(View.GONE);
@@ -164,7 +168,7 @@ public class VPWidgetAdapterPreview extends ArrayAdapter<Object> {
                 spTextRepeatType = (TextView) convertView.findViewById(R.id.spTextRepeatType);
                 spTextBreak = (TextView) convertView.findViewById(R.id.spTextBreak);
 
-                if(text.length <= 2) {
+                if (text.length <= 2) {
                     spTextTeacher.setVisibility(View.GONE);
                     spTextSubject.setVisibility(View.GONE);
                     spTextRoom.setVisibility(View.GONE);

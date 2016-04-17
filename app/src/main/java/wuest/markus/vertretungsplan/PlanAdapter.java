@@ -6,14 +6,11 @@ import android.graphics.Color;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.CheckBox;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -92,12 +89,12 @@ public class PlanAdapter extends RecyclerView.Adapter<PlanAdapter.PlanViewHolder
             }
 
             holder.spTextHour.setText(plan.getHourString());
-            holder.spTextTeacher.setText(plan.getTeacher());
+            holder.spTextTeacher.setText(plan.getSpTeacher());
             holder.spTextTeacher.setTextColor(textColor);
             holder.spTextSubject.setText(plan.getSpSubject());
             holder.spTextRoom.setText(plan.getSpRoom());
-            //holder.spTextRoom.setText(TimeTableHelper.getRepeatTypeName(plan.getRepeatType()));
-            holder.spTextRepeatType.setText(plan.getRepeatType());
+            //holder.spTextRoom.setText(TimeTableHelper.getRepeatTypeName(plan.getSpRepeatType()));
+            holder.spTextRepeatType.setText(plan.getSpRepeatType());
 
             if (plan.getSpRoom().equals(plan.getVpRoom())) {
                 holder.spTextRoom.setTextColor(redColor);
@@ -117,7 +114,7 @@ public class PlanAdapter extends RecyclerView.Adapter<PlanAdapter.PlanViewHolder
             //holder.vpLayout.setVisibility(View.VISIBLE);
             String Wochentag;
             Calendar c = new GregorianCalendar();
-            c.setTime(plan.getDate());
+            c.setTime(plan.getVpDate());
             switch (c.get(Calendar.DAY_OF_WEEK)) {
                 case Calendar.MONDAY:
                     Wochentag = context.getString(R.string.dayMonday);
@@ -144,12 +141,12 @@ public class PlanAdapter extends RecyclerView.Adapter<PlanAdapter.PlanViewHolder
                     Wochentag = context.getString(R.string.dayInvalid);
                     break;
             }
-            holder.vpTextDate.setText(context.getString(R.string.datebuilder, Wochentag, dateFormat.format(plan.getDate())));
+            holder.vpTextDate.setText(context.getString(R.string.datebuilder, Wochentag, dateFormat.format(plan.getVpDate())));
             holder.vpTextHour.setText(plan.getHourString());
             holder.vpTextSubject.setText(plan.getVpSubject());
             holder.vpTextRoom.setText(plan.getVpRoom());
-            holder.vpTextInfo1.setText(plan.getInfo1());
-            holder.vpTextInfo2.setText(plan.getInfo2());
+            holder.vpTextInfo1.setText(plan.getVpInfo1());
+            holder.vpTextInfo2.setText(plan.getVpInfo2());
             if (onlyVP) {
                 holder.spTextHour.setText(plan.getHourString());
                 holder.spTextSubject.setText(plan.getVpSubject());
@@ -283,8 +280,7 @@ public class PlanAdapter extends RecyclerView.Adapter<PlanAdapter.PlanViewHolder
     public static float convertPixelsToDp(float px, Context context) {
         Resources resources = context.getResources();
         DisplayMetrics metrics = resources.getDisplayMetrics();
-        float dp = px / (metrics.densityDpi / DisplayMetrics.DENSITY_DEFAULT);
-        return dp;
+        return px / (metrics.densityDpi / DisplayMetrics.DENSITY_DEFAULT);
     }
 
     private void collapseCard(RelativeLayout spLayout, RelativeLayout vpLayout, CardView cardLayout) {

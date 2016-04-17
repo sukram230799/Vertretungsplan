@@ -48,13 +48,18 @@ public class TimeTableFragment extends Fragment implements SwipeRefreshLayout.On
 
     private static final String TAG = "TimeTableFragment";
     //private static int position;
-    private static HWGrade grade;
+    private HWGrade grade;
     private static final String GRADE = "grade";
-    private static int day;
+    private int weekDay;
+    private int week;
+    private HWTime time;
+    private static final String WEEKDAY = "weekday";
     private static final String DAY = "day";
-    private static boolean showFAB;
+    private static final String MONTH = "month";
+    private static final String YEAR = "year";
+    private boolean showFAB;
     private static final String FAB = "fab";
-    private static boolean editMode;
+    private boolean editMode;
     private static final String EDIT_MODE = "editMode";
     private SwipeRefreshLayout mSwipeRefreshLayout;
     private RefreshContentListener refreshListener;
@@ -74,16 +79,26 @@ public class TimeTableFragment extends Fragment implements SwipeRefreshLayout.On
     TableEditAdapter tableEditAdapter;
     TableAdapter tableAdapter;
 
-    public static TimeTableFragment newInstance(HWGrade grade, int day, boolean showFAB, boolean editMode) {
-        if (editMode) {
-            showFAB = false;
-        }
+    public static TimeTableFragment newInstance(HWGrade grade, HWTime time, boolean showFAB) {
         TimeTableFragment fragment = new TimeTableFragment();
         Bundle args = new Bundle();
         args.putString(GRADE, grade.getGradeName());
-        args.putInt(DAY, day);
+        args.putInt(DAY, time.getDay());
+        args.putInt(MONTH, time.getMonth());
+        args.putInt(YEAR, time.getYear());
         args.putBoolean(FAB, showFAB);
-        args.putBoolean(EDIT_MODE, editMode);
+        args.putBoolean(EDIT_MODE, false);
+        fragment.setArguments(args);
+        return fragment;
+    }
+
+    public static TimeTableFragment newEditInstance(HWGrade grade, int weekDay) {
+        TimeTableFragment fragment = new TimeTableFragment();
+        Bundle args = new Bundle();
+        args.putString(GRADE, grade.getGradeName());
+        args.putInt(WEEKDAY, weekDay);
+        args.putBoolean(FAB, false);
+        args.putBoolean(EDIT_MODE, true);
         fragment.setArguments(args);
         return fragment;
     }
@@ -94,28 +109,42 @@ public class TimeTableFragment extends Fragment implements SwipeRefreshLayout.On
         Log.v(TAG, "oC");
         if (savedInstanceState != null) {
             grade = new HWGrade(savedInstanceState.getString(GRADE));
-            day = savedInstanceState.getInt(DAY);
             showFAB = savedInstanceState.getBoolean(FAB);
             editMode = savedInstanceState.getBoolean(EDIT_MODE);
+            if(editMode){
+                weekDay = savedInstanceState.getInt(WEEKDAY);
+            } else {
+                time = new HWTime(0, 0, savedInstanceState.getInt(YEAR), savedInstanceState.getInt(MONTH), savedInstanceState.getInt(DAY));
+            }
             Log.v(TAG, "savedInstanceState not null");
         } else {
             grade = new HWGrade(getArguments().getString(GRADE));
-            day = getArguments().getInt(DAY);
             showFAB = getArguments().getBoolean(FAB);
             editMode = getArguments().getBoolean(EDIT_MODE);
+            if(editMode){
+                weekDay = getArguments().getInt(WEEKDAY);
+            } else {
+                time = new HWTime(0, 0, getArguments().getInt(YEAR), getArguments().getInt(MONTH), getArguments().getInt(DAY));
+            }
         }
         Log.v(TAG, "section_number: " + grade.getGradeName());
         //if (position < 0) position = 0;
         this.data = new ArrayList<>();
         DBHandler dbHandler = new DBHandler(getContext(), null, null, 1);
+        if(!editMode) {
+            Calendar c = GregorianCalendar.getInstance();
+            c.setTime(time.toDate());
+            weekDay = c.get(Calendar.DAY_OF_WEEK);
+            week = c.get(Calendar.WEEK_OF_YEAR);
+        }
         try {
-            HWLesson[] hwLessons = dbHandler.getTimeTable(grade, day /*Calendar.getInstance().get(Calendar.DAY_OF_WEEK)*/);
+            HWLesson[] hwLessons = dbHandler.getTimeTable(grade, weekDay /*Calendar.getInstance().get(Calendar.DAY_OF_WEEK)*/);
             int week = GregorianCalendar.getInstance().get(Calendar.WEEK_OF_YEAR);
             if (!editMode) {
                 String[] subscribedSubjects = dbHandler.getSubscribedSubjects();
-                hwLessons = TimeTableHelper.selectLessonsFromRepeatType(hwLessons, week, subscribedSubjects, getActivity()); //No CombineData, because of better layout;
+                hwLessons = TimeTableHelper.selectLessonsFromTime(hwLessons, time, subscribedSubjects, getActivity()); //No CombineData, because of better layout;
             }
-            hwLessons = TimeTableHelper.fillGabs(hwLessons, week, day, getActivity(), editMode);  //When editMode == true then whole day should be filled;
+            hwLessons = TimeTableHelper.fillGabs(hwLessons, week, weekDay, getActivity(), editMode);  //When editMode == true then whole day should be filled;
             this.data = Arrays.asList(hwLessons);
             /*for (VPData data : vpData) {
                 this.data.add(data);
@@ -215,7 +244,7 @@ public class TimeTableFragment extends Fragment implements SwipeRefreshLayout.On
                     //tableAdapter.notifyDataSetChanged();
                     //setShowCheckBoxes(showCheckBoxes);
                     if (editInterface != null) {
-                        editInterface.onEditLesson(day, grade);
+                        editInterface.onEditLesson(weekDay, grade);
                     }
                 }
             });
@@ -224,7 +253,7 @@ public class TimeTableFragment extends Fragment implements SwipeRefreshLayout.On
                 @Override
                 public void onClick(View v) {
                     fab.close(true);
-                    editInterface.onAddLesson(day, grade);
+                    editInterface.onAddLesson(weekDay, grade);
                 }
             });
             shareFAB.setClickable(true);
@@ -241,11 +270,11 @@ public class TimeTableFragment extends Fragment implements SwipeRefreshLayout.On
         //return inflater.inflate(R.layout.fragment_vp, container, false);
     }
 
-    public HWLesson getSelectedLesson() {
+    public Integer[] getSelectedLesson() {
         if (editMode) {
-            return tableEditAdapter.getSelectedLesson();
+            return tableEditAdapter.getSelectedLessonIds();
         } else {
-            return null;
+            return new Integer[0];
         }
     }
 

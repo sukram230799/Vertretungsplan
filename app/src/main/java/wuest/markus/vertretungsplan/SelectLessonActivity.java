@@ -44,18 +44,13 @@ public class SelectLessonActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(SelectLessonActivity.this, TableEditor.class);
-                HWLesson lesson = timeTableFragment.getSelectedLesson();
-                if (lesson != null) {
+                Integer[] lessonIds = timeTableFragment.getSelectedLesson();
+                if (lessonIds.length != 0) {
                     Bundle b = new Bundle();
-                    ArrayList<Integer> hours = new ArrayList<>(Arrays.asList(lesson.getHours()));
+                    Arrays.sort(lessonIds);
+                    ArrayList<Integer> hours = new ArrayList<>(Arrays.asList(lessonIds));
                     Collections.sort(hours);
-                    b.putString(TableEditor.GRADE, lesson.getGrade().getGradeName());
-                    b.putInt(TableEditor.DAY, lesson.getDay());
-                    b.putIntegerArrayList(TableEditor.HOURS, hours);
-                    b.putString(TableEditor.TEACHER, lesson.getTeacher());
-                    b.putString(TableEditor.SUBJECT, lesson.getSubject());
-                    b.putString(TableEditor.ROOM, lesson.getRoom());
-                    b.putString(TableEditor.REPEATTYPE, lesson.getRepeatType());
+                    b.putIntegerArrayList(TableEditor.IDS, hours);
                     intent.putExtras(b);
                 }
                 startActivity(intent);
@@ -66,7 +61,7 @@ public class SelectLessonActivity extends AppCompatActivity {
         }
 
         FragmentManager fragmentManager = getSupportFragmentManager();
-        timeTableFragment = TimeTableFragment.newInstance(grade, day, true, true);
+        timeTableFragment = TimeTableFragment.newEditInstance(grade, day);
         //timeTableFragment.setRefreshListener(this);
         //timeTableFragment.setEditInterface(this);
         fragmentManager.beginTransaction()
@@ -83,7 +78,7 @@ public class SelectLessonActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if(item.getItemId() == R.id.action_remove) {
-            new DBHandler(this, null, null, 0).removeLesson(timeTableFragment.getSelectedLesson());
+            new DBHandler(this, null, null, 0).removeLessons(timeTableFragment.getSelectedLesson());
             finish();
             return true;
         }

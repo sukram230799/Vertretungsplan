@@ -9,6 +9,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.GregorianCalendar;
@@ -18,7 +19,8 @@ public class VPAdapter extends RecyclerView.Adapter<VPAdapter.PlanViewHolder> {
     private static final String TAG = "VPAdapter";
     private LayoutInflater inflater;
     private Context context;
-    List<VPData> data = Collections.emptyList();
+    //List<VPData> data = Collections.emptyList();
+    List<VPData[]> combinedData = Collections.emptyList();
     private ClickListener clickListener;
 
     public static final SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy");
@@ -28,14 +30,24 @@ public class VPAdapter extends RecyclerView.Adapter<VPAdapter.PlanViewHolder> {
         Log.v(TAG, "" + data.size());
         Log.v(TAG, String.valueOf(context));
         this.context = context;
-        this.data = data;
+        combinedData = new ArrayList<>();
+        VPData[] dataArray = data.toArray(new VPData[data.size()]);
+        for(VPData vpData : data){
+            boolean found = false;
+            for(VPData[] usedDataArray : combinedData) {
+                for (VPData usedData: usedDataArray){
+                    if(usedData == vpData){
+                        found = true;
+                        break;
+                    }
+                }
+            }
+            if(!found){
+                combinedData.add(CombineData.getSimilarVP(vpData, dataArray));
+            }
+        }
         inflater = LayoutInflater.from(context);
         Log.v(TAG, "-VPAdapter");
-    }
-
-    public void deleteItem(int position) {
-        data.remove(position);
-        notifyItemRemoved(position);
     }
 
     public void setClickListener(ClickListener clickListener) {
@@ -52,7 +64,12 @@ public class VPAdapter extends RecyclerView.Adapter<VPAdapter.PlanViewHolder> {
     @Override
     public void onBindViewHolder(PlanViewHolder holder, int position) {
         Log.v(TAG, "oBVH");
-        VPData vpData = data.get(position);
+        VPData[] vpDataArray = combinedData.get(position);
+        Integer[] hours = new Integer[vpDataArray.length];
+        for(int i = 0; i < vpDataArray.length; i++){
+            hours[i] = vpDataArray[i].getHour();
+        }
+        VPData vpData = vpDataArray[0];
         String Wochentag;
         Calendar c = new GregorianCalendar();
         c.setTime(vpData.getDate());
@@ -83,7 +100,7 @@ public class VPAdapter extends RecyclerView.Adapter<VPAdapter.PlanViewHolder> {
                 break;
         }
         holder.textDate.setText(context.getString(R.string.datebuilder, Wochentag, dateFormat.format(vpData.getDate())));
-        holder.textHour.setText(CombineData.hoursString(vpData.getHours(), false));
+        holder.textHour.setText(CombineData.hoursString(hours, false));
         holder.textSubject.setText(vpData.getSubject());
         holder.textRoom.setText(vpData.getRoom());
         holder.textInfo1.setText(vpData.getInfo1());
@@ -93,7 +110,7 @@ public class VPAdapter extends RecyclerView.Adapter<VPAdapter.PlanViewHolder> {
     @Override
     public int getItemCount() {
         Log.v(TAG, "gIC");
-        return data.size();
+        return combinedData.size();
     }
 
     class PlanViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener {
