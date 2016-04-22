@@ -80,16 +80,14 @@ public class MainActivity extends AppCompatActivity implements /*Navigation*/Dra
                         public void onClick(DialogInterface dialog, int which) {
                             dialog.cancel();
                             dialog.dismiss();
-                            try {
+                            loadVPFragment(getSupportFragmentManager(), position);
+                                /*
                                 FragmentManager fragmentManager = getSupportFragmentManager();
                                 VPFragment vpFragment = VPFragment.newInstance(dbHandler.getGrade(position));
                                 vpFragment.setRefreshListener(mainActivity);
                                 fragmentManager.beginTransaction()
                                         .replace(R.id.container, vpFragment)
-                                        .commit();
-                            } catch (DBError e) {
-                                e.printStackTrace();
-                            }
+                                        .commit();*/
                             if (refreshLayout != null) {
                                 Log.d(TAG, "setRefreshing(false)");
                                 refreshLayout.setRefreshing(false);
@@ -756,6 +754,12 @@ public class MainActivity extends AppCompatActivity implements /*Navigation*/Dra
         builder.setTitle("Stundenplan");
         builder.setMessage("Alten Stundenplan löschen?");
         builder.setCancelable(false);
+        builder.setNegativeButton("Nicht Importieren", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+            }
+        });
         builder.setNegativeButton("Behalten", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
