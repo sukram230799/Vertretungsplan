@@ -258,7 +258,7 @@ public class DBHandler extends SQLiteOpenHelper {
     }
 
     public VPData[] getVP(HWGrade grade, HWTime date) throws DBError {
-        trimPlans();
+        trimVP();
         Log.d(TAG, "@getVP");
         ArrayList<VPData> vpDatas = new ArrayList<>();
         SQLiteDatabase db = getWritableDatabase();
@@ -350,7 +350,7 @@ public class DBHandler extends SQLiteOpenHelper {
         return true;
     }
 
-    public void trimPlans() {
+    public void trimVP() {
         if (!Preferences.readBooleanFromPreferences(context, context.getString(R.string.NO_EXPIRE), false)) {
             SQLiteDatabase db = getWritableDatabase();
             String query;
@@ -366,6 +366,20 @@ public class DBHandler extends SQLiteOpenHelper {
         query = "DELETE FROM " + TABLE_VP + " WHERE " + COLUMN_ID + " NOT IN (SELECT min(" + COLUMN_ID + " FROM " + TABLE_VP + " GROUP BY " + COLUMN_HOUR + ");";
         db.execSQL(query);
         */
+    }
+
+    public boolean isSP(HWGrade grade) {
+        String query = "SELECT 1 FROM " + TABLE_TIMETABLE + " WHERE " + COLUMN_GRADE + "=\"" + grade.getGradeName() + "\";";
+        Cursor cursor = getWritableDatabase().rawQuery(query, null);
+        cursor.moveToFirst();
+        if (cursor.isAfterLast()) {
+            cursor.close();
+            Log.d(TAG, "false");
+            return false;
+        }
+        Log.d(TAG, "true");
+        cursor.close();
+        return true;
     }
 
     public void addLesson(HWLesson hwLesson) {

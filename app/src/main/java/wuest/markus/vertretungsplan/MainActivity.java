@@ -234,6 +234,7 @@ public class MainActivity extends AppCompatActivity implements /*Navigation*/Dra
     NfcAdapter mNfcAdapter;
 
     private boolean devMode = false;
+    static boolean noSP = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -286,6 +287,7 @@ public class MainActivity extends AppCompatActivity implements /*Navigation*/Dra
             mNfcAdapter.setOnNdefPushCompleteCallback(this, this);
         }
         devMode = Preferences.readBooleanFromPreferences(this, getString(R.string.DEVELOPER_MODE), false);
+        noSP = !dbHandler.isSP(new HWGrade(grade));
 
         Intent intent = getIntent();
         Uri data = intent.getData();
