@@ -97,4 +97,43 @@ public class PlanHelper {
         }
         return planArrayList.toArray(new HWPlan[planArrayList.size()]);
     }
+
+    public static ArrayList<HWPlan[]> combinePlans(HWPlan[] plans) {
+
+        ArrayList<HWPlan[]> combinedPlan = new ArrayList<>();
+        for(HWPlan hwPlan : plans){
+            boolean found = false;
+            for(HWPlan[] usedPlanArray : combinedPlan) {
+                for (HWPlan usedPlan: usedPlanArray){
+                    if(usedPlan == hwPlan){
+                        found = true;
+                        break;
+                    }
+                }
+            }
+            if(!found){
+                combinedPlan.add(getSimilarPlans(hwPlan, plans));
+            }
+        }
+        return combinedPlan;
+    }
+
+
+    public static HWPlan[] getSimilarPlans(HWPlan compare, HWPlan[] rest) {
+        ArrayList<HWPlan> planArrayList = new ArrayList<>();
+        for (HWPlan plan : rest) {
+            if (plan.getGrade().equals(compare.getGrade()) &&
+                    plan.getSpTeacher().equals(compare.getSpTeacher()) &&
+                    plan.getSpSubject().equals(compare.getSpSubject()) &&
+                    plan.getSpRoom().equals(compare.getSpRoom()) &&
+                    plan.getSpRepeatType().equals(compare.getSpRepeatType()) &&
+                    plan.getVpSubject().equals(compare.getVpSubject()) &&
+                    plan.getVpRoom().equals(compare.getVpRoom()) &&
+                    plan.getVpInfo1().equals(compare.getVpInfo1()) &&
+                    plan.getVpInfo2().equals(compare.getVpInfo2())) {
+                planArrayList.add(plan);
+            }
+        }
+        return planArrayList.toArray(new HWPlan[planArrayList.size()]);
+    }
 }
