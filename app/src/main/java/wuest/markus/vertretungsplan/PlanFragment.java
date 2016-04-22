@@ -143,6 +143,7 @@ public class PlanFragment extends Fragment implements SwipeRefreshLayout.OnRefre
                 e.printStackTrace();
                 plan = PlanHelper.combineVPSP(hwLessons, new VPData[0]);
             }
+            plan = PlanHelper.fillPlanGabs(plan, weekDay);
             this.data = Arrays.asList(plan);
         } catch (DBError dbError) {
             dbError.printStackTrace();

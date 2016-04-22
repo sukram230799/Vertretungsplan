@@ -90,6 +90,7 @@ public class VPWidgetAdapter implements RemoteViewsFactory {
                     e.printStackTrace();
                     plan = PlanHelper.combineVPSP(hwLessons, new VPData[0]);
                 }
+                plan = PlanHelper.fillPlanGabs(plan, day);
                 arrayList = new ArrayList<>(Arrays.asList((Object[]) plan));
             }
         } catch (DBError dbError) {
